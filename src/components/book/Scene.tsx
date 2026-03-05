@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { Canvas } from "@react-three/fiber";
 import { Sparkles, ContactShadows } from "@react-three/drei";
 import { Book } from "./Book";
 import { Podium } from "./Podium";
@@ -9,9 +10,10 @@ import { Lighting } from "./Lighting";
 
 interface SceneProps {
   isRotating: boolean;
+  onError?: () => void;
 }
 
-export function Scene({ isRotating }: SceneProps) {
+export function Scene({ isRotating, onError }: SceneProps) {
   const sparklesProps = useMemo(() => ({
     count: 20,
     scale: 4,
@@ -30,14 +32,25 @@ export function Scene({ isRotating }: SceneProps) {
     color: "#000",
   }), []);
 
+  const canvasConfig = useMemo(() => ({
+    camera: { position: [0, 1.25, 4.0] as [number, number, number], fov: 38 },
+    dpr: [1, 1.5] as [number, number],
+    gl: { antialias: true, alpha: true, powerPreference: "high-performance" as const, preserveDrawingBuffer: false },
+    performance: { min: 0.5 },
+  }), []);
+
   return (
-    <>
+    <Canvas
+      {...canvasConfig}
+      shadows
+      onError={onError}
+    >
       <Lighting />
       <Book isRotating={isRotating} />
       <Podium />
       <ParticleRing isRotating={isRotating} />
       <Sparkles {...sparklesProps} />
       <ContactShadows {...shadowProps} />
-    </>
+    </Canvas>
   );
 }

@@ -1,13 +1,17 @@
 "use client";
 
-import { Suspense, useState, useEffect, useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useState, useEffect, useMemo } from "react";
+import dynamic from "next/dynamic";
 import { QuotesPanel } from "@/components/quotes";
 import { ControlButton, WebGLError, useWebGLSupport, SettingsBar } from "@/components/ui";
 import { useRotationControl } from "@/hooks/use-rotation";
 import { useMounted } from "@/hooks/use-mounted";
 import { LoadingFallback } from "@/components/ui/LoadingFallback";
-import { Scene } from "@/components/book";
+
+const Scene = dynamic(() => import("@/components/book").then(mod => ({ default: mod.Scene })), {
+  ssr: false,
+  loading: () => <LoadingFallback />,
+});
 
 export default function Home() {
   const mounted = useMounted();
@@ -45,13 +49,6 @@ export default function Home() {
     return <WebGLError onRetry={handleRetry} />;
   }
 
-  const canvasConfig = useMemo(() => ({
-    camera: { position: [0, 1.25, 4.0] as [number, number, number], fov: 38 },
-    dpr: [1, 1.5] as [number, number],
-    gl: { antialias: true, alpha: true, powerPreference: "high-performance" as const, preserveDrawingBuffer: false },
-    performance: { min: 0.5 },
-  }), []);
-
   const backgroundGradient = useMemo(() => 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.045)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.035)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(15,15,35,0.55)_0%,transparent_50%)', []);
   const gridPattern = useMemo(() => 'linear-gradient(rgba(212,175,55,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.7)_1px,transparent_1px)', []);
 
@@ -64,15 +61,7 @@ export default function Home() {
       <div className="relative z-10 h-full flex flex-col lg:flex-row">
         <div className="w-full lg:w-[58%] h-[50%] lg:h-full relative">
           {mounted && (
-            <Suspense fallback={<LoadingFallback />}>
-              <Canvas
-                {...canvasConfig}
-                shadows
-                onError={() => setWebGLError(true)}
-              >
-                <Scene isRotating={isRotating} />
-              </Canvas>
-            </Suspense>
+            <Scene isRotating={isRotating} onError={() => setWebGLError(true)} />
           )}
 
           <ControlButton isRotating={isRotating} onClick={toggleRotation} />
