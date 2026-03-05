@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stoic Book 3D — Демо Web Component</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #d4af37;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 40px;
+    }
+
+    .demo-section {
+      margin-bottom: 60px;
+    }
+
+    .demo-section h2 {
+      margin-bottom: 20px;
+      color: #d4af37;
+      font-size: 18px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #d4af37;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #f0c94e;
+    }
+
+    button.secondary {
+      background: #333;
+      color: #fff;
+    }
+
+    button.secondary:hover {
+      background: #444;
+    }
+
+    .code-block {
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-top: 20px;
+    }
+
+    code {
+      color: #a5d6ff;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 13px;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()">🌓 Тема</button>
+
+  <div class="container">
+    <h1>Stoic Book 3D Web Component</h1>
+    <p class="subtitle">Демонстрация интеграции через Web Component</p>
+
+    <!-- Демо 1: Базовое использование -->
+    <div class="demo-section">
+      <h2>1. Базовое использование</h2>
+      <stoic-book-3d id="demo1" height="600"></stoic-book-3d>
+      <div class="code-block">
+        <code>&lt;stoic-book-3d height="600"&gt;&lt;/stoic-book-3d&gt;</code>
+      </div>
+    </div>
+
+    <!-- Демо 2: С кастомной высотой -->
+    <div class="demo-section">
+      <h2>2. Кастомная высота</h2>
+      <stoic-book-3d id="demo2" height="500"></stoic-book-3d>
+      <div class="code-block">
+        <code>&lt;stoic-book-3d height="500"&gt;&lt;/stoic-book-3d&gt;</code>
+      </div>
+    </div>
+
+    <!-- Демо 3: С контролами -->
+    <div class="demo-section">
+      <h2>3. С внешними контролами</h2>
+      <div class="controls">
+        <button onclick="toggleRotation()">⏯ Вращение</button>
+        <button class="secondary" onclick="changeHeight()">📏 Изменить высоту</button>
+        <button class="secondary" onclick="resetHeight()">↺ Сброс</button>
+      </div>
+      <stoic-book-3d id="demo3" height="550"></stoic-book-3d>
+    </div>
+
+    <!-- Демо 4: Для Tilda -->
+    <div class="demo-section">
+      <h2>4. Код для вставки в Tilda</h2>
+      <div class="code-block">
+        <code>
+&lt;!-- Добавьте в блок T123 или Zero Block --&gt;
+&lt;script src="https://your-domain.com/web-component.js"&gt;&lt;/script&gt;
+&lt;stoic-book-3d src="https://your-domain.com" height="600"&gt;&lt;/stoic-book-3d&gt;
+        </code>
+      </div>
+    </div>
+  </div>
+
+  <script src="/web-component.js" type="module"></script>
+  <script>
+    // Переключение темы
+    let isDark = true;
+    function toggleTheme() {
+      isDark = !isDark;
+      const component = document.getElementById('demo1');
+      if (component) {
+        component.setTheme(isDark ? 'dark' : 'light');
+      }
+    }
+
+    // Переключение вращения
+    function toggleRotation() {
+      const component = document.getElementById('demo3');
+      if (component) {
+        component.toggleRotation();
+      }
+    }
+
+    // Изменение высоты
+    function changeHeight() {
+      const component = document.getElementById('demo3');
+      if (component) {
+        component.setHeight('400');
+      }
+    }
+
+    // Сброс высоты
+    function resetHeight() {
+      const component = document.getElementById('demo3');
+      if (component) {
+        component.setHeight('550');
+      }
+    }
+  </script>
+</body>
+</html>
