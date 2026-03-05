@@ -13,6 +13,7 @@ interface QuotesPanelProps {
 export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
   const [visibleQuotes, setVisibleQuotes] = useState<number[]>([]);
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const { favorites, isLoaded, toggleFavorite, isFavorite } = useFavorites();
 
   useEffect(() => {
@@ -34,9 +35,24 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
   }, []);
 
   const filteredQuotes = useMemo(() => {
-    if (filter === 'all') return quotes;
-    return quotes.filter((_, index) => favorites.includes(index));
-  }, [filter, favorites]);
+    let result = quotes;
+
+    // Filter by favorites
+    if (filter === 'favorites') {
+      result = result.filter((_, index) => favorites.includes(index));
+    }
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(quote =>
+        quote.text.toLowerCase().includes(query) ||
+        quote.author.toLowerCase().includes(query)
+      );
+    }
+
+    return result;
+  }, [filter, favorites, searchQuery]);
 
   const handleToggleFavorite = (e: React.MouseEvent, index: number) => {
     e.stopPropagation();
@@ -54,8 +70,29 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
           Стоическая мудрость
         </p>
         
+        {/* Search input */}
+        <div className="mt-4 relative">
+          <input
+            type="text"
+            placeholder="Поиск цитат..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-3 py-2 text-sm bg-white/5 border border-amber-500/20 rounded-lg text-amber-100 placeholder-gray-500 focus:outline-none focus:border-amber-500/40 transition-colors"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-amber-400"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+        
         {/* Filter tabs */}
-        <div className="flex items-center gap-2 mt-4">
+        <div className="flex items-center gap-2 mt-3">
           <button
             onClick={() => setFilter('all')}
             className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
