@@ -18,6 +18,16 @@ export default function Home() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
+    document.body.classList.toggle("light-theme", theme === "light");
+    if (process.env.NODE_ENV === "development") {
+      console.log("[DEV] Theme changed:", theme);
+      console.log("[DEV] Mounted:", mounted);
+      console.log("[DEV] WebGL support:", hasWebGL);
+      console.log("[DEV] Active quote:", activeQuote);
+    }
+  }, [theme, mounted, hasWebGL, activeQuote]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setActiveQuote((prev) => (prev + 1) % 8);
     }, 5000);
