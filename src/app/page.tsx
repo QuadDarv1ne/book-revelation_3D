@@ -18,14 +18,21 @@ export default function Home() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
-    document.body.classList.toggle("light-theme", theme === "light");
-    if (process.env.NODE_ENV === "development") {
-      console.log("[DEV] Theme changed:", theme);
-      console.log("[DEV] Mounted:", mounted);
-      console.log("[DEV] WebGL support:", hasWebGL);
-      console.log("[DEV] Active quote:", activeQuote);
+    const saved = localStorage.getItem("theme");
+    if (saved === "light" || saved === "dark") {
+      setTheme(saved);
     }
-  }, [theme, mounted, hasWebGL, activeQuote]);
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle("light-theme", theme === "light");
+    localStorage.setItem("theme", theme);
+    if (process.env.NODE_ENV === "development") {
+      console.log("[DEV] Theme:", theme);
+      console.log("[DEV] Mounted:", mounted);
+      console.log("[DEV] WebGL:", hasWebGL);
+    }
+  }, [theme, mounted, hasWebGL]);
 
   useEffect(() => {
     const interval = setInterval(() => {
