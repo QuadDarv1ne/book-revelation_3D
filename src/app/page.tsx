@@ -60,8 +60,8 @@ export default function Home() {
 
           <div className="absolute bottom-3 md:bottom-6 left-0 right-0 text-center pointer-events-none px-4">
             <div className="inline-block px-5 md:px-8 py-3 md:py-4 rounded-2xl backdrop-blur-lg bg-[rgba(8,8,16,0.72)] border border-[rgba(212,175,55,0.18)] shadow-[0_10px_35px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(212,175,55,0.12)]">
-              <h1 className="text-base md:text-lg lg:text-xl text-amber-100 font-light tracking-wider">В чём наше благо?</h1>
-              <p className="text-[9px] md:text-[11px] text-amber-400/55 mt-1 tracking-[0.12em] uppercase">Марк Аврелий & Эпиктет</p>
+              <h1 className="text-base md:text-lg lg:text-xl text-amber-100 font-light tracking-wider">Ищешь смысл жизни?</h1>
+              <p className="text-[9px] md:text-[11px] text-amber-400/55 mt-1 tracking-[0.12em] uppercase">Марк Аврелий & Стоицизм</p>
             </div>
           </div>
         </div>
