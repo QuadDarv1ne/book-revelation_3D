@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { QuotesPanel } from "@/components/quotes";
-import { ControlButton, WebGLError, useWebGLSupport, SettingsBar } from "@/components/ui";
+import { ControlButton, WebGLError, useWebGLSupport, SettingsBar, PWAInstall } from "@/components/ui";
 import { useRotationControl } from "@/hooks/use-rotation";
 import { useMounted } from "@/hooks/use-mounted";
 import { LoadingFallback } from "@/components/ui/LoadingFallback";
@@ -91,6 +91,8 @@ export default function Home() {
       </div>
 
       <SettingsBar theme={theme} onThemeChange={setTheme} />
+
+      <PWAInstall />
 
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar { width: 2.5px; }
