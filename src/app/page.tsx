@@ -1,12 +1,15 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
-import { Scene } from "@/components/book";
+import { Suspense, useState, useEffect, lazy } from "react";
 import { QuotesPanel } from "@/components/quotes";
 import { ControlButton, WebGLError, useWebGLSupport } from "@/components/ui";
 import { useRotationControl } from "@/hooks/use-rotation";
 import { useMounted } from "@/hooks/use-mounted";
+import { LoadingFallback } from "@/components/ui/LoadingFallback";
+
+// Lazy load 3D components for better initial load performance
+const Canvas = lazy(() => import("@react-three/fiber").then(mod => ({ default: mod.Canvas })));
+const Scene = lazy(() => import("@/components/book").then(mod => ({ default: mod.Scene })));
 
 export default function Home() {
   const mounted = useMounted();
@@ -68,21 +71,21 @@ export default function Home() {
         {/* 3D Canvas Section */}
         <div className="w-full lg:w-[58%] h-[50%] lg:h-full relative">
           {mounted && (
-            <Canvas
-              camera={{ position: [0, 1.25, 4.0], fov: 38 }}
-              shadows
-              dpr={[1, 2]}
-              gl={{
-                antialias: true,
-                alpha: true,
-                powerPreference: "high-performance",
-              }}
-              onError={() => setWebGLError(true)}
-            >
-              <Suspense fallback={null}>
+            <Suspense fallback={<LoadingFallback />}>
+              <Canvas
+                camera={{ position: [0, 1.25, 4.0], fov: 38 }}
+                shadows
+                dpr={[1, 2]}
+                gl={{
+                  antialias: true,
+                  alpha: true,
+                  powerPreference: "high-performance",
+                }}
+                onError={() => setWebGLError(true)}
+              >
                 <Scene isRotating={isRotating} />
-              </Suspense>
-            </Canvas>
+              </Canvas>
+            </Suspense>
           )}
 
           {/* Control Button */}

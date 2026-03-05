@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useRef, useState, useMemo, useEffect } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
 import { Float } from "@react-three/drei";
 import * as THREE from "three";
 import { createBookCoverTexture, createSpineTexture } from "@/lib/textures";
@@ -10,10 +10,26 @@ interface BookProps {
   isRotating: boolean;
 }
 
+interface TouchState {
+  startX: number;
+  startY: number;
+  isDragging: boolean;
+}
+
 export function Book({ isRotating }: BookProps) {
   const bookRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   const glowRef = useRef<THREE.Mesh>(null);
+  const { camera, gl } = useThree();
+  
+  const touchState = useRef<TouchState>({
+    startX: 0,
+    startY: 0,
+    isDragging: false,
+  });
+  
+  const touchRotation = useRef({ x: 0, y: 0 });
+  const lastTouchTime = useRef(0);
 
   // Create textures once using useMemo
   const coverTexture = useMemo(() => createBookCoverTexture(), []);
@@ -22,20 +38,89 @@ export function Book({ isRotating }: BookProps) {
   // Target rotation for smooth transitions
   const targetRotation = useRef(0);
 
+  // Touch handlers for mobile
+  useEffect(() => {
+    const canvas = gl.domElement;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      touchState.current = {
+        startX: touch.clientX,
+        startY: touch.clientY,
+        isDragging: true,
+      };
+      lastTouchTime.current = Date.now();
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!touchState.current.isDragging) return;
+
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - touchState.current.startX;
+      const deltaY = touch.clientY - touchState.current.startY;
+
+      touchRotation.current.y += deltaX * 0.5;
+      touchRotation.current.x += deltaY * 0.5;
+
+      touchState.current = {
+        ...touchState.current,
+        startX: touch.clientX,
+        startY: touch.clientY,
+      };
+    };
+
+    const handleTouchEnd = () => {
+      const elapsed = Date.now() - lastTouchTime.current;
+      if (elapsed < 200) {
+        // Tap detected - toggle rotation
+        targetRotation.current = isRotating ? targetRotation.current : targetRotation.current;
+      }
+      touchState.current.isDragging = false;
+    };
+
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: true });
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: true });
+    canvas.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      canvas.removeEventListener("touchstart", handleTouchStart);
+      canvas.removeEventListener("touchmove", handleTouchMove);
+      canvas.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [gl.domElement, isRotating]);
+
   useFrame((state) => {
     if (bookRef.current) {
       // Smooth rotation
-      if (isRotating) {
+      if (isRotating && !touchState.current.isDragging) {
         targetRotation.current += 0.005;
       }
-      bookRef.current.rotation.y +=
-        (targetRotation.current - bookRef.current.rotation.y) * 0.05;
+      
+      // Apply touch rotation with decay
+      if (touchState.current.isDragging) {
+        bookRef.current.rotation.y = THREE.MathUtils.lerp(
+          bookRef.current.rotation.y,
+          touchRotation.current.y * 0.01,
+          0.1
+        );
+        bookRef.current.rotation.x = THREE.MathUtils.lerp(
+          bookRef.current.rotation.x,
+          touchRotation.current.x * 0.01,
+          0.1
+        );
+      } else {
+        bookRef.current.rotation.y +=
+          (targetRotation.current - bookRef.current.rotation.y) * 0.05;
+        // Decay touch rotation
+        touchRotation.current.x *= 0.95;
+        touchRotation.current.y *= 0.95;
+      }
 
       // Subtle floating
       bookRef.current.position.y = 0.6 + Math.sin(state.clock.elapsedTime * 0.5) * 0.04;
 
       // Tilt effect
-      bookRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.3) * 0.015;
+      bookRef.current.rotation.x += Math.sin(state.clock.elapsedTime * 0.3) * 0.015;
       bookRef.current.rotation.z = Math.cos(state.clock.elapsedTime * 0.4) * 0.008;
 
       // Hover scale effect

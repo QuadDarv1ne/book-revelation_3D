@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { quotes } from "@/data/quotes";
 import { QuoteCard } from "./QuoteCard";
+import { useFavorites } from "@/hooks/use-favorites";
 
 interface QuotesPanelProps {
   activeQuote: number;
@@ -11,6 +12,8 @@ interface QuotesPanelProps {
 
 export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
   const [visibleQuotes, setVisibleQuotes] = useState<number[]>([]);
+  const [filter, setFilter] = useState<'all' | 'favorites'>('all');
+  const { favorites, isLoaded, toggleFavorite, isFavorite } = useFavorites();
 
   useEffect(() => {
     const showQuote = (index: number) => {
@@ -18,17 +21,27 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
         const timer = setTimeout(() => {
           setVisibleQuotes(prev => [...prev, index]);
           showQuote(index + 1);
-        }, 300);
+        }, 50);
         return timer;
       }
       return undefined;
     };
 
-    const initialTimer = setTimeout(() => showQuote(0), 500);
+    const initialTimer = setTimeout(() => showQuote(0), 300);
     return () => {
       clearTimeout(initialTimer);
     };
   }, []);
+
+  const filteredQuotes = useMemo(() => {
+    if (filter === 'all') return quotes;
+    return quotes.filter((_, index) => favorites.includes(index));
+  }, [filter, favorites]);
+
+  const handleToggleFavorite = (e: React.MouseEvent, index: number) => {
+    e.stopPropagation();
+    toggleFavorite(index);
+  };
 
   return (
     <div className="h-full flex flex-col justify-center p-5 md:p-7 lg:p-8">
@@ -38,8 +51,33 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
           В чём наше благо?
         </h2>
         <p className="text-xs md:text-sm text-amber-500/65 tracking-[0.18em] uppercase font-light">
-          Марк Аврелий & Эпиктет
+          Стоическая мудрость
         </p>
+        
+        {/* Filter tabs */}
+        <div className="flex items-center gap-2 mt-4">
+          <button
+            onClick={() => setFilter('all')}
+            className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
+              filter === 'all'
+                ? 'bg-amber-600/30 text-amber-200'
+                : 'text-gray-500 hover:text-amber-400'
+            }`}
+          >
+            Все ({quotes.length})
+          </button>
+          <button
+            onClick={() => setFilter('favorites')}
+            className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
+              filter === 'favorites'
+                ? 'bg-amber-600/30 text-amber-200'
+                : 'text-gray-500 hover:text-amber-400'
+            }`}
+          >
+            Избранные ({favorites.length})
+          </button>
+        </div>
+        
         <div className="flex items-center gap-2 mt-3">
           <div className="w-8 h-px bg-gradient-to-r from-amber-400/55 to-transparent" />
           <div className="w-1.5 h-1.5 rounded-full bg-amber-400/45" />
@@ -48,16 +86,31 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
 
       {/* Quotes List */}
       <div className="space-y-2 md:space-y-2.5 max-h-[50vh] md:max-h-[420px] overflow-y-auto pr-1.5 custom-scrollbar">
-        {quotes.map((quote, index) => (
-          <QuoteCard
-            key={index}
-            quote={quote}
-            index={index}
-            isVisible={visibleQuotes.includes(index)}
-            isActive={activeQuote === index}
-            onClick={() => setActiveQuote(index)}
-          />
-        ))}
+        {!isLoaded ? (
+          <p className="text-gray-500 text-sm">Загрузка...</p>
+        ) : filteredQuotes.length === 0 ? (
+          <p className="text-gray-500 text-sm">
+            {filter === 'favorites' 
+              ? 'Нет избранных цитат. Нажмите на сердце, чтобы добавить цитату в избранное.'
+              : 'Цитаты загружаются...'}
+          </p>
+        ) : (
+          filteredQuotes.map((quote, index) => {
+            const originalIndex = quotes.findIndex(q => q.text === quote.text);
+            return (
+              <QuoteCard
+                key={originalIndex}
+                quote={quote}
+                index={originalIndex}
+                isVisible={visibleQuotes.includes(originalIndex)}
+                isActive={activeQuote === originalIndex}
+                isFavorite={isFavorite(originalIndex)}
+                onClick={() => setActiveQuote(originalIndex)}
+                onToggleFavorite={(e) => handleToggleFavorite(e, originalIndex)}
+              />
+            );
+          })
+        )}
       </div>
 
       {/* Footer decoration */}

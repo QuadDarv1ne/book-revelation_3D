@@ -7,10 +7,12 @@ interface QuoteCardProps {
   index: number;
   isVisible: boolean;
   isActive: boolean;
+  isFavorite: boolean;
   onClick: () => void;
+  onToggleFavorite: (e: React.MouseEvent) => void;
 }
 
-export function QuoteCard({ quote, index, isVisible, isActive, onClick }: QuoteCardProps) {
+export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onClick, onToggleFavorite }: QuoteCardProps) {
   return (
     <div
       onClick={onClick}
@@ -19,7 +21,7 @@ export function QuoteCard({ quote, index, isVisible, isActive, onClick }: QuoteC
         transform ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}
       `}
       style={{
-        transitionDelay: `${index * 100}ms`
+        transitionDelay: `${index * 50}ms`
       }}
     >
       <div
@@ -51,8 +53,29 @@ export function QuoteCard({ quote, index, isVisible, isActive, onClick }: QuoteC
           </>
         )}
 
+        {/* Favorite button */}
+        <button
+          onClick={onToggleFavorite}
+          className="absolute top-2 right-2 z-20 p-1.5 rounded-full hover:bg-amber-500/20 transition-colors"
+          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+        >
+          <svg
+            className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-500 hover:text-amber-400'}`}
+            fill={isFavorite ? "currentColor" : "none"}
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+            />
+          </svg>
+        </button>
+
         <p className={`
-          text-sm md:text-[15px] leading-relaxed mb-2 relative z-10
+          text-sm md:text-[15px] leading-relaxed mb-2 pr-8 relative z-10
           ${isActive ? 'text-amber-50' : 'text-gray-300'}
           transition-colors duration-400
         `}>
