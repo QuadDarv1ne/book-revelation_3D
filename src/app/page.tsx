@@ -1,14 +1,14 @@
 "use client";
 
 import { Suspense, useState, useEffect, lazy } from "react";
+import { Canvas } from "@react-three/fiber";
 import { QuotesPanel } from "@/components/quotes";
 import { ControlButton, WebGLError, useWebGLSupport } from "@/components/ui";
 import { useRotationControl } from "@/hooks/use-rotation";
 import { useMounted } from "@/hooks/use-mounted";
 import { LoadingFallback } from "@/components/ui/LoadingFallback";
 
-// Lazy load 3D components for better initial load performance
-const Canvas = lazy(() => import("@react-three/fiber").then(mod => ({ default: mod.Canvas })));
+// Lazy load Scene component for better initial load performance
 const Scene = lazy(() => import("@/components/book").then(mod => ({ default: mod.Scene })));
 
 export default function Home() {
