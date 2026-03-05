@@ -13,27 +13,12 @@ interface QuoteCardProps {
 }
 
 export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onClick, onToggleFavorite }: QuoteCardProps) {
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onClick();
-    }
-  };
-
-  const handleFavoriteKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onToggleFavorite(e as unknown as React.MouseEvent);
-    }
-  };
-
   return (
     <div
       onClick={onClick}
-      onKeyDown={handleKeyDown}
       tabIndex={0}
       role="button"
-      aria-label={`Цитата ${index + 1}: ${quote.text.substring(0, 50)}...`}
+      aria-label={`Цитата ${index + 1}: ${quote.text.substring(0, 50)}... ${isActive ? '(активна)' : ''}`}
       aria-pressed={isActive}
       className={`
         transition-all duration-700 ease-out cursor-pointer
@@ -54,39 +39,21 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
           }
         `}
       >
-        {/* Active glow effect */}
-        {isActive && (
-          <>
-            <div
-              className="absolute inset-0 rounded-xl"
-              style={{
-                background: 'radial-gradient(ellipse at left, rgba(212, 175, 55, 0.28), transparent 65%)',
-              }}
-            />
-            <div
-              className="absolute -inset-0.5 rounded-xl opacity-30"
-              style={{
-                background: 'linear-gradient(90deg, rgba(212, 175, 55, 0.5), transparent)',
-                filter: 'blur(10px)'
-              }}
-            />
-          </>
-        )}
-
         {/* Favorite button */}
         <button
-          onClick={onToggleFavorite}
-          onKeyDown={handleFavoriteKeyDown}
+          onClick={(e) => { e.stopPropagation(); onToggleFavorite(e); }}
           tabIndex={0}
           className="absolute top-2 right-2 z-20 p-1.5 rounded-full hover:bg-amber-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400"
           aria-label={isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
           aria-pressed={isFavorite}
+          type="button"
         >
           <svg
             className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-500 hover:text-amber-400'}`}
             fill={isFavorite ? "currentColor" : "none"}
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <path
               strokeLinecap="round"

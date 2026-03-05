@@ -53,18 +53,26 @@ export default function Home() {
   const gridPattern = useMemo(() => 'linear-gradient(rgba(212,175,55,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.7)_1px,transparent_1px)', []);
 
   return (
-    <main className="relative w-full h-screen overflow-hidden select-none bg-[#07070d]">
+    <main className="relative w-full h-screen overflow-hidden select-none bg-[#07070d]" role="main">
+      <a href="#quotes" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-amber-600 focus:text-white focus:rounded-lg">
+        Перейти к цитатам
+      </a>
+      <a href="#controls" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-amber-600 focus:text-white focus:rounded-lg focus:mt-14">
+        Управление
+      </a>
       <div className="absolute inset-0 pointer-events-none" style={{ background: backgroundGradient }} />
 
       <div className="absolute inset-0 pointer-events-none opacity-[0.012]" style={{ background: gridPattern, backgroundSize: '45px 45px' }} />
 
       <div className="relative z-10 h-full flex flex-col lg:flex-row">
-        <div className="w-full lg:w-[58%] h-[50%] lg:h-full relative">
+        <div className="w-full lg:w-[58%] h-[50%] lg:h-full relative" role="region" aria-label="3D сцена с книгой">
           {mounted && (
             <Scene isRotating={isRotating} onError={() => setWebGLError(true)} />
           )}
 
-          <ControlButton isRotating={isRotating} onClick={toggleRotation} />
+          <div id="controls">
+            <ControlButton isRotating={isRotating} onClick={toggleRotation} />
+          </div>
 
           <div className="absolute bottom-3 md:bottom-6 left-0 right-0 text-center pointer-events-none px-4">
             <div className="inline-block px-5 md:px-8 py-3 md:py-4 rounded-2xl backdrop-blur-lg bg-[rgba(8,8,16,0.72)] border border-[rgba(212,175,55,0.18)] shadow-[0_10px_35px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(212,175,55,0.12)]">
@@ -74,7 +82,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full lg:w-[42%] h-[50%] lg:h-full relative bg-gradient-to-b from-[rgba(10,10,18,0.97)] to-[rgba(5,5,10,0.99)] border-l border-[rgba(212,175,55,0.08)]">
+        <div id="quotes" className="w-full lg:w-[42%] h-[50%] lg:h-full relative bg-gradient-to-b from-[rgba(10,10,18,0.97)] to-[rgba(5,5,10,0.99)] border-l border-[rgba(212,175,55,0.08)]" role="region" aria-label="Цитаты стоических философов">
           <div className="absolute top-0 left-0 right-0 h-20 pointer-events-none bg-gradient-to-b from-[rgba(10,10,18,1)] to-transparent" />
           <QuotesPanel activeQuote={activeQuote} setActiveQuote={setActiveQuote} />
           <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none bg-gradient-to-t from-[rgba(5,5,10,1)] to-transparent" />
