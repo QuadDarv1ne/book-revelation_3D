@@ -6,14 +6,24 @@ interface ControlButtonProps {
 }
 
 export function ControlButton({ isRotating, onClick }: ControlButtonProps) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
     <button
       onClick={onClick}
-      className="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-lg backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95"
+      onKeyDown={handleKeyDown}
+      className="absolute top-4 right-4 z-20 px-3 py-1.5 rounded-lg backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-amber-400"
       style={{
         background: 'rgba(10, 10, 20, 0.6)',
         border: '1px solid rgba(212, 175, 55, 0.2)',
       }}
+      aria-label={isRotating ? 'Приостановить вращение' : 'Включить вращение'}
+      aria-pressed={isRotating}
     >
       <span className="text-xs text-amber-400/80 tracking-wider uppercase flex items-center gap-1.5">
         {isRotating ? (
