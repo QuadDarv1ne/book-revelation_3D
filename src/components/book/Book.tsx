@@ -114,23 +114,23 @@ export function Book({ isRotating }: BookProps) {
     };
   }, [gl.domElement, handleTouchStart, handleTouchMove, handleTouchEnd]);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const book = bookRef.current;
     if (!book) return;
 
     const time = state.clock.elapsedTime;
 
     if (isRotating && !touchState.current.isDragging) {
-      targetRotation.current += 0.005;
+      targetRotation.current += delta * 0.5;
     }
 
     if (touchState.current.isDragging) {
-      book.rotation.y = THREE.MathUtils.lerp(book.rotation.y, touchRotation.current.y * 0.01, 0.1);
-      book.rotation.x = THREE.MathUtils.lerp(book.rotation.x, touchRotation.current.x * 0.01, 0.1);
+      book.rotation.y = THREE.MathUtils.lerp(book.rotation.y, touchRotation.current.y * 0.01, delta * 10);
+      book.rotation.x = THREE.MathUtils.lerp(book.rotation.x, touchRotation.current.x * 0.01, delta * 10);
     } else {
-      book.rotation.y += (targetRotation.current - book.rotation.y) * 0.05;
-      touchRotation.current.x *= 0.95;
-      touchRotation.current.y *= 0.95;
+      book.rotation.y += (targetRotation.current - book.rotation.y) * delta * 5;
+      touchRotation.current.x *= Math.pow(0.01, delta);
+      touchRotation.current.y *= Math.pow(0.01, delta);
     }
 
     book.position.y = 0.6 + Math.sin(time * 0.5) * 0.04;
@@ -138,7 +138,7 @@ export function Book({ isRotating }: BookProps) {
     book.rotation.z = Math.cos(time * 0.4) * 0.008;
 
     const targetScale = hovered ? 1.12 : 1;
-    book.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+    book.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 10);
 
     if (glowRef.current) {
       (glowRef.current.material as THREE.MeshBasicMaterial).opacity = 0.22 + Math.sin(time * 2.5) * 0.08;

@@ -40,6 +40,9 @@ class StoicBook3D extends HTMLElement {
     this._retryCount = 0;
     this._maxRetries = 3;
     this._messageHandler = null;
+    this._renderTimeout = null;
+    this._loadTimeout = null;
+    this._observer = null;
   }
 
   static get observedAttributes() {
@@ -53,13 +56,21 @@ class StoicBook3D extends HTMLElement {
   connectedCallback() {
     this.setAttribute('role', 'application');
     this.setAttribute('aria-label', 'Stoic Book 3D — Интерактивные цитаты стоических философов');
+    this.setAttribute('tabindex', '0');
     this.render();
     this._setupMessageListener();
+    this.addEventListener('keydown', this._handleKeyboard.bind(this));
     this._dispatchEvent('ready', { version: StoicBook3D.version });
   }
 
   disconnectedCallback() {
     this._cleanupMessageListener();
+    this.removeEventListener('keydown', this._handleKeyboard);
+    clearTimeout(this._renderTimeout);
+    clearTimeout(this._loadTimeout);
+    if (this._observer) {
+      this._observer.disconnect();
+    }
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -159,6 +170,17 @@ class StoicBook3D extends HTMLElement {
     window.addEventListener('message', this._messageHandler);
   }
 
+  _handleKeyboard(event) {
+    if (event.key === 'ArrowLeft') {
+      this.setActiveQuote(Math.max(0, parseInt(this.quotesCount) - 1));
+    } else if (event.key === 'ArrowRight') {
+      this.setActiveQuote(0);
+    } else if (event.key === ' ') {
+      event.preventDefault();
+      this.toggleRotation();
+    }
+  }
+
   _cleanupMessageListener() {
     if (this._messageHandler) {
       window.removeEventListener('message', this._messageHandler);
@@ -222,6 +244,11 @@ class StoicBook3D extends HTMLElement {
           --sb3d-background: ${this.theme === 'dark' ? '#07070d' : '#faf8f5'};
           --sb3d-radius: ${this.borderRadius}px;
           --sb3d-shadow: ${this.shadow ? '0 10px 40px rgba(0,0,0,0.3)' : 'none'};
+        }
+
+        :host(:focus) {
+          outline: 2px solid var(--sb3d-primary);
+          outline-offset: 2px;
         }
 
         .container {
@@ -360,13 +387,26 @@ class StoicBook3D extends HTMLElement {
     this._loading = true;
     this._retryCount = 0;
 
-    // Fallback timeout
     clearTimeout(this._loadTimeout);
     this._loadTimeout = setTimeout(() => {
       if (this._loading) {
         this._hideLoading();
       }
     }, 5000);
+
+    // Visibility change handling
+    if (this._observer) {
+      this._observer.disconnect();
+    }
+    this._observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && this._iframe && this._iframe.src) {
+          // Trigger lazy load when visible
+        }
+      });
+    }, { threshold: 0.1 });
+
+    this._observer.observe(this);
   }
 }
 
