@@ -1,14 +1,13 @@
 "use client";
 
-import { Suspense, useState, useEffect, lazy } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import { QuotesPanel } from "@/components/quotes";
-import { ControlButton, WebGLError, useWebGLSupport } from "@/components/ui";
+import { ControlButton, WebGLError, useWebGLSupport, SettingsBar } from "@/components/ui";
 import { useRotationControl } from "@/hooks/use-rotation";
 import { useMounted } from "@/hooks/use-mounted";
 import { LoadingFallback } from "@/components/ui/LoadingFallback";
-
-const Scene = lazy(() => import("@/components/book").then(mod => ({ default: mod.Scene })));
+import { Scene } from "@/components/book";
 
 export default function Home() {
   const mounted = useMounted();
@@ -16,6 +15,7 @@ export default function Home() {
   const { isRotating, toggleRotation } = useRotationControl();
   const [activeQuote, setActiveQuote] = useState(0);
   const [webGLError, setWebGLError] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -81,6 +81,8 @@ export default function Home() {
       <div className="absolute bottom-3 left-3 pointer-events-none">
         <p className="text-amber-600/15 text-[9px] tracking-[0.2em] uppercase font-light">Stoic Philosophy</p>
       </div>
+
+      <SettingsBar theme={theme} onThemeChange={setTheme} />
 
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar { width: 2.5px; }
