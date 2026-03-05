@@ -3,14 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stoic Book 3D — Демо Web Component</title>
+  <title>Stoic Book 3D — Web Component Demo</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: system-ui, -apple-system, sans-serif;
       background: #0a0a0a;
@@ -18,41 +13,12 @@
       min-height: 100vh;
       padding: 40px 20px;
     }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 10px;
-      color: #d4af37;
-    }
-
-    .subtitle {
-      text-align: center;
-      color: #888;
-      margin-bottom: 40px;
-    }
-
-    .demo-section {
-      margin-bottom: 60px;
-    }
-
-    .demo-section h2 {
-      margin-bottom: 20px;
-      color: #d4af37;
-      font-size: 18px;
-    }
-
-    .controls {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { text-align: center; margin-bottom: 10px; color: #d4af37; }
+    .subtitle { text-align: center; color: #888; margin-bottom: 40px; }
+    .demo-section { margin-bottom: 60px; }
+    .demo-section h2 { margin-bottom: 20px; color: #d4af37; font-size: 18px; }
+    .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
     button {
       padding: 10px 20px;
       background: #d4af37;
@@ -63,20 +29,9 @@
       font-size: 14px;
       transition: background 0.2s;
     }
-
-    button:hover {
-      background: #f0c94e;
-    }
-
-    button.secondary {
-      background: #333;
-      color: #fff;
-    }
-
-    button.secondary:hover {
-      background: #444;
-    }
-
+    button:hover { background: #f0c94e; }
+    button.secondary { background: #333; color: #fff; }
+    button.secondary:hover { background: #444; }
     .code-block {
       background: #1a1a1a;
       padding: 20px;
@@ -84,65 +39,144 @@
       overflow-x: auto;
       margin-top: 20px;
     }
-
-    code {
-      color: #a5d6ff;
-      font-family: 'Consolas', 'Monaco', monospace;
-      font-size: 13px;
+    code { color: #a5d6ff; font-family: 'Consolas', monospace; font-size: 13px; }
+    .theme-toggle { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+    .event-log {
+      background: #1a1a1a;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+      max-height: 150px;
+      overflow-y: auto;
+      font-size: 12px;
     }
-
-    .theme-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
+    .event-log p { margin: 5px 0; color: #888; }
+    .event-log .event { color: #4ade80; }
+    .event-log .error { color: #f87171; }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
     }
+    .feature {
+      background: #1a1a1a;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 3px solid #d4af37;
+    }
+    .feature h3 { color: #d4af37; font-size: 14px; margin-bottom: 8px; }
+    .feature p { font-size: 13px; color: #888; }
   </style>
 </head>
 <body>
-  <button class="theme-toggle" onclick="toggleTheme()">🌓 Тема</button>
+  <button class="theme-toggle" onclick="toggleGlobalTheme()">🌓 Тема</button>
 
   <div class="container">
-    <h1>Stoic Book 3D Web Component</h1>
-    <p class="subtitle">Демонстрация интеграции через Web Component</p>
+    <h1>Stoic Book 3D Web Component v2</h1>
+    <p class="subtitle">Демонстрация всех возможностей</p>
 
-    <!-- Демо 1: Базовое использование -->
+    <!-- Demo 1: Basic -->
     <div class="demo-section">
       <h2>1. Базовое использование</h2>
-      <stoic-book-3d id="demo1" height="600"></stoic-book-3d>
+      <stoic-book-3d id="demo1" height="550"></stoic-book-3d>
       <div class="code-block">
-        <code>&lt;stoic-book-3d height="600"&gt;&lt;/stoic-book-3d&gt;</code>
+        <code>&lt;stoic-book-3d height="550"&gt;&lt;/stoic-book-3d&gt;</code>
+      </div>
+      <div class="event-log" id="log1"></div>
+    </div>
+
+    <!-- Demo 2: Custom options -->
+    <div class="demo-section">
+      <h2>2. Кастомные настройки</h2>
+      <stoic-book-3d 
+        id="demo2" 
+        height="500"
+        theme="dark"
+        quotes-count="6"
+        border-radius="16"
+        shadow="true"
+      ></stoic-book-3d>
+      <div class="features">
+        <div class="feature">
+          <h3>Theme</h3>
+          <p>dark / light</p>
+        </div>
+        <div class="feature">
+          <h3>Quotes Count</h3>
+          <p>6 цитат</p>
+        </div>
+        <div class="feature">
+          <h3>Border Radius</h3>
+          <p>16px</p>
+        </div>
+        <div class="feature">
+          <h3>Shadow</h3>
+          <p>Enabled</p>
+        </div>
       </div>
     </div>
 
-    <!-- Демо 2: С кастомной высотой -->
+    <!-- Demo 3: Interactive controls -->
     <div class="demo-section">
-      <h2>2. Кастомная высота</h2>
-      <stoic-book-3d id="demo2" height="500"></stoic-book-3d>
-      <div class="code-block">
-        <code>&lt;stoic-book-3d height="500"&gt;&lt;/stoic-book-3d&gt;</code>
-      </div>
-    </div>
-
-    <!-- Демо 3: С контролами -->
-    <div class="demo-section">
-      <h2>3. С внешними контролами</h2>
+      <h2>3. Интерактивное управление</h2>
       <div class="controls">
         <button onclick="toggleRotation()">⏯ Вращение</button>
-        <button class="secondary" onclick="changeHeight()">📏 Изменить высоту</button>
+        <button class="secondary" onclick="changeHeight()">📏 Высота ↓</button>
         <button class="secondary" onclick="resetHeight()">↺ Сброс</button>
+        <button class="secondary" onclick="setQuote(0)">Цитата 1</button>
+        <button class="secondary" onclick="setQuote(3)">Цитата 4</button>
+        <button class="secondary" onclick="toggleTheme()">🌓 Тема</button>
       </div>
-      <stoic-book-3d id="demo3" height="550"></stoic-book-3d>
+      <stoic-book-3d id="demo3" height="500"></stoic-book-3d>
+      <div class="event-log" id="log3"></div>
     </div>
 
-    <!-- Демо 4: Для Tilda -->
+    <!-- Demo 4: Light theme -->
     <div class="demo-section">
-      <h2>4. Код для вставки в Tilda</h2>
+      <h2>4. Светлая тема</h2>
+      <stoic-book-3d id="demo4" height="500" theme="light"></stoic-book-3d>
+    </div>
+
+    <!-- Demo 5: API usage -->
+    <div class="demo-section">
+      <h2>5. JavaScript API</h2>
+      <div class="controls">
+        <button onclick="apiDemo()">Запустить демо API</button>
+      </div>
+      <stoic-book-3d id="demo5" height="450"></stoic-book-3d>
+      <div class="event-log" id="log5"></div>
+    </div>
+
+    <!-- Code examples -->
+    <div class="demo-section">
+      <h2>Код для вставки</h2>
       <div class="code-block">
         <code>
-&lt;!-- Добавьте в блок T123 или Zero Block --&gt;
-&lt;script src="https://your-domain.com/web-component.js"&gt;&lt;/script&gt;
-&lt;stoic-book-3d src="https://your-domain.com" height="600"&gt;&lt;/stoic-book-3d&gt;
+&lt;!-- Tilda / WordPress / Любой сайт --&gt;
+&lt;script src="https://your-domain.com/web-component.js" defer&gt;&lt;/script&gt;
+&lt;stoic-book-3d 
+  src="https://your-domain.com"
+  height="600"
+  theme="dark"
+  quotes-count="8"
+&gt;&lt;/stoic-book-3d&gt;
+
+&lt;script&gt;
+  const wc = document.querySelector('stoic-book-3d');
+  
+  // Методы
+  wc.setTheme('light');
+  wc.setHeight('500');
+  wc.toggleRotation();
+  wc.setActiveQuote(3);
+  wc.refresh();
+  
+  // События
+  wc.addEventListener('ready', (e) => console.log('Готово!', e.detail));
+  wc.addEventListener('quote-change', (e) => console.log('Цитата:', e.detail));
+  wc.addEventListener('error', (e) => console.error('Ошибка:', e.detail));
+&lt;/script&gt;
         </code>
       </div>
     </div>
@@ -150,39 +184,79 @@
 
   <script src="/web-component.js" type="module"></script>
   <script>
-    // Переключение темы
-    let isDark = true;
-    function toggleTheme() {
-      isDark = !isDark;
-      const component = document.getElementById('demo1');
-      if (component) {
-        component.setTheme(isDark ? 'dark' : 'light');
+    // Event logging
+    function log(id, message, type = 'event') {
+      const logEl = document.getElementById(id);
+      if (logEl) {
+        const time = new Date().toLocaleTimeString();
+        logEl.innerHTML += `<p class="${type}">[${time}] ${message}</p>`;
+        logEl.scrollTop = logEl.scrollHeight;
       }
     }
 
-    // Переключение вращения
+    // Setup event listeners
+    document.getElementById('demo1')?.addEventListener('ready', () => log('log1', '✓ Компонент готов'));
+    document.getElementById('demo1')?.addEventListener('quote-change', (e) => log('log1', `Цитата #${e.detail?.index || 'changed'}`));
+    document.getElementById('demo1')?.addEventListener('error', (e) => log('log1', `✗ Ошибка: ${e.detail?.message || 'unknown'}`, 'error'));
+
+    document.getElementById('demo3')?.addEventListener('ready', () => log('log3', '✓ Компонент готов'));
+    document.getElementById('demo3')?.addEventListener('quote-change', (e) => log('log3', `Цитата #${e.detail?.index || 'changed'}`));
+
+    document.getElementById('demo5')?.addEventListener('ready', () => log('log5', '✓ Компонент готов'));
+    document.getElementById('demo5')?.addEventListener('quote-change', (e) => log('log5', `Цитата #${e.detail?.index || 'changed'}`));
+
+    // Global functions
     function toggleRotation() {
-      const component = document.getElementById('demo3');
-      if (component) {
-        component.toggleRotation();
-      }
+      document.getElementById('demo3')?.toggleRotation();
+      log('log3', 'Переключено вращение');
     }
 
-    // Изменение высоты
     function changeHeight() {
-      const component = document.getElementById('demo3');
-      if (component) {
-        component.setHeight('400');
-      }
+      document.getElementById('demo3')?.setHeight('400');
+      log('log3', 'Высота: 400px');
     }
 
-    // Сброс высоты
     function resetHeight() {
-      const component = document.getElementById('demo3');
-      if (component) {
-        component.setHeight('550');
-      }
+      document.getElementById('demo3')?.setHeight('500');
+      log('log3', 'Высота: 500px');
     }
+
+    function setQuote(index) {
+      document.getElementById('demo3')?.setActiveQuote(index);
+      log('log3', `Активна цитата #${index}`);
+    }
+
+    function toggleTheme() {
+      const wc = document.getElementById('demo3');
+      const current = wc?.getAttribute('theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      wc?.setTheme(next);
+      log('log3', `Тема: ${next}`);
+    }
+
+    function toggleGlobalTheme() {
+      const wc = document.getElementById('demo1');
+      const current = wc?.getAttribute('theme');
+      wc?.setTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    function apiDemo() {
+      const wc = document.getElementById('demo5');
+      if (!wc) return;
+
+      log('log5', 'Запуск демо последовательности...');
+      
+      setTimeout(() => { wc.setTheme('light'); log('log5', '→ Тема: light'); }, 500);
+      setTimeout(() => { wc.setHeight('400'); log('log5', '→ Высота: 400px'); }, 1500);
+      setTimeout(() => { wc.toggleRotation(); log('log5', '→ Вращение: toggle'); }, 2500);
+      setTimeout(() => { wc.setActiveQuote(2); log('log5', '→ Цитата: #2'); }, 3500);
+      setTimeout(() => { wc.setTheme('dark'); log('log5', '→ Тема: dark'); }, 4500);
+      setTimeout(() => { wc.setHeight('450'); log('log5', '→ Высота: 450px'); }, 5500);
+      setTimeout(() => { log('log5', '✓ Демо завершено'); }, 6000);
+    }
+
+    // Log version
+    console.log('Stoic Book 3D Web Component v' + (customElements.get('stoic-book-3d')?.version || '1.0.0'));
   </script>
 </body>
 </html>
