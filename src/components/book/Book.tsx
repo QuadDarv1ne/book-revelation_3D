@@ -4,7 +4,7 @@ import { useRef, useState, useMemo, useEffect, useCallback } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Float } from "@react-three/drei";
 import * as THREE from "three";
-import { createBookCoverTexture, createSpineTexture } from "@/lib/textures";
+import { createBookCoverTexture, createSpineTexture } from "@/lib/textures/index";
 
 interface BookProps {
   isRotating: boolean;
@@ -26,8 +26,15 @@ export function Book({ isRotating }: BookProps) {
   const targetRotation = useRef(0);
   const lastTouchTime = useRef(0);
 
-  const coverTexture = useMemo(() => createBookCoverTexture(), []);
-  const spineTexture = useMemo(() => createSpineTexture(), []);
+  const coverTexture = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    return createBookCoverTexture();
+  }, []);
+
+  const spineTexture = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    return createSpineTexture();
+  }, []);
 
   const handleTouchStart = useCallback((e: TouchEvent) => {
     const touch = e.touches[0];
@@ -112,12 +119,12 @@ export function Book({ isRotating }: BookProps) {
 
           <mesh position={[0, 0, BOOK_DEPTH/2 - COVER_THICKNESS/2]} castShadow>
             <boxGeometry args={[BOOK_WIDTH, BOOK_HEIGHT, COVER_THICKNESS]} />
-            <meshStandardMaterial map={coverTexture} roughness={0.45} metalness={0.15} />
+            <meshStandardMaterial map={coverTexture || undefined} roughness={0.45} metalness={0.15} color={coverTexture ? "#ffffff" : "#2a1810"} />
           </mesh>
 
           <mesh position={[-BOOK_WIDTH/2 - 0.008, 0, 0]} castShadow>
             <boxGeometry args={[0.035, BOOK_HEIGHT + 0.015, BOOK_DEPTH + 0.015]} />
-            <meshStandardMaterial map={spineTexture} roughness={0.45} metalness={0.15} />
+            <meshStandardMaterial map={spineTexture || undefined} roughness={0.45} metalness={0.15} color={spineTexture ? "#ffffff" : "#2a1810"} />
           </mesh>
 
           <mesh position={[BOOK_WIDTH/2 - 0.035, 0, 0]}>
