@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { quotes } from "@/data/quotes";
 import { QuoteCard } from "./QuoteCard";
 import { useFavorites } from "@/hooks/use-favorites";
@@ -29,20 +29,17 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
     };
 
     const initialTimer = setTimeout(() => showQuote(0), 300);
-    return () => {
-      clearTimeout(initialTimer);
-    };
+    return () => clearTimeout(initialTimer);
   }, []);
 
   const filteredQuotes = useMemo(() => {
     let result = quotes;
 
-    // Filter by favorites
     if (filter === 'favorites') {
-      result = result.filter((_, index) => favorites.includes(index));
+      const favSet = new Set(favorites);
+      result = result.filter((_, index) => favSet.has(index));
     }
 
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter(quote =>
@@ -54,10 +51,38 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
     return result;
   }, [filter, favorites, searchQuery]);
 
-  const handleToggleFavorite = (e: React.MouseEvent, index: number) => {
+  const handleToggleFavorite = useCallback((e: React.MouseEvent, index: number) => {
     e.stopPropagation();
     toggleFavorite(index);
-  };
+  }, [toggleFavorite]);
+
+  const quoteCards = useMemo(() => {
+    if (!isLoaded) return null;
+    if (filteredQuotes.length === 0) {
+      return (
+        <p className="text-gray-500 text-sm">
+          {filter === 'favorites'
+            ? 'Нет избранных цитат. Нажмите на сердце, чтобы добавить цитату в избранное.'
+            : 'Цитаты загружаются...'}
+        </p>
+      );
+    }
+    return filteredQuotes.map((quote, index) => {
+      const originalIndex = quotes.findIndex(q => q.text === quote.text);
+      return (
+        <QuoteCard
+          key={originalIndex}
+          quote={quote}
+          index={originalIndex}
+          isVisible={visibleQuotes.includes(originalIndex)}
+          isActive={activeQuote === originalIndex}
+          isFavorite={isFavorite(originalIndex)}
+          onClick={() => setActiveQuote(originalIndex)}
+          onToggleFavorite={(e) => handleToggleFavorite(e, originalIndex)}
+        />
+      );
+    });
+  }, [isLoaded, filteredQuotes, visibleQuotes, activeQuote, isFavorite, handleToggleFavorite, setActiveQuote]);
 
   return (
     <div className="h-full flex flex-col justify-center p-5 md:p-7 lg:p-8">
@@ -123,31 +148,7 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
 
       {/* Quotes List */}
       <div className="space-y-2 md:space-y-2.5 max-h-[50vh] md:max-h-[420px] overflow-y-auto pr-1.5 custom-scrollbar">
-        {!isLoaded ? (
-          <p className="text-gray-500 text-sm">Загрузка...</p>
-        ) : filteredQuotes.length === 0 ? (
-          <p className="text-gray-500 text-sm">
-            {filter === 'favorites' 
-              ? 'Нет избранных цитат. Нажмите на сердце, чтобы добавить цитату в избранное.'
-              : 'Цитаты загружаются...'}
-          </p>
-        ) : (
-          filteredQuotes.map((quote, index) => {
-            const originalIndex = quotes.findIndex(q => q.text === quote.text);
-            return (
-              <QuoteCard
-                key={originalIndex}
-                quote={quote}
-                index={originalIndex}
-                isVisible={visibleQuotes.includes(originalIndex)}
-                isActive={activeQuote === originalIndex}
-                isFavorite={isFavorite(originalIndex)}
-                onClick={() => setActiveQuote(originalIndex)}
-                onToggleFavorite={(e) => handleToggleFavorite(e, originalIndex)}
-              />
-            );
-          })
-        )}
+        {quoteCards}
       </div>
 
       {/* Footer decoration */}

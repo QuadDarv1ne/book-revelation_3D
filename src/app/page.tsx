@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState, useEffect, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { QuotesPanel } from "@/components/quotes";
 import { ControlButton, WebGLError, useWebGLSupport, SettingsBar } from "@/components/ui";
@@ -27,12 +27,7 @@ export default function Home() {
   useEffect(() => {
     document.body.classList.toggle("light-theme", theme === "light");
     localStorage.setItem("theme", theme);
-    if (process.env.NODE_ENV === "development") {
-      console.log("[DEV] Theme:", theme);
-      console.log("[DEV] Mounted:", mounted);
-      console.log("[DEV] WebGL:", hasWebGL);
-    }
-  }, [theme, mounted, hasWebGL]);
+  }, [theme]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -41,31 +36,38 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleRetry = () => {
+  const handleRetry = useMemo(() => () => {
     setWebGLError(false);
     window.location.reload();
-  };
+  }, []);
 
   if (hasWebGL === false || webGLError) {
     return <WebGLError onRetry={handleRetry} />;
   }
 
+  const canvasConfig = useMemo(() => ({
+    camera: { position: [0, 1.25, 4.0] as [number, number, number], fov: 38 },
+    dpr: [1, 1.5] as [number, number],
+    gl: { antialias: true, alpha: true, powerPreference: "high-performance" as const, preserveDrawingBuffer: false },
+    performance: { min: 0.5 },
+  }), []);
+
+  const backgroundGradient = useMemo(() => 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.045)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.035)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(15,15,35,0.55)_0%,transparent_50%)', []);
+  const gridPattern = useMemo(() => 'linear-gradient(rgba(212,175,55,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.7)_1px,transparent_1px)', []);
+
   return (
     <main className="relative w-full h-screen overflow-hidden select-none bg-[#07070d]">
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.045)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.035)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(15,15,35,0.55)_0%,transparent_50%)]" />
+      <div className="absolute inset-0 pointer-events-none" style={{ background: backgroundGradient }} />
 
-      <div className="absolute inset-0 pointer-events-none opacity-[0.012] bg-[linear-gradient(rgba(212,175,55,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.7)_1px,transparent_1px)] bg-[length:45px_45px]" />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.012]" style={{ background: gridPattern, backgroundSize: '45px 45px' }} />
 
       <div className="relative z-10 h-full flex flex-col lg:flex-row">
         <div className="w-full lg:w-[58%] h-[50%] lg:h-full relative">
           {mounted && (
             <Suspense fallback={<LoadingFallback />}>
               <Canvas
-                camera={{ position: [0, 1.25, 4.0], fov: 38 }}
+                {...canvasConfig}
                 shadows
-                dpr={[1, 1.5]}
-                gl={{ antialias: true, alpha: true, powerPreference: "high-performance", preserveDrawingBuffer: false }}
-                performance={{ min: 0.5 }}
                 onError={() => setWebGLError(true)}
               >
                 <Scene isRotating={isRotating} />

@@ -8,9 +8,9 @@ export function Lighting() {
         position={[5, 8, 5]}
         angle={0.3}
         penumbra={1}
-        intensity={3.2}
+        intensity={2.8}
         castShadow
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={[1024, 1024]}
         shadow-bias={-0.0001}
         color="#fff8f0"
       />
@@ -20,7 +20,7 @@ export function Lighting() {
         position={[-5, 5, -4]}
         angle={0.5}
         penumbra={1}
-        intensity={1.3}
+        intensity={1}
         color="#e8d8c8"
       />
 
@@ -29,19 +29,12 @@ export function Lighting() {
         position={[0, 5, -8]}
         angle={0.35}
         penumbra={1}
-        intensity={2.2}
+        intensity={1.8}
         color="#d4af37"
       />
 
-      {/* Top accent */}
-      <pointLight position={[0, 6, 0]} intensity={1.1} color="#ffffff" distance={12} />
-
-      {/* Gold accent lights */}
-      <pointLight position={[3, 2, 3]} intensity={0.55} color="#d4af37" distance={5} />
-      <pointLight position={[-3, 2, 3]} intensity={0.55} color="#d4af37" distance={5} />
-
       {/* Ambient */}
-      <ambientLight intensity={0.1} color="#c8d4e8" />
+      <ambientLight intensity={0.15} color="#c8d4e8" />
     </>
   );
 }

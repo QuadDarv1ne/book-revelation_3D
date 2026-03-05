@@ -1,14 +1,20 @@
 import * as THREE from "three";
 
-const CANVAS_WIDTH = 512;
-const CANVAS_HEIGHT = 704;
+const CANVAS_WIDTH = 256;
+const CANVAS_HEIGHT = 352;
 
 interface CornerPosition {
   x: number;
   y: number;
 }
 
+const textureCache = new Map<string, THREE.CanvasTexture>();
+
 export function createBookCoverTexture(): THREE.CanvasTexture {
+  const cacheKey = `cover-${CANVAS_WIDTH}x${CANVAS_HEIGHT}`;
+  const cached = textureCache.get(cacheKey);
+  if (cached) return cached;
+
   const canvas = document.createElement("canvas");
   canvas.width = CANVAS_WIDTH;
   canvas.height = CANVAS_HEIGHT;
@@ -22,8 +28,8 @@ export function createBookCoverTexture(): THREE.CanvasTexture {
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Add subtle leather texture (optimized: reduced from 8000 to 3000 particles)
-  for (let i = 0; i < 3000; i++) {
+  // Add subtle leather texture (reduced particles)
+  for (let i = 0; i < 1500; i++) {
     const alpha = Math.random() * 0.04;
     ctx.fillStyle = `rgba(${Math.random() > 0.5 ? 255 : 0}, ${Math.random() > 0.5 ? 200 : 50}, ${Math.random() > 0.5 ? 150 : 0}, ${alpha})`;
     ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 1, 1);
@@ -148,6 +154,7 @@ export function createBookCoverTexture(): THREE.CanvasTexture {
   ctx.fill();
 
   const texture = new THREE.CanvasTexture(canvas);
-  texture.anisotropy = 16;
+  texture.anisotropy = 8;
+  textureCache.set(cacheKey, texture);
   return texture;
 }

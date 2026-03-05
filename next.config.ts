@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
   devIndicators: {
     position: "bottom-left",
   },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
+  },
+  poweredByHeader: false,
+  compress: true,
 };
 
 export default withBundleAnalyzer(nextConfig);

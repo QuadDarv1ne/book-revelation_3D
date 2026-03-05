@@ -24,22 +24,69 @@ export function Book({ isRotating }: BookProps) {
   const touchState = useRef({ startX: 0, startY: 0, isDragging: false });
   const touchRotation = useRef({ x: 0, y: 0 });
   const targetRotation = useRef(0);
-  const lastTouchTime = useRef(0);
 
-  const coverTexture = useMemo(() => {
-    if (typeof window === "undefined") return null;
-    return createBookCoverTexture();
-  }, []);
+  const coverTexture = useMemo(() => createBookCoverTexture(), []);
+  const spineTexture = useMemo(() => createSpineTexture(), []);
 
-  const spineTexture = useMemo(() => {
-    if (typeof window === "undefined") return null;
-    return createSpineTexture();
-  }, []);
+  // Reusable materials
+  const coverMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    map: coverTexture,
+    roughness: 0.45,
+    metalness: 0.15,
+    color: "#ffffff"
+  }), [coverTexture]);
+
+  const spineMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    map: spineTexture,
+    roughness: 0.45,
+    metalness: 0.15,
+    color: "#ffffff"
+  }), [spineTexture]);
+
+  const darkCoverMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    color: "#1a0f0a",
+    roughness: 0.6,
+    metalness: 0.1
+  }), []);
+
+  const pagesMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    color: "#f8f4eb",
+    roughness: 0.95,
+    metalness: 0
+  }), []);
+
+  const pagesEdgeMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    color: "#f5f0e6",
+    roughness: 0.9,
+    metalness: 0
+  }), []);
+
+  const goldMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    color: "#d4af37",
+    roughness: 0.25,
+    metalness: 0.85,
+    emissive: "#d4af37",
+    emissiveIntensity: 0.1
+  }), []);
+
+  const glowMaterial = useMemo(() => new THREE.MeshBasicMaterial({
+    color: "#d4af37",
+    transparent: true,
+    opacity: 0.2,
+    blending: THREE.AdditiveBlending
+  }), []);
+
+  // Geometries
+  const coverGeometry = useMemo(() => new THREE.BoxGeometry(BOOK_WIDTH, BOOK_HEIGHT, COVER_THICKNESS), []);
+  const pagesGeometry = useMemo(() => new THREE.BoxGeometry(BOOK_WIDTH - 0.06, BOOK_HEIGHT - 0.06, BOOK_DEPTH - 0.035), []);
+  const spineGeometry = useMemo(() => new THREE.BoxGeometry(0.035, BOOK_HEIGHT + 0.015, BOOK_DEPTH + 0.015), []);
+  const pagesEdgeGeometry = useMemo(() => new THREE.BoxGeometry(0.07, BOOK_HEIGHT - 0.08, BOOK_DEPTH - 0.04), []);
+  const goldTopGeometry = useMemo(() => new THREE.BoxGeometry(BOOK_WIDTH - 0.08, 0.012, BOOK_DEPTH - 0.015), []);
+  const glowGeometry = useMemo(() => new THREE.CircleGeometry(1.1, 32), []);
 
   const handleTouchStart = useCallback((e: TouchEvent) => {
     const touch = e.touches[0];
     touchState.current = { startX: touch.clientX, startY: touch.clientY, isDragging: true };
-    lastTouchTime.current = Date.now();
   }, []);
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
@@ -108,44 +155,44 @@ export function Book({ isRotating }: BookProps) {
           position={[0, 0.6, 0]}
         >
           <mesh position={[0, 0, -BOOK_DEPTH/2 + COVER_THICKNESS/2]} castShadow>
-            <boxGeometry args={[BOOK_WIDTH, BOOK_HEIGHT, COVER_THICKNESS]} />
-            <meshStandardMaterial color="#1a0f0a" roughness={0.6} metalness={0.1} />
+            <primitive object={coverGeometry} />
+            <primitive object={darkCoverMaterial} />
           </mesh>
 
           <mesh position={[0, 0, 0]} castShadow>
-            <boxGeometry args={[BOOK_WIDTH - 0.06, BOOK_HEIGHT - 0.06, BOOK_DEPTH - 0.035]} />
-            <meshStandardMaterial color="#f8f4eb" roughness={0.95} metalness={0} />
+            <primitive object={pagesGeometry} />
+            <primitive object={pagesMaterial} />
           </mesh>
 
           <mesh position={[0, 0, BOOK_DEPTH/2 - COVER_THICKNESS/2]} castShadow>
-            <boxGeometry args={[BOOK_WIDTH, BOOK_HEIGHT, COVER_THICKNESS]} />
-            <meshStandardMaterial map={coverTexture || undefined} roughness={0.45} metalness={0.15} color={coverTexture ? "#ffffff" : "#2a1810"} />
+            <primitive object={coverGeometry} />
+            <primitive object={coverMaterial} />
           </mesh>
 
           <mesh position={[-BOOK_WIDTH/2 - 0.008, 0, 0]} castShadow>
-            <boxGeometry args={[0.035, BOOK_HEIGHT + 0.015, BOOK_DEPTH + 0.015]} />
-            <meshStandardMaterial map={spineTexture || undefined} roughness={0.45} metalness={0.15} color={spineTexture ? "#ffffff" : "#2a1810"} />
+            <primitive object={spineGeometry} />
+            <primitive object={spineMaterial} />
           </mesh>
 
           <mesh position={[BOOK_WIDTH/2 - 0.035, 0, 0]}>
-            <boxGeometry args={[0.07, BOOK_HEIGHT - 0.08, BOOK_DEPTH - 0.04]} />
-            <meshStandardMaterial color="#f5f0e6" roughness={0.9} metalness={0} />
+            <primitive object={pagesEdgeGeometry} />
+            <primitive object={pagesEdgeMaterial} />
           </mesh>
 
           <mesh position={[0, BOOK_HEIGHT/2 - 0.008, 0]}>
-            <boxGeometry args={[BOOK_WIDTH - 0.08, 0.012, BOOK_DEPTH - 0.015]} />
-            <meshStandardMaterial color="#d4af37" roughness={0.25} metalness={0.85} emissive="#d4af37" emissiveIntensity={0.1} />
+            <primitive object={goldTopGeometry} />
+            <primitive object={goldMaterial} />
           </mesh>
           <mesh position={[0, -BOOK_HEIGHT/2 + 0.008, 0]}>
-            <boxGeometry args={[BOOK_WIDTH - 0.08, 0.012, BOOK_DEPTH - 0.015]} />
-            <meshStandardMaterial color="#d4af37" roughness={0.25} metalness={0.85} emissive="#d4af37" emissiveIntensity={0.1} />
+            <primitive object={goldTopGeometry} />
+            <primitive object={goldMaterial} />
           </mesh>
         </group>
       </Float>
 
       <mesh ref={glowRef} position={[0, 0.04, 0]} rotation={[-Math.PI/2, 0, 0]}>
-        <circleGeometry args={[1.1, 64]} />
-        <meshBasicMaterial color="#d4af37" transparent opacity={0.2} blending={THREE.AdditiveBlending} />
+        <primitive object={glowGeometry} />
+        <primitive object={glowMaterial} />
       </mesh>
     </group>
   );

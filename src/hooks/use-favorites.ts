@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 export function useFavorites() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load favorites from localStorage on mount
   useEffect(() => {
     try {
       const stored = localStorage.getItem("stoic-favorites");
@@ -19,7 +18,6 @@ export function useFavorites() {
     setIsLoaded(true);
   }, []);
 
-  // Save favorites to localStorage when changed
   useEffect(() => {
     if (isLoaded) {
       try {
@@ -47,11 +45,14 @@ export function useFavorites() {
     setFavorites([]);
   }, []);
 
+  const favoritesSet = useMemo(() => new Set(favorites), [favorites]);
+
   return {
     favorites,
     isLoaded,
     toggleFavorite,
     isFavorite,
     clearFavorites,
+    favoritesSet,
   };
 }
