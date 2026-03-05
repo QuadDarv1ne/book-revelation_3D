@@ -51,6 +51,12 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
     return result;
   }, [filter, favorites, searchQuery]);
 
+  const quoteToIndexMap = useMemo(() => {
+    const map = new Map<string, number>();
+    quotes.forEach((q, i) => map.set(q.text, i));
+    return map;
+  }, []);
+
   const handleToggleFavorite = useCallback((e: React.MouseEvent, index: number) => {
     e.stopPropagation();
     toggleFavorite(index);
@@ -67,8 +73,8 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
         </p>
       );
     }
-    return filteredQuotes.map((quote, index) => {
-      const originalIndex = quotes.findIndex(q => q.text === quote.text);
+    return filteredQuotes.map((quote) => {
+      const originalIndex = quoteToIndexMap.get(quote.text) ?? 0;
       return (
         <QuoteCard
           key={originalIndex}
@@ -82,7 +88,7 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
         />
       );
     });
-  }, [isLoaded, filteredQuotes, visibleQuotes, activeQuote, isFavorite, handleToggleFavorite, setActiveQuote]);
+  }, [isLoaded, filteredQuotes, visibleQuotes, activeQuote, isFavorite, handleToggleFavorite, setActiveQuote, quoteToIndexMap]);
 
   return (
     <div className="h-full flex flex-col justify-center p-5 md:p-7 lg:p-8">

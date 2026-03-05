@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, memo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -10,7 +10,7 @@ interface ParticleRingProps {
   isRotating: boolean;
 }
 
-export function ParticleRing({ isRotating }: ParticleRingProps) {
+export const ParticleRing = memo(function ParticleRing({ isRotating }: ParticleRingProps) {
   const ringRef = useRef<THREE.Points>(null);
 
   const { positions, colors, baseY } = useMemo(() => {
@@ -64,4 +64,4 @@ export function ParticleRing({ isRotating }: ParticleRingProps) {
   return (
     <points ref={ringRef} geometry={geometry} material={material} />
   );
-}
+});

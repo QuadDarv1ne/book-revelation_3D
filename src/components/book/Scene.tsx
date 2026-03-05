@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, memo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Sparkles, ContactShadows } from "@react-three/drei";
 import { Book } from "./Book";
@@ -13,44 +13,30 @@ interface SceneProps {
   onError?: () => void;
 }
 
-export function Scene({ isRotating, onError }: SceneProps) {
-  const sparklesProps = useMemo(() => ({
-    count: 20,
-    scale: 4,
-    size: 1.5,
-    speed: 0.1,
-    color: "#d4af37",
-    opacity: 0.25,
-  }), []);
-
-  const shadowProps = useMemo(() => ({
-    position: [0, -0.78, 0] as [number, number, number],
-    opacity: 0.4,
-    scale: 5,
-    blur: 2.5,
-    far: 3,
-    color: "#000",
-  }), []);
-
-  const canvasConfig = useMemo(() => ({
-    camera: { position: [0, 1.25, 4.0] as [number, number, number], fov: 38 },
-    dpr: [1, 1.5] as [number, number],
-    gl: { antialias: true, alpha: true, powerPreference: "high-performance" as const, preserveDrawingBuffer: false },
-    performance: { min: 0.5 },
-  }), []);
-
+const SceneContent = memo(function SceneContent({ isRotating }: { isRotating: boolean }) {
   return (
-    <Canvas
-      {...canvasConfig}
-      shadows
-      onError={onError}
-    >
+    <>
       <Lighting />
       <Book isRotating={isRotating} />
       <Podium />
       <ParticleRing isRotating={isRotating} />
-      <Sparkles {...sparklesProps} />
-      <ContactShadows {...shadowProps} />
+      <Sparkles count={20} scale={4} size={1.5} speed={0.1} color="#d4af37" opacity={0.25} />
+      <ContactShadows position={[0, -0.78, 0]} opacity={0.4} scale={5} blur={2.5} far={3} color="#000" />
+    </>
+  );
+});
+
+export const Scene = memo(function Scene({ isRotating, onError }: SceneProps) {
+  return (
+    <Canvas
+      camera={{ position: [0, 1.25, 4.0], fov: 38 }}
+      shadows
+      dpr={[1, 1.5]}
+      gl={{ antialias: true, alpha: true, powerPreference: "high-performance", preserveDrawingBuffer: false }}
+      performance={{ min: 0.5 }}
+      onError={onError}
+    >
+      <SceneContent isRotating={isRotating} />
     </Canvas>
   );
-}
+});

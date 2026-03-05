@@ -1,6 +1,8 @@
 "use client";
 
-export function Lighting() {
+import { memo } from "react";
+
+export const Lighting = memo(function Lighting() {
   return (
     <>
       {/* Main key light */}
@@ -37,4 +39,4 @@ export function Lighting() {
       <ambientLight intensity={0.15} color="#c8d4e8" />
     </>
   );
-}
+});
