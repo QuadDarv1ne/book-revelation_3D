@@ -36,8 +36,7 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
     let result = quotes;
 
     if (filter === 'favorites') {
-      const favSet = new Set(favorites);
-      result = result.filter((_, index) => favSet.has(index));
+      result = result.filter((_, index) => favorites.includes(index));
     }
 
     if (searchQuery.trim()) {
