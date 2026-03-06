@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: stoic-book-3d
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: NODE_ENV
+        value: production

@@ -1,0 +1,48 @@
+# dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Next.js
+.next
+out
+
+# testing
+coverage
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+.env
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDE
+.vscode
+.idea
+
+# git
+.git
+.gitignore
+
+# docs
+docs
+e2e
+
+# config
+netlify.toml
+vercel.json
+railway.json
+render.yaml
+wrangler.toml
+docker-compose.yml

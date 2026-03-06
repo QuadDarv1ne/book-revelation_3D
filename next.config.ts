@@ -6,10 +6,10 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
-  output: "export",
+  output: process.env.DOCKER === "true" ? "standalone" : "export",
   reactStrictMode: true,
   images: {
-    unoptimized: true,
+    unoptimized: process.env.DOCKER !== "true",
   },
   devIndicators: {
     position: "bottom-left",
