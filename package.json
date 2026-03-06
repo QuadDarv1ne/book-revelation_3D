@@ -17,6 +17,8 @@
     "test:e2e:ui": "playwright test --ui",
     "covers:download": "node scripts/download-covers.js",
     "covers:parse": "node scripts/parse-book-covers.js",
+    "covers:azbooka": "node scripts/parse-azbooka.js",
+    "covers:google": "node scripts/parse-google-books.js",
     "covers:set": "node scripts/set-cover.js",
     "covers:create-spine": "node scripts/create-spine.js"
   },
