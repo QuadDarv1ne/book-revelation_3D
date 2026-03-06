@@ -13,13 +13,25 @@ const Scene = dynamic(() => import("@/components/book").then(mod => ({ default: 
   loading: () => <LoadingFallback />,
 });
 
+const BACKGROUND_GRADIENT = 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.045)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.035)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(15,15,35,0.55)_0%,transparent_50%)';
+const GRID_PATTERN = 'linear-gradient(rgba(212,175,55,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.7)_1px,transparent_1px)';
+const QUOTE_ROTATION_INTERVAL = 5000;
+const QUOTE_COUNT = 8;
+
+function getInitialTheme(): "dark" | "light" {
+  if (typeof window === "undefined") return "dark";
+  const saved = localStorage.getItem("theme");
+  if (saved === "light" || saved === "dark") return saved;
+  return "dark";
+}
+
 export default function Home() {
   const mounted = useMounted();
   const hasWebGL = useWebGLSupport();
   const { isRotating, toggleRotation } = useRotationControl();
   const [activeQuote, setActiveQuote] = useState(0);
   const [webGLError, setWebGLError] = useState(false);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">(getInitialTheme);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -33,24 +45,16 @@ export default function Home() {
   }, [toggleRotation]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    if (saved === "light" || saved === "dark") {
-      document.body.classList.toggle("light-theme", saved === "light");
-      localStorage.setItem("theme", saved);
-    }
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveQuote((prev) => (prev + 1) % 8);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
     document.body.classList.toggle("light-theme", theme === "light");
     localStorage.setItem("theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveQuote((prev) => (prev + 1) % QUOTE_COUNT);
+    }, QUOTE_ROTATION_INTERVAL);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleRetry = useCallback(() => {
     setWebGLError(false);
@@ -61,8 +65,8 @@ export default function Home() {
     return <WebGLError onRetry={handleRetry} />;
   }
 
-  const backgroundGradient = 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.045)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.035)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(15,15,35,0.55)_0%,transparent_50%)';
-  const gridPattern = 'linear-gradient(rgba(212,175,55,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.7)_1px,transparent_1px)';
+  const backgroundGradient = BACKGROUND_GRADIENT;
+  const gridPattern = GRID_PATTERN;
 
   return (
     <main className="relative w-full h-screen overflow-hidden select-none bg-[#07070d]" role="main">
