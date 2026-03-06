@@ -14,8 +14,9 @@ export function useFavorites() {
       }
     } catch (error) {
       console.warn("Failed to load favorites:", error);
+    } finally {
+      setIsLoaded(true);
     }
-    setIsLoaded(true);
   }, []);
 
   useEffect(() => {
