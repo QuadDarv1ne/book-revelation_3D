@@ -12,7 +12,7 @@ export const Podium = memo(function Podium() {
   // Geometries
   const baseGeometry = useMemo(() => new THREE.CylinderGeometry(1.35, 1.55, 0.22, 32), []);
   const topCircleGeometry = useMemo(() => new THREE.CircleGeometry(1.35, 32), []);
-  const innerCircle_geometry = useMemo(() => new THREE.CircleGeometry(1.15, 32), []);
+  const innerCircleGeometry = useMemo(() => new THREE.CircleGeometry(1.15, 32), []);
   const ringGeometry = useMemo(() => new THREE.RingGeometry(1.1, 1.3, 32), []);
   const torusGeometry = useMemo(() => new THREE.TorusGeometry(1.5, 0.022, 16, 32), []);
   const bottomCircleGeometry = useMemo(() => new THREE.CircleGeometry(1.7, 32), []);
@@ -89,7 +89,7 @@ export const Podium = memo(function Podium() {
       </mesh>
 
       <mesh ref={innerGlowRef} position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <primitive object={innerCircle_geometry} />
+        <primitive object={innerCircleGeometry} />
         <primitive object={innerGlowMaterial} />
       </mesh>
 
