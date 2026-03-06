@@ -10,6 +10,40 @@ interface CornerPosition {
 
 const textureCache = new Map<string, THREE.CanvasTexture>();
 
+function drawCornerDecorations(ctx: CanvasRenderingContext2D, corners: CornerPosition[]): void {
+  corners.forEach(({ x, y }) => {
+    ctx.beginPath();
+    ctx.arc(x, y, 15, 0, Math.PI * 2);
+    ctx.fillStyle = "#d4af37";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, 8, 0, Math.PI * 2);
+    ctx.fillStyle = "#1a0f0a";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = "#d4af37";
+    ctx.fill();
+  });
+}
+
+function drawLeatherTexture(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+  for (let i = 0; i < 1500; i++) {
+    const alpha = Math.random() * 0.04;
+    ctx.fillStyle = `rgba(${Math.random() > 0.5 ? 255 : 0}, ${Math.random() > 0.5 ? 200 : 50}, ${Math.random() > 0.5 ? 150 : 0}, ${alpha})`;
+    ctx.fillRect(Math.random() * width, Math.random() * height, 1, 1);
+  }
+}
+
+function drawDecorativeLine(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, color: string, lineWidth: number): void {
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+  ctx.stroke();
+}
+
 export function createBookCoverTexture(): THREE.CanvasTexture {
   const cacheKey = `cover-${CANVAS_WIDTH}x${CANVAS_HEIGHT}`;
   const cached = textureCache.get(cacheKey);
@@ -28,12 +62,7 @@ export function createBookCoverTexture(): THREE.CanvasTexture {
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Add subtle leather texture (reduced particles)
-  for (let i = 0; i < 1500; i++) {
-    const alpha = Math.random() * 0.04;
-    ctx.fillStyle = `rgba(${Math.random() > 0.5 ? 255 : 0}, ${Math.random() > 0.5 ? 200 : 50}, ${Math.random() > 0.5 ? 150 : 0}, ${alpha})`;
-    ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 1, 1);
-  }
+  drawLeatherTexture(ctx, canvas.width, canvas.height);
 
   // Gold outer border
   ctx.strokeStyle = "#d4af37";
@@ -41,14 +70,16 @@ export function createBookCoverTexture(): THREE.CanvasTexture {
   ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
 
   // Inner decorative border
-  ctx.strokeStyle = "#b8962e";
-  ctx.lineWidth = 2;
-  ctx.strokeRect(38, 38, canvas.width - 76, canvas.height - 76);
+  drawDecorativeLine(ctx, 38, 38, canvas.width - 38, 38, "#b8962e", 2);
+  drawDecorativeLine(ctx, canvas.width - 38, 38, canvas.width - 38, canvas.height - 38, "#b8962e", 2);
+  drawDecorativeLine(ctx, canvas.width - 38, canvas.height - 38, 38, canvas.height - 38, "#b8962e", 2);
+  drawDecorativeLine(ctx, 38, canvas.height - 38, 38, 38, "#b8962e", 2);
 
   // Third inner border
-  ctx.strokeStyle = "#8b7225";
-  ctx.lineWidth = 1;
-  ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
+  drawDecorativeLine(ctx, 50, 50, canvas.width - 50, 50, "#8b7225", 1);
+  drawDecorativeLine(ctx, canvas.width - 50, 50, canvas.width - 50, canvas.height - 50, "#8b7225", 1);
+  drawDecorativeLine(ctx, canvas.width - 50, canvas.height - 50, 50, canvas.height - 50, "#8b7225", 1);
+  drawDecorativeLine(ctx, 50, canvas.height - 50, 50, 50, "#8b7225", 1);
 
   // Corner decorations
   const corners: CornerPosition[] = [
@@ -57,23 +88,7 @@ export function createBookCoverTexture(): THREE.CanvasTexture {
     { x: 30, y: canvas.height - 30 },
     { x: canvas.width - 30, y: canvas.height - 30 },
   ];
-  corners.forEach(({ x, y }) => {
-    // Outer circle
-    ctx.beginPath();
-    ctx.arc(x, y, 15, 0, Math.PI * 2);
-    ctx.fillStyle = "#d4af37";
-    ctx.fill();
-    // Inner circle
-    ctx.beginPath();
-    ctx.arc(x, y, 8, 0, Math.PI * 2);
-    ctx.fillStyle = "#1a0f0a";
-    ctx.fill();
-    // Center dot
-    ctx.beginPath();
-    ctx.arc(x, y, 3, 0, Math.PI * 2);
-    ctx.fillStyle = "#d4af37";
-    ctx.fill();
-  });
+  drawCornerDecorations(ctx, corners);
 
   // Top decorative ornament
   ctx.beginPath();
@@ -106,12 +121,7 @@ export function createBookCoverTexture(): THREE.CanvasTexture {
   ctx.shadowOffsetY = 0;
 
   // Decorative divider
-  ctx.beginPath();
-  ctx.moveTo(140, 280);
-  ctx.lineTo(canvas.width - 140, 280);
-  ctx.strokeStyle = "#d4af37";
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+  drawDecorativeLine(ctx, 140, 280, canvas.width - 140, 280, "#d4af37", 1.5);
 
   // Diamond ornament in the middle
   ctx.save();
@@ -135,12 +145,7 @@ export function createBookCoverTexture(): THREE.CanvasTexture {
   ctx.fillText("Эпиктет", canvas.width / 2, 475);
 
   // Bottom decorative element
-  ctx.beginPath();
-  ctx.moveTo(170, canvas.height - 140);
-  ctx.lineTo(canvas.width - 170, canvas.height - 140);
-  ctx.strokeStyle = "#d4af37";
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  drawDecorativeLine(ctx, 170, canvas.height - 140, canvas.width - 170, canvas.height - 140, "#d4af37", 2);
 
   // Bottom ornament - laurel wreath style
   ctx.beginPath();

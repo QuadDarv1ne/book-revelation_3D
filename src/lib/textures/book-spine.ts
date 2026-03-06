@@ -5,6 +5,15 @@ const CANVAS_HEIGHT = 352;
 
 const textureCache = new Map<string, THREE.CanvasTexture>();
 
+function drawLine(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, color: string, lineWidth: number): void {
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lineWidth;
+  ctx.stroke();
+}
+
 export function createSpineTexture(): THREE.CanvasTexture {
   const cacheKey = `spine-${CANVAS_WIDTH}x${CANVAS_HEIGHT}`;
   const cached = textureCache.get(cacheKey);
@@ -24,16 +33,8 @@ export function createSpineTexture(): THREE.CanvasTexture {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // Gold lines
-  ctx.strokeStyle = "#d4af37";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(8, 22);
-  ctx.lineTo(canvas.width - 8, 22);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(8, canvas.height - 22);
-  ctx.lineTo(canvas.width - 8, canvas.height - 22);
-  ctx.stroke();
+  drawLine(ctx, 8, 22, canvas.width - 8, 22, "#d4af37", 1);
+  drawLine(ctx, 8, canvas.height - 22, canvas.width - 8, canvas.height - 22, "#d4af37", 1);
 
   // Title on spine (rotated, simplified)
   ctx.save();
