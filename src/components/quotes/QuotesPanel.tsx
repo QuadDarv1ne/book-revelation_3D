@@ -88,7 +88,7 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
         />
       );
     });
-  }, [isLoaded, filteredQuotes, visibleQuotes, activeQuote, isFavorite, handleToggleFavorite, setActiveQuote, quoteToIndexMap]);
+  }, [isLoaded, filteredQuotes, visibleQuotes, activeQuote, isFavorite, handleToggleFavorite, setActiveQuote, quoteToIndexMap, filter]);
 
   return (
     <div className="h-full flex flex-col justify-center p-5 md:p-7 lg:p-8">

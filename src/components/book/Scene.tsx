@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, memo } from "react";
+import { memo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Sparkles, ContactShadows } from "@react-three/drei";
 import { Book } from "./Book";

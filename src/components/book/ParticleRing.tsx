@@ -10,28 +10,30 @@ interface ParticleRingProps {
   isRotating: boolean;
 }
 
+function createParticleData() {
+  const positions = new Float32Array(PARTICLE_COUNT * 3);
+  const colors = new Float32Array(PARTICLE_COUNT * 3);
+  const baseY = new Float32Array(PARTICLE_COUNT);
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const angle = (i / PARTICLE_COUNT) * Math.PI * 2;
+    const radius = 1.5 + Math.random() * 0.4;
+    positions[i * 3] = Math.cos(angle) * radius;
+    baseY[i] = 0.3 + Math.random() * 1.5;
+    positions[i * 3 + 1] = baseY[i];
+    positions[i * 3 + 2] = Math.sin(angle) * radius;
+
+    colors[i * 3] = 0.83;
+    colors[i * 3 + 1] = 0.68;
+    colors[i * 3 + 2] = 0.21;
+  }
+  return { positions, colors, baseY };
+}
+
 export const ParticleRing = memo(function ParticleRing({ isRotating }: ParticleRingProps) {
   const ringRef = useRef<THREE.Points>(null);
-
-  const { positions, colors, baseY } = useMemo(() => {
-    const positions = new Float32Array(PARTICLE_COUNT * 3);
-    const colors = new Float32Array(PARTICLE_COUNT * 3);
-    const baseY = new Float32Array(PARTICLE_COUNT);
-
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const angle = (i / PARTICLE_COUNT) * Math.PI * 2;
-      const radius = 1.5 + Math.random() * 0.4;
-      positions[i * 3] = Math.cos(angle) * radius;
-      baseY[i] = 0.3 + Math.random() * 1.5;
-      positions[i * 3 + 1] = baseY[i];
-      positions[i * 3 + 2] = Math.sin(angle) * radius;
-
-      colors[i * 3] = 0.83;
-      colors[i * 3 + 1] = 0.68;
-      colors[i * 3 + 2] = 0.21;
-    }
-    return { positions, colors, baseY };
-  }, []);
+  const data = useMemo(() => createParticleData(), []);
+  const { positions, colors, baseY } = data;
 
   const geometry = useMemo(() => {
     const geo = new THREE.BufferGeometry();
