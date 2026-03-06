@@ -19,6 +19,14 @@ const COVER_THICKNESS = 0.018;
 const DEFAULT_COVER = "/book-cover.jpg";
 const DEFAULT_SPINE = "/book-spine.jpg";
 
+// Выносим геометрии за пределы компонента для оптимизации
+const COVER_GEOMETRY = new THREE.BoxGeometry(BOOK_WIDTH, BOOK_HEIGHT, COVER_THICKNESS);
+const PAGES_GEOMETRY = new THREE.BoxGeometry(BOOK_WIDTH - 0.06, BOOK_HEIGHT - 0.06, BOOK_DEPTH - 0.035);
+const SPINE_GEOMETRY = new THREE.BoxGeometry(0.035, BOOK_HEIGHT + 0.015, BOOK_DEPTH + 0.015);
+const PAGES_EDGE_GEOMETRY = new THREE.BoxGeometry(0.07, BOOK_HEIGHT - 0.08, BOOK_DEPTH - 0.04);
+const GOLD_TOP_GEOMETRY = new THREE.BoxGeometry(BOOK_WIDTH - 0.08, 0.012, BOOK_DEPTH - 0.015);
+const GLOW_GEOMETRY = new THREE.CircleGeometry(1.1, 32);
+
 export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFAULT_SPINE }: BookProps) {
   const bookRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
@@ -80,13 +88,7 @@ export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFA
     blending: THREE.AdditiveBlending
   }), []);
 
-  // Geometries
-  const coverGeometry = useMemo(() => new THREE.BoxGeometry(BOOK_WIDTH, BOOK_HEIGHT, COVER_THICKNESS), []);
-  const pagesGeometry = useMemo(() => new THREE.BoxGeometry(BOOK_WIDTH - 0.06, BOOK_HEIGHT - 0.06, BOOK_DEPTH - 0.035), []);
-  const spineGeometry = useMemo(() => new THREE.BoxGeometry(0.035, BOOK_HEIGHT + 0.015, BOOK_DEPTH + 0.015), []);
-  const pagesEdgeGeometry = useMemo(() => new THREE.BoxGeometry(0.07, BOOK_HEIGHT - 0.08, BOOK_DEPTH - 0.04), []);
-  const goldTopGeometry = useMemo(() => new THREE.BoxGeometry(BOOK_WIDTH - 0.08, 0.012, BOOK_DEPTH - 0.015), []);
-  const glowGeometry = useMemo(() => new THREE.CircleGeometry(1.1, 32), []);
+  // Geometries - используем константы
 
   const handleTouchStart = useCallback((e: TouchEvent) => {
     const touch = e.touches[0];
@@ -159,43 +161,43 @@ export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFA
           position={[0, 0.6, 0]}
         >
           <mesh position={[0, 0, -BOOK_DEPTH/2 + COVER_THICKNESS/2]} castShadow>
-            <primitive object={coverGeometry} />
+            <primitive object={COVER_GEOMETRY} />
             <primitive object={darkCoverMaterial} />
           </mesh>
 
           <mesh position={[0, 0, 0]} castShadow>
-            <primitive object={pagesGeometry} />
+            <primitive object={PAGES_GEOMETRY} />
             <primitive object={pagesMaterial} />
           </mesh>
 
           <mesh position={[0, 0, BOOK_DEPTH/2 - COVER_THICKNESS/2]} castShadow>
-            <primitive object={coverGeometry} />
+            <primitive object={COVER_GEOMETRY} />
             <primitive object={coverMaterial} />
           </mesh>
 
           <mesh position={[-BOOK_WIDTH/2 - 0.008, 0, 0]} castShadow>
-            <primitive object={spineGeometry} />
+            <primitive object={SPINE_GEOMETRY} />
             <primitive object={spineMaterial} />
           </mesh>
 
           <mesh position={[BOOK_WIDTH/2 - 0.035, 0, 0]}>
-            <primitive object={pagesEdgeGeometry} />
+            <primitive object={PAGES_EDGE_GEOMETRY} />
             <primitive object={pagesEdgeMaterial} />
           </mesh>
 
           <mesh position={[0, BOOK_HEIGHT/2 - 0.008, 0]}>
-            <primitive object={goldTopGeometry} />
+            <primitive object={GOLD_TOP_GEOMETRY} />
             <primitive object={goldMaterial} />
           </mesh>
           <mesh position={[0, -BOOK_HEIGHT/2 + 0.008, 0]}>
-            <primitive object={goldTopGeometry} />
+            <primitive object={GOLD_TOP_GEOMETRY} />
             <primitive object={goldMaterial} />
           </mesh>
         </group>
       </Float>
 
       <mesh ref={glowRef} position={[0, 0.04, 0]} rotation={[-Math.PI/2, 0, 0]}>
-        <primitive object={glowGeometry} />
+        <primitive object={GLOW_GEOMETRY} />
         <primitive object={glowMaterial} />
       </mesh>
     </group>

@@ -37,16 +37,16 @@ export function useFavorites() {
     );
   }, []);
 
+  const favoritesSet = useMemo(() => new Set(favorites), [favorites]);
+
   const isFavorite = useCallback(
-    (index: number) => favorites.includes(index),
-    [favorites]
+    (index: number) => favoritesSet.has(index),
+    [favoritesSet]
   );
 
   const clearFavorites = useCallback(() => {
     setFavorites([]);
   }, []);
-
-  const favoritesSet = useMemo(() => new Set(favorites), [favorites]);
 
   return {
     favorites,

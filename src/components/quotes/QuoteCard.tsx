@@ -10,12 +10,21 @@ interface QuoteCardProps {
   isFavorite: boolean;
   onClick: () => void;
   onToggleFavorite: (e: React.MouseEvent) => void;
+  onCopy?: (text: string) => void;
 }
 
-export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onClick, onToggleFavorite }: QuoteCardProps) {
+export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onClick, onToggleFavorite, onCopy }: QuoteCardProps) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
     <div
       onClick={onClick}
+      onKeyDown={handleKeyDown}
       tabIndex={0}
       role="button"
       aria-label={`Цитата ${index + 1}: ${quote.text.substring(0, 50)}... ${isActive ? '(активна)' : ''}`}
@@ -39,30 +48,47 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
           }
         `}
       >
-        {/* Favorite button */}
-        <button
-          onClick={(e) => { e.stopPropagation(); onToggleFavorite(e); }}
-          tabIndex={0}
-          className="absolute top-2 right-2 z-20 p-1.5 rounded-full hover:bg-amber-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400"
-          aria-label={isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
-          aria-pressed={isFavorite}
-          type="button"
-        >
-          <svg
-            className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-500 hover:text-amber-400'}`}
-            fill={isFavorite ? "currentColor" : "none"}
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
+        {/* Action buttons */}
+        <div className="absolute top-2 right-2 z-20 flex gap-1">
+          {/* Copy button */}
+          {onCopy && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onCopy(`"${quote.text}" — ${quote.author}`); }}
+              tabIndex={0}
+              className="p-1.5 rounded-full hover:bg-amber-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400"
+              aria-label="Копировать цитату"
+              type="button"
+            >
+              <svg className="w-4 h-4 text-gray-500 hover:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </button>
+          )}
+          {/* Favorite button */}
+          <button
+            onClick={(e) => { e.stopPropagation(); onToggleFavorite(e); }}
+            tabIndex={0}
+            className="p-1.5 rounded-full hover:bg-amber-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400"
+            aria-label={isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
+            aria-pressed={isFavorite}
+            type="button"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-            />
-          </svg>
-        </button>
+            <svg
+              className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-500 hover:text-amber-400'}`}
+              fill={isFavorite ? "currentColor" : "none"}
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
+            </svg>
+          </button>
+        </div>
 
         <p className={`
           text-sm md:text-[15px] leading-relaxed mb-2 pr-8 relative z-10

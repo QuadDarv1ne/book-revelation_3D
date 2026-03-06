@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { quotes } from "@/data/quotes";
 import { QuoteCard } from "./QuoteCard";
 import { useFavorites } from "@/hooks/use-favorites";
+import { useToast } from "@/components/ui/Toast";
 
 interface QuotesPanelProps {
   activeQuote: number;
@@ -32,16 +33,17 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
     return () => clearTimeout(initialTimer);
   }, []);
 
-  const filteredQuotes = useMemo(() => {
-    let result = quotes;
+  // Фильтруем с сохранением оригинального индекса
+  const filteredQuotesWithIndex = useMemo(() => {
+    let result = quotes.map((q, i) => ({ quote: q, originalIndex: i }));
 
     if (filter === 'favorites') {
-      result = result.filter((_, index) => favorites.includes(index));
+      result = result.filter(({ originalIndex }) => favorites.includes(originalIndex));
     }
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(quote =>
+      result = result.filter(({ quote }) =>
         quote.text.toLowerCase().includes(query) ||
         quote.author.toLowerCase().includes(query)
       );
@@ -50,20 +52,34 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
     return result;
   }, [filter, favorites, searchQuery]);
 
-  const quoteToIndexMap = useMemo(() => {
-    const map = new Map<string, number>();
-    quotes.forEach((q, i) => map.set(q.text, i));
-    return map;
-  }, []);
-
   const handleToggleFavorite = useCallback((e: React.MouseEvent, index: number) => {
     e.stopPropagation();
     toggleFavorite(index);
   }, [toggleFavorite]);
 
+  const { showToast } = useToast();
+
+  // Функция копирования цитаты
+  const handleCopyQuote = useCallback((text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast("Цитата скопирована!", "success");
+    }).catch(err => {
+      showToast("Не удалось скопировать", "error");
+      console.warn('Failed to copy:', err);
+    });
+  }, [showToast]);
+
+  // Перемешать цитаты случайным образом
+  const shuffleQuotes = useCallback(() => {
+    const shuffled = [...quotes].sort(() => Math.random() - 0.5);
+    const firstQuote = shuffled[0];
+    const newIndex = quotes.findIndex(q => q.text === firstQuote.text);
+    setActiveQuote(newIndex);
+  }, [setActiveQuote]);
+
   const quoteCards = useMemo(() => {
     if (!isLoaded) return null;
-    if (filteredQuotes.length === 0) {
+    if (filteredQuotesWithIndex.length === 0) {
       return (
         <p className="text-gray-500 text-sm">
           {filter === 'favorites'
@@ -72,22 +88,20 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
         </p>
       );
     }
-    return filteredQuotes.map((quote) => {
-      const originalIndex = quoteToIndexMap.get(quote.text) ?? 0;
-      return (
-        <QuoteCard
-          key={originalIndex}
-          quote={quote}
-          index={originalIndex}
-          isVisible={visibleQuotes.includes(originalIndex)}
-          isActive={activeQuote === originalIndex}
-          isFavorite={isFavorite(originalIndex)}
-          onClick={() => setActiveQuote(originalIndex)}
-          onToggleFavorite={(e) => handleToggleFavorite(e, originalIndex)}
-        />
-      );
-    });
-  }, [isLoaded, filteredQuotes, visibleQuotes, activeQuote, isFavorite, handleToggleFavorite, setActiveQuote, quoteToIndexMap, filter]);
+    return filteredQuotesWithIndex.map(({ quote, originalIndex }) => (
+      <QuoteCard
+        key={originalIndex}
+        quote={quote}
+        index={originalIndex}
+        isVisible={visibleQuotes.includes(originalIndex)}
+        isActive={activeQuote === originalIndex}
+        isFavorite={isFavorite(originalIndex)}
+        onClick={() => setActiveQuote(originalIndex)}
+        onToggleFavorite={(e) => handleToggleFavorite(e, originalIndex)}
+        onCopy={handleCopyQuote}
+      />
+    ));
+  }, [isLoaded, filteredQuotesWithIndex, visibleQuotes, activeQuote, isFavorite, handleToggleFavorite, handleCopyQuote, setActiveQuote, filter]);
 
   return (
     <div className="h-full flex flex-col justify-center p-5 md:p-7 lg:p-8">
@@ -142,6 +156,16 @@ export function QuotesPanel({ activeQuote, setActiveQuote }: QuotesPanelProps) {
             }`}
           >
             Избранные ({favorites.length})
+          </button>
+          <button
+            onClick={shuffleQuotes}
+            className="px-3 py-1.5 text-xs rounded-lg text-gray-500 hover:text-amber-400 hover:bg-amber-500/10 transition-colors"
+            title="Перемешать цитаты"
+            aria-label="Перемешать цитаты случайным образом"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
           </button>
         </div>
         

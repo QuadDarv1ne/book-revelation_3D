@@ -1,7 +1,5 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
-
 function subscribe() {
   return () => {};
 }

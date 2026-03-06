@@ -13,12 +13,13 @@ interface SceneProps {
   onError?: () => void;
   coverImage?: string;
   spineImage?: string;
+  theme?: string;
 }
 
-const SceneContent = memo(function SceneContent({ isRotating, coverImage, spineImage }: { isRotating: boolean; coverImage?: string; spineImage?: string }) {
+const SceneContent = memo(function SceneContent({ isRotating, coverImage, spineImage, theme }: { isRotating: boolean; coverImage?: string; spineImage?: string; theme?: string }) {
   return (
     <>
-      <Lighting />
+      <Lighting theme={theme} />
       <Book isRotating={isRotating} coverImage={coverImage} spineImage={spineImage} />
       <Podium />
       <ParticleRing isRotating={isRotating} />
@@ -28,7 +29,7 @@ const SceneContent = memo(function SceneContent({ isRotating, coverImage, spineI
   );
 });
 
-export const Scene = memo(function Scene({ isRotating, onError, coverImage, spineImage }: SceneProps) {
+export const Scene = memo(function Scene({ isRotating, onError, coverImage, spineImage, theme }: SceneProps) {
   return (
     <Canvas
       camera={{ position: [0, 1.25, 4.0], fov: 38 }}
@@ -38,7 +39,7 @@ export const Scene = memo(function Scene({ isRotating, onError, coverImage, spin
       performance={{ min: 0.5 }}
       onError={onError}
     >
-      <SceneContent isRotating={isRotating} coverImage={coverImage} spineImage={spineImage} />
+      <SceneContent isRotating={isRotating} coverImage={coverImage} spineImage={spineImage} theme={theme} />
     </Canvas>
   );
 });
