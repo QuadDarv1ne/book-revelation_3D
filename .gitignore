@@ -40,3 +40,8 @@ coverage/
 # Misc
 .vercel
 *.tgz
+
+# Screenshots
+*.png
+*.jpg
+!public/*.jpg
