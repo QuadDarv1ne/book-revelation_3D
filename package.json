@@ -16,7 +16,9 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "covers:download": "node scripts/download-covers.js",
-    "covers:parse": "node scripts/parse-book-covers.js"
+    "covers:parse": "node scripts/parse-book-covers.js",
+    "covers:set": "node scripts/set-cover.js",
+    "covers:create-spine": "node scripts/create-spine.js"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
