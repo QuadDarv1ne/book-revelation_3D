@@ -12,7 +12,7 @@ describe('quotes', () => {
   });
 
   it('should have valid quote structure', () => {
-    quotes.forEach((quote: Quote, index: number) => {
+    quotes.forEach((quote: Quote) => {
       expect(quote).toHaveProperty('text');
       expect(quote).toHaveProperty('author');
       expect(quote).toHaveProperty('era');

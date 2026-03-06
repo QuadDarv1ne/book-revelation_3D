@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { QuotesPanel } from "@/components/quotes";
 import { ControlButton, WebGLError, useWebGLSupport, SettingsBar, PWAInstall } from "@/components/ui";
@@ -35,14 +35,10 @@ export default function Home() {
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved === "light" || saved === "dark") {
-      setTheme(saved);
+      document.body.classList.toggle("light-theme", saved === "light");
+      localStorage.setItem("theme", saved);
     }
   }, []);
-
-  useEffect(() => {
-    document.body.classList.toggle("light-theme", theme === "light");
-    localStorage.setItem("theme", theme);
-  }, [theme]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -51,7 +47,12 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleRetry = useMemo(() => () => {
+  useEffect(() => {
+    document.body.classList.toggle("light-theme", theme === "light");
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const handleRetry = useCallback(() => {
     setWebGLError(false);
     window.location.reload();
   }, []);
@@ -60,8 +61,8 @@ export default function Home() {
     return <WebGLError onRetry={handleRetry} />;
   }
 
-  const backgroundGradient = useMemo(() => 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.045)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.035)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(15,15,35,0.55)_0%,transparent_50%)', []);
-  const gridPattern = useMemo(() => 'linear-gradient(rgba(212,175,55,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.7)_1px,transparent_1px)', []);
+  const backgroundGradient = 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.045)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.035)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(15,15,35,0.55)_0%,transparent_50%)';
+  const gridPattern = 'linear-gradient(rgba(212,175,55,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.7)_1px,transparent_1px)';
 
   return (
     <main className="relative w-full h-screen overflow-hidden select-none bg-[#07070d]" role="main">
