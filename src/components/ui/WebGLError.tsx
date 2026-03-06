@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+function subscribe() {
+  return () => {};
+}
 
 export function WebGLError({ onRetry }: { onRetry: () => void }) {
   return (
@@ -24,21 +28,17 @@ export function WebGLError({ onRetry }: { onRetry: () => void }) {
 }
 
 export function useWebGLSupport() {
-  const [hasWebGL, setHasWebGL] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const checkWebGL = () => {
+  return useSyncExternalStore(
+    subscribe,
+    () => {
       try {
         const canvas = document.createElement("canvas");
         const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-        setHasWebGL(!!gl);
+        return !!gl;
       } catch {
-        setHasWebGL(false);
+        return false;
       }
-    };
-
-    checkWebGL();
-  }, []);
-
-  return hasWebGL;
+    },
+    () => false
+  );
 }
