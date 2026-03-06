@@ -4,18 +4,22 @@ import { useRef, useState, useMemo, useEffect, useCallback } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Float } from "@react-three/drei";
 import * as THREE from "three";
-import { createBookCoverTexture, createSpineTexture } from "@/lib/textures/index";
+import { loadRealBookCoverTexture, loadRealSpineTexture } from "@/lib/textures/index";
 
 interface BookProps {
   isRotating: boolean;
+  coverImage?: string;
+  spineImage?: string;
 }
 
 const BOOK_WIDTH = 1.35;
 const BOOK_HEIGHT = 1.85;
 const BOOK_DEPTH = 0.22;
 const COVER_THICKNESS = 0.018;
+const DEFAULT_COVER = "/book-cover.jpg";
+const DEFAULT_SPINE = "/book-spine.jpg";
 
-export function Book({ isRotating }: BookProps) {
+export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFAULT_SPINE }: BookProps) {
   const bookRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   const glowRef = useRef<THREE.Mesh>(null);
@@ -25,8 +29,8 @@ export function Book({ isRotating }: BookProps) {
   const touchRotation = useRef({ x: 0, y: 0 });
   const targetRotation = useRef(0);
 
-  const coverTexture = useMemo(() => createBookCoverTexture(), []);
-  const spineTexture = useMemo(() => createSpineTexture(), []);
+  const coverTexture = useMemo(() => loadRealBookCoverTexture(coverImage), [coverImage]);
+  const spineTexture = useMemo(() => loadRealSpineTexture(spineImage), [spineImage]);
 
   // Reusable materials
   const coverMaterial = useMemo(() => new THREE.MeshStandardMaterial({

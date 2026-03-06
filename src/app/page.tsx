@@ -17,6 +17,8 @@ const BACKGROUND_GRADIENT = 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212
 const GRID_PATTERN = 'linear-gradient(rgba(212,175,55,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.7)_1px,transparent_1px)';
 const QUOTE_ROTATION_INTERVAL = 5000;
 const QUOTE_COUNT = 8;
+const BOOK_COVER_IMAGE = "/book-cover.jpg";
+const BOOK_SPINE_IMAGE = "/book-spine.jpg";
 
 function getInitialTheme(): "dark" | "light" {
   if (typeof window === "undefined") return "dark";
@@ -83,7 +85,7 @@ export default function Home() {
       <div className="relative z-10 h-full flex flex-col lg:flex-row">
         <div className="w-full lg:w-[58%] h-[50%] lg:h-full relative" role="region" aria-label="3D сцена с книгой">
           {mounted && (
-            <Scene isRotating={isRotating} onError={() => setWebGLError(true)} />
+            <Scene isRotating={isRotating} onError={() => setWebGLError(true)} coverImage={BOOK_COVER_IMAGE} spineImage={BOOK_SPINE_IMAGE} />
           )}
 
           <div id="controls">
