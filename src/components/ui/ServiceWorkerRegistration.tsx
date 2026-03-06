@@ -7,9 +7,6 @@ export function ServiceWorkerRegistration() {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
         .register("/sw.js")
-        .then((registration) => {
-          console.warn("SW registered:", registration.scope);
-        })
         .catch((error) => {
           console.error("SW registration failed:", error);
         });
