@@ -29,6 +29,7 @@ interface Book3DContextType {
   zoomIn: () => void;
   zoomOut: () => void;
   resetZoom: () => void;
+  setZoom: (zoom: number) => void;
 
   // Загрузка
   isLoading: boolean;
@@ -88,6 +89,10 @@ export function Book3DProvider({
     setCameraZoom(1);
   }, []);
 
+  const setZoom = useCallback((zoom: number) => {
+    setCameraZoom(Math.max(0.5, Math.min(zoom, 2)));
+  }, []);
+
   const value = useMemo(() => ({
     isRotating,
     toggleRotation,
@@ -100,6 +105,7 @@ export function Book3DProvider({
     zoomIn,
     zoomOut,
     resetZoom,
+    setZoom,
     isLoading,
     setIsLoading,
     error,
@@ -116,10 +122,9 @@ export function Book3DProvider({
     zoomIn,
     zoomOut,
     resetZoom,
+    setZoom,
     isLoading,
-    setIsLoading,
     error,
-    setError,
   ]);
 
   return (

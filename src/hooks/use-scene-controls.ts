@@ -22,12 +22,7 @@ const BASE_FOV = 38;
  * Хук для управления камерой в 3D сцене
  */
 export function useCameraControls(): UseCameraControls {
-  const { cameraZoom, zoomIn, zoomOut, resetZoom } = useBook3D();
-
-  const setZoom = useCallback((_zoom: number) => {
-    // Будет реализовано через контекст при необходимости
-    console.warn("setZoom not yet implemented in context");
-  }, []);
+  const { cameraZoom, zoomIn, zoomOut, resetZoom, setZoom } = useBook3D();
 
   const fov = useMemo(() => {
     return BASE_FOV / cameraZoom;
@@ -39,7 +34,6 @@ export function useCameraControls(): UseCameraControls {
 
   const updatePosition = useCallback((_pos: Partial<THREE.Vector3>) => {
     // Будет реализовано через контекст при необходимости
-    console.warn("updatePosition not yet implemented in context");
   }, []);
 
   return {
@@ -67,11 +61,10 @@ interface UseBookRotation {
 
 export function useBookRotation(): UseBookRotation {
   const { isRotating, toggleRotation, setRotation } = useBook3D();
-  const rotationSpeed = 0.5; // Можно вынести в контекст при необходимости
+  const rotationSpeed = 0.5;
 
   const setRotationSpeed = useCallback((_speed: number) => {
     // Будет реализовано через контекст при необходимости
-    console.warn("setRotationSpeed not yet implemented in context");
   }, []);
 
   return {
