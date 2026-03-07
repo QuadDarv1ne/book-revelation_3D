@@ -7,25 +7,21 @@ import { useState, useEffect } from "react";
  * Возвращает "dark" или "light" в зависимости от настроек системы
  */
 export function usePrefersColorScheme(): "dark" | "light" {
-  const [colorScheme, setColorScheme] = useState<"dark" | "light">("dark");
+  const [colorScheme, setColorScheme] = useState<"dark" | "light">(() => {
+    if (typeof window !== "undefined") {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    return "dark";
+  });
 
   useEffect(() => {
-    // Проверяем prefers-color-scheme
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     const handleChange = (e: MediaQueryListEvent) => {
       setColorScheme(e.matches ? "dark" : "light");
     };
 
-    // Устанавливаем начальное значение через функциональное обновление
-    setColorScheme(prev => {
-      const initial = mediaQuery.matches ? "dark" : "light";
-      return initial !== prev ? initial : prev;
-    });
-
-    // Подписываемся на изменения
     mediaQuery.addEventListener("change", handleChange);
-
     return () => {
       mediaQuery.removeEventListener("change", handleChange);
     };
