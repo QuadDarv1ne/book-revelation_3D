@@ -28,12 +28,15 @@ export function useAccessibility(): UseAccessibility {
       // Alt + K - переключение клавиатурной навигации
       if (e.altKey && e.key === "k") {
         e.preventDefault();
-        setKeyboardNavEnabled(prev => !prev);
-        setScreenReaderAnnouncement(
-          keyboardNavEnabled 
-            ? "Клавиатурная навигация отключена" 
-            : "Клавиатурная навигация включена"
-        );
+        setKeyboardNavEnabled(prev => {
+          const newValue = !prev;
+          setScreenReaderAnnouncement(
+            newValue
+              ? "Клавиатурная навигация включена"
+              : "Клавиатурная навигация отключена"
+          );
+          return newValue;
+        });
       }
 
       // Escape - сброс фокуса
@@ -45,7 +48,7 @@ export function useAccessibility(): UseAccessibility {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [keyboardNavEnabled]);
+  }, []);
 
   // Очистка объявления для screen reader через 3 секунды
   useEffect(() => {
@@ -87,7 +90,7 @@ export function useFocusTrap(isActive: boolean) {
     ].join(", ");
 
     const focusableElements = document.querySelectorAll<HTMLElement>(focusableSelectors);
-    
+
     if (focusableElements.length > 0) {
       setFirstFocusable(focusableElements[0]);
       setLastFocusable(focusableElements[focusableElements.length - 1]);
@@ -100,22 +103,22 @@ export function useFocusTrap(isActive: boolean) {
 
       if (e.shiftKey) {
         // Shift + Tab
-        if (currentFocus === firstFocusable) {
+        if (currentFocus === focusableElements[0]) {
           e.preventDefault();
-          lastFocusable?.focus();
+          focusableElements[focusableElements.length - 1]?.focus();
         }
       } else {
         // Tab
-        if (currentFocus === lastFocusable) {
+        if (currentFocus === focusableElements[focusableElements.length - 1]) {
           e.preventDefault();
-          firstFocusable?.focus();
+          focusableElements[0]?.focus();
         }
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isActive, firstFocusable, lastFocusable]);
+  }, [isActive]);
 
   const focusFirst = useCallback(() => {
     firstFocusable?.focus();

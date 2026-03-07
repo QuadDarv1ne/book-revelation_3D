@@ -224,35 +224,40 @@ export function useGamification() {
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
 
-    if (progress.lastVisitDate !== today) {
+    setProgress(prev => {
+      if (prev.lastVisitDate === today) {
+        return prev;
+      }
+
       // Новый день — обновляем серию
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
       const yesterdayStr = yesterday.toISOString().split("T")[0];
 
-      const newStreak = progress.lastVisitDate === yesterdayStr
-        ? progress.streakDays + 1
-        : progress.streakDays > 0 ? 1 : 0;
+      const newStreak = prev.lastVisitDate === yesterdayStr
+        ? prev.streakDays + 1
+        : prev.streakDays > 0 ? 1 : 0;
 
       const newProgress = {
-        ...progress,
-        totalVisits: progress.totalVisits + 1,
+        ...prev,
+        totalVisits: prev.totalVisits + 1,
         streakDays: newStreak,
         lastVisitDate: today,
       };
 
-      setProgress(newProgress);
       saveProgress(newProgress);
 
       // Проверяем достижение за серию
       checkAchievement("week_streak", newStreak);
-    }
 
-    // Проверяем достижение за первое посещение
-    if (progress.totalVisits === 0) {
-      unlockAchievement("first_visit");
-    }
-  }, [progress, checkAchievement, unlockAchievement]);
+      // Проверяем достижение за первое посещение
+      if (prev.totalVisits === 0) {
+        unlockAchievement("first_visit");
+      }
+
+      return newProgress;
+    });
+  }, [checkAchievement, unlockAchievement]);
 
   // Обновление прогресса вращения
   const incrementRotations = useCallback(() => {

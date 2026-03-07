@@ -7,7 +7,7 @@ import { ControlButton, WebGLError, useWebGLSupport, SettingsBar, PWAInstall, To
 import { useRotationControl } from "@/hooks/use-rotation";
 import { useMounted } from "@/hooks/use-mounted";
 import { LoadingFallback } from "@/components/ui/LoadingFallback";
-import { books, getBookById, getDefaultBook } from "@/data/books";
+import { getBookById, getDefaultBook } from "@/data/books";
 import { textureManager } from "@/lib/textures/texture-manager";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useToast } from "@/components/ui/Toast";

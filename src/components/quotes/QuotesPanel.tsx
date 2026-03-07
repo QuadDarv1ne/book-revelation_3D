@@ -156,7 +156,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
         onCopy={handleCopyQuote}
       />
     ));
-  }, [isLoaded, filteredQuotesWithIndex, visibleQuotes, activeQuote, isFavorite, handleToggleFavorite, handleCopyQuote, setActiveQuote, filter]);
+  }, [isLoaded, filteredQuotesWithIndex, visibleQuotes, activeQuote, isFavorite, handleToggleFavorite, handleCopyQuote, setActiveQuote, filter, bookTitle]);
 
   return (
     <div
