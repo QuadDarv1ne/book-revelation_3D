@@ -53,16 +53,16 @@ export function useAccessibility(): UseAccessibility {
 
   // Очистка объявления для screen reader через 3 секунды
   useEffect(() => {
-    if (screenReaderAnnouncement) {
-      announcementTimerRef.current = setTimeout(() => {
-        setScreenReaderAnnouncement("");
-      }, 3000);
+    if (!screenReaderAnnouncement) return;
 
-      return () => {
-        if (announcementTimerRef.current) clearTimeout(announcementTimerRef.current);
-      };
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    announcementTimerRef.current = setTimeout(() => {
+      setScreenReaderAnnouncement("");
+    }, 3000);
+
+    return () => {
+      if (announcementTimerRef.current) clearTimeout(announcementTimerRef.current);
+    };
+  }, [screenReaderAnnouncement]);
 
   return {
     prefersReducedMotion,
