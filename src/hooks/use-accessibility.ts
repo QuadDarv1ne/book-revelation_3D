@@ -90,13 +90,12 @@ export function useFocusTrap(isActive: boolean) {
     ].join(", ");
 
     const focusableElements = document.querySelectorAll<HTMLElement>(focusableSelectors);
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
 
     if (focusableElements.length > 0) {
-      // Используем setTimeout для избежания каскадных рендеров
-      setTimeout(() => {
-        setFirstFocusable(focusableElements[0]);
-        setLastFocusable(focusableElements[focusableElements.length - 1]);
-      }, 0);
+      setFirstFocusable(firstElement);
+      setLastFocusable(lastElement);
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -106,15 +105,15 @@ export function useFocusTrap(isActive: boolean) {
 
       if (e.shiftKey) {
         // Shift + Tab
-        if (currentFocus === focusableElements[0]) {
+        if (currentFocus === firstElement) {
           e.preventDefault();
-          focusableElements[focusableElements.length - 1]?.focus();
+          lastElement?.focus();
         }
       } else {
         // Tab
-        if (currentFocus === focusableElements[focusableElements.length - 1]) {
+        if (currentFocus === lastElement) {
           e.preventDefault();
-          focusableElements[0]?.focus();
+          firstElement?.focus();
         }
       }
     };
