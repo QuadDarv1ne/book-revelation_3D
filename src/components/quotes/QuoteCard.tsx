@@ -1,6 +1,7 @@
 "use client";
 
 import type { Quote } from "@/types/quote";
+import { sanitizeText } from "@/lib/security";
 
 interface QuoteCardProps {
   quote: Quote;
@@ -9,15 +10,34 @@ interface QuoteCardProps {
   isActive: boolean;
   isFavorite: boolean;
   onClick: () => void;
-  onToggleFavorite: (e: React.MouseEvent) => void;
+  onToggleFavorite: (e: React.MouseEvent | React.KeyboardEvent) => void;
   onCopy?: (text: string) => void;
 }
 
 export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onClick, onToggleFavorite, onCopy }: QuoteCardProps) {
+  // Санитизация данных для защиты от XSS
+  const safeText = sanitizeText(quote.text);
+  const safeAuthor = sanitizeText(quote.author);
+  const safeEra = sanitizeText(quote.era);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onClick();
+    }
+  };
+
+  const handleCopyKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onCopy?.(`"${quote.text}" — ${quote.author}`);
+    }
+  };
+
+  const handleFavoriteKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onToggleFavorite(e);
     }
   };
 
@@ -27,12 +47,12 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="button"
-      aria-label={`Цитата ${index + 1}: ${quote.text.substring(0, 50)}... ${isActive ? '(активна)' : ''}`}
+      aria-label={`Цитата ${index + 1}: ${quote.text.substring(0, 50)}${quote.text.length > 50 ? '...' : ''}. ${isActive ? '(активна)' : ''}. Автор: ${quote.author}`}
       aria-pressed={isActive}
       className={`
         transition-all duration-700 ease-out cursor-pointer
         transform ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}
-        focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:ring-offset-2 focus:ring-offset-transparent
+        focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(25,25,40,0.95)] focus-visible:ring-4
       `}
       style={{
         transitionDelay: `${index * 50}ms`
@@ -44,7 +64,7 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
           transition-all duration-400
           ${isActive
             ? 'bg-gradient-to-r from-amber-900/55 via-amber-900/30 to-transparent border-l-[3px] border-amber-400'
-            : 'bg-white/[0.04] border-l-[3px] border-transparent hover:bg-white/[0.08] hover:border-amber-600/30'
+            : 'bg-white/[0.08] border-l-[3px] border-transparent hover:bg-white/[0.12] hover:border-amber-600/30'
           }
         `}
       >
@@ -54,12 +74,13 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
           {onCopy && (
             <button
               onClick={(e) => { e.stopPropagation(); onCopy(`"${quote.text}" — ${quote.author}`); }}
+              onKeyDown={handleCopyKeyDown}
               tabIndex={0}
-              className="p-1.5 rounded-full hover:bg-amber-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400"
-              aria-label="Копировать цитату"
+              className="p-1.5 rounded-full hover:bg-amber-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus-visible:ring-4"
+              aria-label={`Копировать цитату: "${quote.text.substring(0, 30)}${quote.text.length > 30 ? '...' : ''}"`}
               type="button"
             >
-              <svg className="w-4 h-4 text-gray-500 hover:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="w-4 h-4 text-gray-400 hover:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
               </svg>
             </button>
@@ -67,14 +88,15 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
           {/* Favorite button */}
           <button
             onClick={(e) => { e.stopPropagation(); onToggleFavorite(e); }}
+            onKeyDown={handleFavoriteKeyDown}
             tabIndex={0}
-            className="p-1.5 rounded-full hover:bg-amber-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400"
+            className="p-1.5 rounded-full hover:bg-amber-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus-visible:ring-4"
             aria-label={isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
             aria-pressed={isFavorite}
             type="button"
           >
             <svg
-              className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-500 hover:text-amber-400'}`}
+              className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-400 hover:text-amber-300'}`}
               fill={isFavorite ? "currentColor" : "none"}
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -92,25 +114,25 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
 
         <p className={`
           text-sm md:text-[15px] leading-relaxed mb-2 pr-8 relative z-10
-          ${isActive ? 'text-amber-50' : 'text-gray-300'}
+          ${isActive ? 'text-amber-50' : 'text-gray-200'}
           transition-colors duration-400
         `}>
-          &ldquo;{quote.text}&rdquo;
+          &ldquo;{safeText}&rdquo;
         </p>
         <div className="flex items-center gap-2 relative z-10">
           <p className={`
             text-xs md:text-sm
-            ${isActive ? 'text-amber-300' : 'text-gray-500'}
+            ${isActive ? 'text-amber-300' : 'text-gray-400'}
             transition-colors duration-400 font-light tracking-wide
           `}>
-            — {quote.author}
+            — {safeAuthor}
           </p>
           <span className={`
             text-[10px] px-1.5 py-0.5 rounded
-            ${isActive ? 'bg-amber-600/30 text-amber-200' : 'bg-white/5 text-gray-600'}
+            ${isActive ? 'bg-amber-600/30 text-amber-200' : 'bg-white/5 text-gray-500'}
             transition-colors duration-400
           `}>
-            {quote.era}
+            {safeEra}
           </span>
         </div>
       </div>

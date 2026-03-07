@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useToast } from "./Toast";
+import { useFavorites } from "@/hooks/use-favorites";
 
 interface IconProps {
   className?: string;
@@ -70,12 +72,12 @@ interface ThemeOption {
 }
 
 const THEMES: ThemeOption[] = [
-  { value: "dark" as const, label: "Тёмная", icon: Moon, preview: "bg-[#1a1a1a]" },
-  { value: "light" as const, label: "Светлая", icon: Sun, preview: "bg-[#f5f5f5]" },
-  { value: "blue" as const, label: "Синяя", icon: Palette, preview: "bg-[#1e3a5f]" },
-  { value: "purple" as const, label: "Фиолетовая", icon: Palette, preview: "bg-[#3f2a5f]" },
-  { value: "ambient" as const, label: "Атмосферная", icon: Palette, preview: "bg-[#1a3f2f]" },
-  { value: "relax" as const, label: "Расслабляющая", icon: Palette, preview: "bg-[#d4dcc4]" },
+  { value: "dark" as const, label: "Тёмная" as const, icon: Moon, preview: "bg-[#1a1a1a]" },
+  { value: "light" as const, label: "Светлая" as const, icon: Sun, preview: "bg-[#f5f5f5]" },
+  { value: "blue" as const, label: "Синяя" as const, icon: Palette, preview: "bg-[#1e3a5f]" },
+  { value: "purple" as const, label: "Фиолетовая" as const, icon: Palette, preview: "bg-[#3f2a5f]" },
+  { value: "ambient" as const, label: "Атмосферная" as const, icon: Palette, preview: "bg-[#1a3f2f]" },
+  { value: "relax" as const, label: "Расслабляющая" as const, icon: Palette, preview: "bg-[#d4dcc4]" },
 ];
 
 interface SettingsBarProps {
@@ -85,6 +87,9 @@ interface SettingsBarProps {
 
 export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { showToast } = useToast();
+  const { exportFavorites, importFavorites } = useFavorites();
+  const [rotationSpeed, setRotationSpeed] = useState(0.5);
 
   const cycleTheme = () => {
     const currentIndex = THEMES.findIndex(t => t.value === theme);
@@ -95,6 +100,74 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
   const currentTheme = THEMES.find(t => t.value === theme) || THEMES[0];
   const CurrentIcon = currentTheme.icon;
 
+  // Обработчик экспорта избранных цитат
+  const handleExportFavorites = useCallback(() => {
+    const exportData = exportFavorites();
+    
+    if (!exportData) {
+      showToast("Нет избранных цитат для экспорта", "info");
+      return;
+    }
+    
+    try {
+      const blob = new Blob([exportData], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `stoic-favorites-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showToast("Избранные цитаты экспортированы", "success");
+    } catch (error) {
+      showToast("Ошибка при экспорте", "error");
+      console.error("Export error:", error);
+    }
+  }, [exportFavorites, showToast]);
+
+  // Обработчик импорта избранных цитат
+  const handleImportFavorites = useCallback(() => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement)?.files?.[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        const result = importFavorites(content);
+        
+        if (result.success) {
+          showToast(`Успешно импортировано ${result.count} цитат`, "success");
+        } else {
+          showToast(`Ошибка импорта: ${result.error}`, "error");
+        }
+      };
+      
+      reader.onerror = () => {
+        showToast("Ошибка чтения файла", "error");
+      };
+      
+      reader.readAsText(file);
+    };
+    
+    input.click();
+  }, [importFavorites, showToast]);
+
+  // Обработчик изменения скорости вращения
+  const handleRotationSpeedChange = useCallback((speed: number) => {
+    setRotationSpeed(speed);
+    // Здесь можно отправить событие в родительский компонент
+    // или сохранить в localStorage
+    localStorage.setItem('rotationSpeed', speed.toString());
+    showToast(`Скорость вращения: ${speed}`, "success");
+  }, [showToast]);
+
   return (
     <>
       <div className="absolute bottom-0 left-0 right-0 z-50">
@@ -103,19 +176,21 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
             isExpanded ? "bg-[rgba(15,15,25,0.95)]" : "bg-[rgba(15,15,25,0.75)]"
           }`}
         >
-          <div className="flex items-center gap-1 p-2">
+          <div className="flex items-center gap-1 p-2" role="toolbar" aria-label="Панель настроек">
             <button
               onClick={cycleTheme}
-              className="group relative flex items-center justify-center w-11 h-11 rounded-xl text-amber-400/80 hover:text-amber-300 hover:bg-[rgba(212,175,55,0.1)] transition-all duration-200"
+              className="group relative flex items-center justify-center w-12 h-12 sm:w-11 sm:h-11 rounded-xl text-amber-400/80 hover:text-amber-300 hover:bg-[rgba(212,175,55,0.1)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(15,15,25,0.85)] min-w-[48px] min-h-[48px] sm:min-w-[44px] sm:min-h-[44px]"
               title={`Сменить тему (${currentTheme.label})`}
+              aria-label={`Сменить тему (текущая: ${currentTheme.label})`}
+              type="button"
             >
-              <CurrentIcon className="w-5 h-5" />
+              <CurrentIcon className="w-5 h-5 sm:w-5 sm:h-5" aria-hidden="true" />
               <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 text-[10px] text-amber-100 bg-[rgba(15,15,25,0.9)] border border-[rgba(212,175,55,0.2)] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                 {currentTheme.label}
               </span>
             </button>
 
-            <div className="flex gap-1 ml-1" role="group" aria-label="Выбор темы оформления">
+            <div className="flex gap-0.5 sm:gap-1 ml-0.5 sm:ml-1" role="group" aria-label="Выбор темы оформления">
               {THEMES.map((t) => {
                 const Icon = t.icon;
                 const isActive = theme === t.value;
@@ -123,7 +198,7 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
                   <button
                     key={t.value}
                     onClick={() => onThemeChange(t.value as "dark" | "light" | "blue" | "purple" | "ambient" | "relax")}
-                    className={`group relative flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 ${
+                    className={`group relative flex items-center justify-center w-9 h-9 sm:w-8 sm:h-8 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(15,15,25,0.85)] min-w-[40px] min-h-[40px] sm:min-w-[36px] sm:min-h-[36px] ${
                       isActive
                         ? "bg-[rgba(212,175,55,0.25)] text-amber-300 ring-1 ring-amber-500/50"
                         : "text-amber-400/60 hover:text-amber-300 hover:bg-[rgba(212,175,55,0.1)]"
@@ -131,6 +206,7 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
                     title={t.label}
                     aria-label={`Тема: ${t.label}${isActive ? ' (активна)' : ''}`}
                     aria-pressed={isActive}
+                    type="button"
                   >
                     <Icon className="w-4 h-4" aria-hidden="true" />
                     <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 text-[10px] text-amber-100 bg-[rgba(15,15,25,0.9)] border border-[rgba(212,175,55,0.2)] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
@@ -145,23 +221,26 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
 
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="group flex items-center justify-center w-11 h-11 rounded-xl text-amber-400/80 hover:text-amber-300 hover:bg-[rgba(212,175,55,0.1)] transition-all duration-200"
+              className="group flex items-center justify-center w-12 h-12 sm:w-11 sm:h-11 rounded-xl text-amber-400/80 hover:text-amber-300 hover:bg-[rgba(212,175,55,0.1)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(15,15,25,0.85)] min-w-[48px] min-h-[48px] sm:min-w-[44px] sm:min-h-[44px]"
               title="Настройки"
               aria-label="Открыть настройки"
               aria-expanded={isExpanded}
               aria-controls="settings-panel"
+              type="button"
             >
-              <Settings className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? "rotate-90" : ""}`} aria-hidden="true" />
+              <Settings className={`w-5 h-5 sm:w-5 sm:h-5 transition-transform duration-300 ${isExpanded ? "rotate-90" : ""}`} aria-hidden="true" />
             </button>
 
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center justify-center w-8 h-11 text-amber-500/50 hover:text-amber-400 transition-colors"
+              className="flex items-center justify-center w-9 h-11 sm:w-8 sm:h-11 text-amber-500/50 hover:text-amber-400 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 rounded min-w-[44px] min-h-[44px]"
+              aria-label={isExpanded ? "Свернуть настройки" : "Развернуть настройки"}
+              type="button"
             >
               {isExpanded ? (
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-4 h-4" aria-hidden="true" />
               ) : (
-                <ChevronUp className="w-4 h-4" />
+                <ChevronUp className="w-4 h-4" aria-hidden="true" />
               )}
             </button>
           </div>
@@ -169,22 +248,91 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
           {isExpanded && (
             <div id="settings-panel" className="px-3 pb-3 pt-1 border-t border-[rgba(212,175,55,0.1)]" role="region" aria-label="Настройки приложения">
               <div className="grid grid-cols-2 gap-2">
-                <button className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm">
-                  <Settings className="w-4 h-4" />
+                <button 
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  aria-label="Общие настройки"
+                  type="button"
+                >
+                  <Settings className="w-4 h-4" aria-hidden="true" />
                   <span>Общие</span>
                 </button>
-                <button className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm">
-                  <User className="w-4 h-4" />
+                <button 
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  aria-label="Настройки аккаунта"
+                  type="button"
+                >
+                  <User className="w-4 h-4" aria-hidden="true" />
                   <span>Аккаунт</span>
                 </button>
-                <button className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm">
-                  <Moon className="w-4 h-4" />
+                <button 
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  aria-label="Настройки внешнего вида"
+                  type="button"
+                >
+                  <Moon className="w-4 h-4" aria-hidden="true" />
                   <span>Внешний вид</span>
                 </button>
-                <button className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm">
-                  <span className="w-4 h-4 flex items-center justify-center text-[10px]">🔔</span>
+                <button 
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  aria-label="Настройки уведомлений"
+                  type="button"
+                >
+                  <span className="w-4 h-4 flex items-center justify-center text-[10px]" aria-hidden="true">🔔</span>
                   <span>Уведомления</span>
                 </button>
+              </div>
+
+              {/* Секция для управления избранным */}
+              <div className="mt-3 pt-3 border-t border-[rgba(212,175,55,0.1)]">
+                <h3 className="text-xs uppercase tracking-[0.15em] text-amber-500/70 mb-2">Избранное</h3>
+                <div className="flex flex-col gap-2">
+                  <button
+                    id="export-favorites"
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                    aria-label="Экспортировать избранные цитаты"
+                    onClick={handleExportFavorites}
+                    type="button"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    <span>Экспорт</span>
+                  </button>
+                  <button
+                    id="import-favorites"
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                    aria-label="Импортировать избранные цитаты"
+                    onClick={handleImportFavorites}
+                    type="button"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14" />
+                    </svg>
+                    <span>Импорт</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Секция для настройки вращения книги */}
+              <div className="mt-3 pt-3 border-t border-[rgba(212,175,55,0.1)]">
+                <h3 className="text-xs uppercase tracking-[0.15em] text-amber-500/70 mb-2">Вращение книги</h3>
+                <div className="flex items-center gap-3">
+                  <span className="text-amber-400/60 text-sm" id="rotation-speed-label">Скорость:</span>
+                  <div className="flex-1">
+                    <input
+                      type="range"
+                      min="0.1"
+                      max="2"
+                      step="0.1"
+                      value={rotationSpeed}
+                      onChange={(e) => handleRotationSpeedChange(parseFloat(e.target.value))}
+                      className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider focus:outline-none focus:ring-2 focus:ring-amber-400"
+                      aria-label="Настройка скорости вращения книги"
+                      aria-labelledby="rotation-speed-label"
+                    />
+                  </div>
+                  <span className="text-amber-400/60 text-sm w-8 text-right" aria-live="polite">{rotationSpeed}</span>
+                </div>
               </div>
             </div>
           )}

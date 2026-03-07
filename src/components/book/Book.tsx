@@ -4,12 +4,14 @@ import { useRef, useState, useMemo, useEffect, useCallback } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Float } from "@react-three/drei";
 import * as THREE from "three";
-import { loadRealBookCoverTexture, loadRealSpineTexture } from "@/lib/textures/index";
+import { textureManager } from "@/lib/textures/texture-manager";
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 
 interface BookProps {
   isRotating: boolean;
   coverImage?: string;
   spineImage?: string;
+  backCoverImage?: string;
 }
 
 const BOOK_WIDTH = 1.35;
@@ -18,6 +20,7 @@ const BOOK_DEPTH = 0.22;
 const COVER_THICKNESS = 0.018;
 const DEFAULT_COVER = "/book-cover.jpg";
 const DEFAULT_SPINE = "/book-spine.jpg";
+const DEFAULT_BACK_COVER = "/book-cover.jpg";
 
 // Выносим геометрии за пределы компонента для оптимизации
 const COVER_GEOMETRY = new THREE.BoxGeometry(BOOK_WIDTH, BOOK_HEIGHT, COVER_THICKNESS);
@@ -27,20 +30,28 @@ const PAGES_EDGE_GEOMETRY = new THREE.BoxGeometry(0.07, BOOK_HEIGHT - 0.08, BOOK
 const GOLD_TOP_GEOMETRY = new THREE.BoxGeometry(BOOK_WIDTH - 0.08, 0.012, BOOK_DEPTH - 0.015);
 const GLOW_GEOMETRY = new THREE.CircleGeometry(1.1, 32);
 
-export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFAULT_SPINE }: BookProps) {
+export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFAULT_SPINE, backCoverImage = DEFAULT_BACK_COVER }: BookProps) {
   const bookRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   const glowRef = useRef<THREE.Mesh>(null);
   const { gl } = useThree();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const touchState = useRef({ startX: 0, startY: 0, isDragging: false });
   const touchRotation = useRef({ x: 0, y: 0 });
   const targetRotation = useRef(0);
 
-  const coverTexture = useMemo(() => loadRealBookCoverTexture(coverImage), [coverImage]);
-  const spineTexture = useMemo(() => loadRealSpineTexture(spineImage), [spineImage]);
+  // Загружаем текстуры через оптимизированный менеджер
+  const coverTexture = useMemo(() => textureManager.getTexture(coverImage, 'cover'), [coverImage]);
+  const spineTexture = useMemo(() => textureManager.getTexture(spineImage, 'spine'), [spineImage]);
+  const backCoverTexture = useMemo(() => textureManager.getTexture(backCoverImage, 'back'), [backCoverImage]);
 
-  // Reusable materials
+  // Предзагрузка текстур при изменении книги
+  useEffect(() => {
+    textureManager.preloadBookTextures(coverImage, spineImage, backCoverImage);
+  }, [coverImage, spineImage, backCoverImage]);
+
+  // Reusable materials - обновляем map при смене текстур
   const coverMaterial = useMemo(() => new THREE.MeshStandardMaterial({
     map: coverTexture,
     roughness: 0.45,
@@ -48,18 +59,19 @@ export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFA
     color: "#ffffff"
   }), [coverTexture]);
 
+  const backCoverMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    map: backCoverTexture,
+    roughness: 0.45,
+    metalness: 0.15,
+    color: "#ffffff"
+  }), [backCoverTexture]);
+
   const spineMaterial = useMemo(() => new THREE.MeshStandardMaterial({
     map: spineTexture,
     roughness: 0.45,
     metalness: 0.15,
     color: "#ffffff"
   }), [spineTexture]);
-
-  const darkCoverMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    color: "#1a0f0a",
-    roughness: 0.6,
-    metalness: 0.1
-  }), []);
 
   const pagesMaterial = useMemo(() => new THREE.MeshStandardMaterial({
     color: "#f8f4eb",
@@ -124,30 +136,51 @@ export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFA
     const book = bookRef.current;
     if (!book) return;
 
+    // Ограничиваем delta time для стабильности (максимум 100ms)
+    const clampedDelta = Math.min(delta, 0.1);
     const time = state.clock.elapsedTime;
 
-    if (isRotating && !touchState.current.isDragging) {
-      targetRotation.current += delta * 0.5;
+    // Вращение книги (отключаем при reduced-motion)
+    if (isRotating && !touchState.current.isDragging && !prefersReducedMotion) {
+      targetRotation.current += clampedDelta * 0.5;
     }
 
+    // Обработка touch вращения
     if (touchState.current.isDragging) {
-      book.rotation.y = THREE.MathUtils.lerp(book.rotation.y, touchRotation.current.y * 0.01, delta * 10);
-      book.rotation.x = THREE.MathUtils.lerp(book.rotation.x, touchRotation.current.x * 0.01, delta * 10);
+      book.rotation.y = THREE.MathUtils.lerp(book.rotation.y, touchRotation.current.y * 0.01, clampedDelta * 10);
+      book.rotation.x = THREE.MathUtils.lerp(book.rotation.x, touchRotation.current.x * 0.01, clampedDelta * 10);
     } else {
-      book.rotation.y += (targetRotation.current - book.rotation.y) * delta * 5;
-      touchRotation.current.x *= Math.pow(0.01, delta);
-      touchRotation.current.y *= Math.pow(0.01, delta);
+      // Плавное затухание вращения
+      book.rotation.y += (targetRotation.current - book.rotation.y) * clampedDelta * 5;
+      touchRotation.current.x *= Math.pow(0.01, clampedDelta);
+      touchRotation.current.y *= Math.pow(0.01, clampedDelta);
     }
 
-    book.position.y = 0.6 + Math.sin(time * 0.5) * 0.04;
-    book.rotation.x += Math.sin(time * 0.3) * 0.015;
-    book.rotation.z = Math.cos(time * 0.4) * 0.008;
+    // Парение книги (float animation) - уменьшено при reduced-motion
+    if (prefersReducedMotion) {
+      book.position.y = 0.6; // Статичная позиция
+    } else {
+      book.position.y = 0.6 + Math.sin(time * 0.5) * 0.04;
+    }
 
+    // Микро-колебания (отключаем при reduced-motion)
+    if (!prefersReducedMotion) {
+      book.rotation.x += Math.sin(time * 0.3) * 0.015 * clampedDelta;
+      book.rotation.z = Math.cos(time * 0.4) * 0.008;
+    }
+
+    // Плавное изменение масштаба при наведении
     const targetScale = hovered ? 1.12 : 1;
-    book.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), delta * 10);
+    book.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), clampedDelta * 10);
 
+    // Анимация свечения (уменьшена при reduced-motion)
     if (glowRef.current) {
-      (glowRef.current.material as THREE.MeshBasicMaterial).opacity = 0.22 + Math.sin(time * 2.5) * 0.08;
+      const material = glowRef.current.material as THREE.MeshBasicMaterial;
+      if (prefersReducedMotion) {
+        material.opacity = 0.2; // Статичная прозрачность
+      } else {
+        material.opacity = 0.22 + Math.sin(time * 2.5) * 0.08;
+      }
     }
   });
 
@@ -160,16 +193,19 @@ export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFA
           onPointerOut={() => setHovered(false)}
           position={[0, 0.6, 0]}
         >
+          {/* Задняя обложка */}
           <mesh position={[0, 0, -BOOK_DEPTH/2 + COVER_THICKNESS/2]} castShadow>
             <primitive object={COVER_GEOMETRY} />
-            <primitive object={darkCoverMaterial} />
+            <primitive object={backCoverMaterial} />
           </mesh>
 
+          {/* Страницы */}
           <mesh position={[0, 0, 0]} castShadow>
             <primitive object={PAGES_GEOMETRY} />
             <primitive object={pagesMaterial} />
           </mesh>
 
+          {/* Передняя обложка */}
           <mesh position={[0, 0, BOOK_DEPTH/2 - COVER_THICKNESS/2]} castShadow>
             <primitive object={COVER_GEOMETRY} />
             <primitive object={coverMaterial} />

@@ -1,5 +1,7 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
+
 function subscribe() {
   return () => {};
 }
@@ -31,9 +33,29 @@ export function useWebGLSupport() {
     () => {
       try {
         const canvas = document.createElement("canvas");
-        const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+        // Пробуем получить WebGL контекст с разными опциями
+        const gl = canvas.getContext("webgl", { 
+          alpha: true, 
+          antialias: true,
+          powerPreference: "high-performance"
+        }) || 
+        canvas.getContext("experimental-webgl", {
+          alpha: true,
+          antialias: true,
+        }) ||
+        canvas.getContext("webgl2", {
+          alpha: true,
+          antialias: true,
+        });
+        
+        // Проверяем, не потерян ли контекст
+        if (gl && 'isContextLost' in gl) {
+          const isLost = gl.isContextLost();
+          return !isLost;
+        }
         return !!gl;
-      } catch {
+      } catch (error) {
+        console.warn('WebGL support check failed:', error);
         return false;
       }
     },
