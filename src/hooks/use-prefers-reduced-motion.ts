@@ -7,19 +7,16 @@ import { useEffect, useState } from "react";
  * Возвращает true, если пользователь предпочитает уменьшенное движение
  */
 export function usePrefersReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+    return false;
+  });
 
   useEffect(() => {
-    // Проверяем медиа-запрос
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    
-    // Устанавливаем начальное значение через функциональное обновление
-    setPrefersReducedMotion(prev => {
-      const initial = mediaQuery.matches;
-      return initial !== prev ? initial : prev;
-    });
 
-    // Слушаем изменения
     const handleChange = (event: MediaQueryListEvent) => {
       setPrefersReducedMotion(event.matches);
     };

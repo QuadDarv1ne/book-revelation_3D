@@ -26,9 +26,9 @@ const THEME_COLORS = {
 export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticleEffectProps) {
   const [showParticles, setShowParticles] = useState(false);
   const [previousTheme, setPreviousTheme] = useState(activeTheme);
+  const [particleData, setParticleData] = useState<{ positions: Float32Array; colors: Float32Array } | null>(null);
   const particlesRef = useRef<THREE.Points>(null);
   const velocities = useRef<{ x: number; y: number; z: number }[]>([]);
-  const particleDataRef = useRef<{ positions: Float32Array; colors: Float32Array } | null>(null);
 
   // onThemeChange is available but not currently used
   void onThemeChange;
@@ -63,11 +63,11 @@ export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticl
       cols[i * 3 + 2] = baseColor.b;
     }
 
-    particleDataRef.current = { positions: pos, colors: cols };
+    setParticleData({ positions: pos, colors: cols });
   }, [activeTheme]);
 
-  const positions = particleDataRef.current?.positions || new Float32Array(0);
-  const colors = particleDataRef.current?.colors || new Float32Array(0);
+  const positions = particleData?.positions || new Float32Array(0);
+  const colors = particleData?.colors || new Float32Array(0);
 
   // Анимация частиц
   useFrame(() => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -16,7 +16,7 @@ export function ParticleRingOptimized({ isRotating }: ParticleRingProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const dummyRef = useRef(new THREE.Object3D());
   const colorsRef = useRef(new THREE.Color());
-  const particleDataRef = useRef<Array<{
+  const [particleData, setParticleData] = useState<Array<{
     angle: number;
     radius: number;
     baseY: number;
@@ -44,10 +44,8 @@ export function ParticleRingOptimized({ isRotating }: ParticleRingProps) {
       data.push({ angle, radius, baseY, speed, phase });
     }
 
-    particleDataRef.current = data;
+    setParticleData(data);
   }, []);
-
-  const particleData = particleDataRef.current;
 
   // Создаем геометрию для инстанса (маленькая сфера)
   const instanceGeometry = useMemo(() => {
