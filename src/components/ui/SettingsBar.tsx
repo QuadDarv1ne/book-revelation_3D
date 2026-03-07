@@ -217,8 +217,8 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="group flex items-center justify-center w-12 h-12 sm:w-11 sm:h-11 rounded-xl text-amber-400/80 hover:text-amber-300 hover:bg-[rgba(212,175,55,0.1)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(15,15,25,0.85)] min-w-[48px] min-h-[48px] sm:min-w-[44px] sm:min-h-[44px]"
-              title="Настройки"
-              aria-label="Открыть настройки"
+              title={t('settings.theme')}
+              aria-label={isExpanded ? t('settings.collapse') : t('settings.open')}
               aria-expanded={isExpanded}
               aria-controls="settings-panel"
               type="button"
@@ -229,7 +229,7 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="flex items-center justify-center w-9 h-11 sm:w-8 sm:h-11 text-amber-500/50 hover:text-amber-400 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 rounded min-w-[44px] min-h-[44px]"
-              aria-label={isExpanded ? "Свернуть настройки" : "Развернуть настройки"}
+              aria-label={isExpanded ? t('settings.collapse') : t('settings.expand')}
               type="button"
             >
               {isExpanded ? (
