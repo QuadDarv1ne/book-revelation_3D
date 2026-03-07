@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useToast } from "./Toast";
+import { useI18n } from "@/hooks/use-i18n";
 
 interface MainMenuProps {
   theme: string;
@@ -15,15 +16,6 @@ interface MainMenuProps {
 }
 
 type MenuSection = "settings" | "about" | null;
-
-const THEMES = [
-  { value: "dark", label: "Тёмная", color: "bg-[#1a1a1a]" },
-  { value: "light", label: "Светлая", color: "bg-[#f5f5f5]" },
-  { value: "blue", label: "Синяя", color: "bg-[#1e3a5f]" },
-  { value: "purple", label: "Фиолетовая", color: "bg-[#3f2a5f]" },
-  { value: "ambient", label: "Атмосферная", color: "bg-[#1a3f2f]" },
-  { value: "relax", label: "Расслабляющая", color: "bg-[#d4dcc4]" },
-];
 
 export function MainMenu({
   theme,
@@ -40,6 +32,16 @@ export function MainMenu({
   const [rotationSpeed, setRotationSpeed] = useState(0.5);
   const menuRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
+  const { t } = useI18n();
+
+  const THEMES = useMemo(() => [
+    { value: "dark", label: t('theme.dark'), color: "bg-[#1a1a1a]" },
+    { value: "light", label: t('theme.light'), color: "bg-[#f5f5f5]" },
+    { value: "blue", label: t('theme.blue'), color: "bg-[#1e3a5f]" },
+    { value: "purple", label: t('theme.purple'), color: "bg-[#3f2a5f]" },
+    { value: "ambient", label: t('theme.ambient'), color: "bg-[#1a3f2f]" },
+    { value: "relax", label: t('theme.relax'), color: "bg-[#d4dcc4]" },
+  ], [t]);
 
   // Закрытие при клике вне
   useEffect(() => {
@@ -74,7 +76,7 @@ export function MainMenu({
 
   const handleThemeSelect = useCallback((themeValue: string) => {
     onThemeChange(themeValue);
-    showToast(`Тема: ${THEMES.find(t => t.value === themeValue)?.label}`, "success");
+    showToast(`Тема: ${themeValue}`, "success");
   }, [onThemeChange, showToast]);
 
   const handleRotationSpeedChange = useCallback((speed: number) => {
