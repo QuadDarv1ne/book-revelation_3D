@@ -31,7 +31,7 @@ export function AchievementNotification() {
       if (timerRef.current) clearTimeout(timerRef.current);
       if (leaveTimerRef.current) clearTimeout(leaveTimerRef.current);
     };
-  }, [dismissAchievement]);
+  }, [dismissAchievement, showAchievement]);
 
   const handleClose = useCallback(() => {
     setIsLeaving(true);
