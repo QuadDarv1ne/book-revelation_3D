@@ -279,40 +279,40 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
 
               {/* Секция для управления избранным */}
               <div className="mt-3 pt-3 border-t border-[rgba(212,175,55,0.1)]">
-                <h3 className="text-xs uppercase tracking-[0.15em] text-amber-500/70 mb-2">Избранное</h3>
+                <h3 className="text-xs uppercase tracking-[0.15em] text-amber-500/70 mb-2">{t('menu.favorites')}</h3>
                 <div className="flex flex-col gap-2">
                   <button
                     id="export-favorites"
                     className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                    aria-label="Экспортировать избранные цитаты"
+                    aria-label={t('quotes.export')}
                     onClick={handleExportFavorites}
                     type="button"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
-                    <span>Экспорт</span>
+                    <span>{t('quotes.export')}</span>
                   </button>
                   <button
                     id="import-favorites"
                     className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                    aria-label="Импортировать избранные цитаты"
+                    aria-label={t('quotes.import')}
                     onClick={handleImportFavorites}
                     type="button"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14" />
                     </svg>
-                    <span>Импорт</span>
+                    <span>{t('quotes.import')}</span>
                   </button>
                 </div>
               </div>
 
               {/* Секция для настройки вращения книги */}
               <div className="mt-3 pt-3 border-t border-[rgba(212,175,55,0.1)]">
-                <h3 className="text-xs uppercase tracking-[0.15em] text-amber-500/70 mb-2">Вращение книги</h3>
+                <h3 className="text-xs uppercase tracking-[0.15em] text-amber-500/70 mb-2">{t('settings.rotation')}</h3>
                 <div className="flex items-center gap-3">
-                  <span className="text-amber-400/60 text-sm" id="rotation-speed-label">Скорость:</span>
+                  <span className="text-amber-400/60 text-sm" id="rotation-speed-label">{t('settings.speed')}:</span>
                   <div className="flex-1">
                     <input
                       type="range"
@@ -322,7 +322,7 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
                       value={rotationSpeed}
                       onChange={(e) => handleRotationSpeedChange(parseFloat(e.target.value))}
                       className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider focus:outline-none focus:ring-2 focus:ring-amber-400"
-                      aria-label="Настройка скорости вращения книги"
+                      aria-label={t('settings.rotationSpeed')}
                       aria-labelledby="rotation-speed-label"
                     />
                   </div>
