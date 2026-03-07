@@ -277,7 +277,7 @@ export function MainMenu({
                 <svg className="w-5 h-5 text-amber-400/70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span className="text-sm text-amber-100 font-medium">О проекте</span>
+                <span className="text-sm text-amber-100 font-medium">{t('menu.about')}</span>
               </div>
               <svg
                 className={`w-4 h-4 text-amber-400/60 transition-transform duration-200 ${activeSection === "about" ? "rotate-180" : ""}`}
@@ -294,23 +294,22 @@ export function MainMenu({
             {activeSection === "about" && (
               <div className="px-5 pb-4 space-y-3">
                 <p className="text-sm text-gray-300 leading-relaxed">
-                  Интерактивный 3D модуль с вращающейся книгой стоической философии. 
-                  Включает мудрость Марка Аврелия, Эпиктета и других великих мыслителей.
+                  {t('menu.aboutText')}
                 </p>
                 <div className="pt-3 border-t border-[rgba(212,175,55,0.1)]">
-                  <h4 className="text-xs uppercase tracking-[0.12em] text-amber-500/70 mb-2">Управление</h4>
+                  <h4 className="text-xs uppercase tracking-[0.12em] text-amber-500/70 mb-2">{t('menu.controls')}</h4>
                   <ul className="space-y-1.5 text-xs text-gray-400">
                     <li className="flex items-center gap-2">
                       <kbd className="px-1.5 py-0.5 bg-white/5 rounded text-amber-400/80">Z</kbd>
-                      <span>Zen-режим</span>
+                      <span>{t('menu.zenMode')}</span>
                     </li>
                     <li className="flex items-center gap-2">
-                      <kbd className="px-1.5 py-0.5 bg-white/5 rounded text-amber-400/80">Пробел</kbd>
-                      <span>Пауза/вращение</span>
+                      <kbd className="px-1.5 py-0.5 bg-white/5 rounded text-amber-400/80">{t('control.space')}</kbd>
+                      <span>{t('menu.pauseRotation')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <kbd className="px-1.5 py-0.5 bg-white/5 rounded text-amber-400/80">↑↓</kbd>
-                      <span>Навигация по цитатам</span>
+                      <span>{t('menu.quoteNav')}</span>
                     </li>
                   </ul>
                 </div>
