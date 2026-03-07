@@ -8,8 +8,12 @@ export default function WebGLTestPage() {
 
   useEffect(() => {
     const info = checkWebGLSupport();
-    setWebglInfo(info);
-    console.log('WebGL Info:', info);
+    setWebglInfo(prevInfo => {
+      if (prevInfo === null) {
+        return info;
+      }
+      return prevInfo;
+    });
   }, []);
 
   if (!webglInfo) {

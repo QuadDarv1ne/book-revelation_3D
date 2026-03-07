@@ -12,7 +12,12 @@ export function usePrefersReducedMotion(): boolean {
   useEffect(() => {
     // Проверяем медиа-запрос
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mediaQuery.matches);
+    
+    // Устанавливаем начальное значение
+    const initial = mediaQuery.matches;
+    if (initial !== prefersReducedMotion) {
+      setPrefersReducedMotion(initial);
+    }
 
     // Слушаем изменения
     const handleChange = (event: MediaQueryListEvent) => {
@@ -24,7 +29,7 @@ export function usePrefersReducedMotion(): boolean {
     return () => {
       mediaQuery.removeEventListener("change", handleChange);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   return prefersReducedMotion;
 }

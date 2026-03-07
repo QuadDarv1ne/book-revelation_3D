@@ -16,9 +16,16 @@ export function ParticleRingOptimized({ isRotating }: ParticleRingProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const dummyRef = useRef(new THREE.Object3D());
   const colorsRef = useRef(new THREE.Color());
-  
-  // Генерируем начальные данные частиц
-  const particleData = useMemo(() => {
+  const particleDataRef = useRef<Array<{
+    angle: number;
+    radius: number;
+    baseY: number;
+    speed: number;
+    phase: number;
+  }>>([]);
+
+  // Генерируем начальные данные частиц один раз при монтировании
+  useEffect(() => {
     const data: Array<{
       angle: number;
       radius: number;
@@ -37,8 +44,10 @@ export function ParticleRingOptimized({ isRotating }: ParticleRingProps) {
       data.push({ angle, radius, baseY, speed, phase });
     }
 
-    return data;
+    particleDataRef.current = data;
   }, []);
+
+  const particleData = particleDataRef.current;
 
   // Создаем геометрию для инстанса (маленькая сфера)
   const instanceGeometry = useMemo(() => {

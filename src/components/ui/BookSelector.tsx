@@ -77,7 +77,7 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
   useEffect(() => {
     if (isOpen) {
       const selectedIndex = books.findIndex(b => b.id === activeBookId);
-      setFocusedIndex(selectedIndex >= 0 ? selectedIndex : 0);
+      setFocusedIndex(prev => selectedIndex >= 0 ? selectedIndex : prev);
     }
   }, [isOpen, activeBookId]);
 

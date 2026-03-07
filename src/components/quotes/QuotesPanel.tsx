@@ -85,7 +85,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
     }
 
     return result;
-  }, [filter, favorites, searchQuery]);
+  }, [quotes, filter, favorites, searchQuery]);
 
   const handleToggleFavorite = useCallback((e: React.MouseEvent | React.KeyboardEvent, index: number) => {
     e.stopPropagation();

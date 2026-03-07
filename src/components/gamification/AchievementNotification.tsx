@@ -12,7 +12,7 @@ export function AchievementNotification() {
     if (showAchievement) {
       // Показываем уведомление
       setIsVisible(true);
-      
+
       // Автоматически скрываем через 4 секунды
       const timer = setTimeout(() => {
         setIsLeaving(true);
@@ -26,6 +26,18 @@ export function AchievementNotification() {
       return () => clearTimeout(timer);
     }
   }, [showAchievement, dismissAchievement]);
+
+  // Обновление состояния видимости
+  useEffect(() => {
+    if (isVisible && isLeaving) {
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+        setIsLeaving(false);
+        dismissAchievement();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible, isLeaving, dismissAchievement]);
 
   const handleClose = useCallback(() => {
     setIsLeaving(true);

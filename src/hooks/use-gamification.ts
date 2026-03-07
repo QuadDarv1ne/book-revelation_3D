@@ -170,51 +170,17 @@ export function useGamification() {
   const [quoteOfDay, setQuoteOfDay] = useState<QuoteOfDay>(getQuoteForToday);
   const [showAchievement, setShowAchievement] = useState<Achievement | null>(null);
 
-  // Обновление прогресса при посещении
-  useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
-    
-    if (progress.lastVisitDate !== today) {
-      // Новый день — обновляем серию
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayStr = yesterday.toISOString().split("T")[0];
-      
-      const newStreak = progress.lastVisitDate === yesterdayStr 
-        ? progress.streakDays + 1 
-        : progress.streakDays > 0 ? 1 : 0;
-      
-      const newProgress = {
-        ...progress,
-        totalVisits: progress.totalVisits + 1,
-        streakDays: newStreak,
-        lastVisitDate: today,
-      };
-      
-      setProgress(newProgress);
-      saveProgress(newProgress);
-      
-      // Проверяем достижение за серию
-      checkAchievement("week_streak", newStreak);
-    }
-    
-    // Проверяем достижение за первое посещение
-    if (progress.totalVisits === 0) {
-      unlockAchievement("first_visit");
-    }
-  }, []);
-
   // Проверка достижения
   const checkAchievement = useCallback((achievementId: string, progressValue: number) => {
     setAchievements(prev => prev.map(ach => {
       if (ach.id === achievementId) {
         const newProgress = Math.min(progressValue, ach.maxProgress);
         const shouldUnlock = newProgress >= ach.maxProgress && !ach.unlocked;
-        
+
         if (shouldUnlock) {
           setTimeout(() => setShowAchievement({ ...ach, unlocked: true }), 500);
         }
-        
+
         return {
           ...ach,
           progress: newProgress,
@@ -231,15 +197,15 @@ export function useGamification() {
     setAchievements(prev => {
       const achievement = prev.find(a => a.id === achievementId);
       if (!achievement || achievement.unlocked) return prev;
-      
-      const updated = prev.map(ach => 
-        ach.id === achievementId 
+
+      const updated = prev.map(ach =>
+        ach.id === achievementId
           ? { ...ach, unlocked: true, unlockedAt: new Date(), progress: ach.maxProgress }
           : ach
       );
-      
+
       setTimeout(() => setShowAchievement(achievement), 500);
-      
+
       // Сохраняем в прогресс
       setProgress(p => {
         const newProgress = {
@@ -249,10 +215,44 @@ export function useGamification() {
         saveProgress(newProgress);
         return newProgress;
       });
-      
+
       return updated;
     });
   }, []);
+
+  // Обновление прогресса при посещении
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+
+    if (progress.lastVisitDate !== today) {
+      // Новый день — обновляем серию
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split("T")[0];
+
+      const newStreak = progress.lastVisitDate === yesterdayStr
+        ? progress.streakDays + 1
+        : progress.streakDays > 0 ? 1 : 0;
+
+      const newProgress = {
+        ...progress,
+        totalVisits: progress.totalVisits + 1,
+        streakDays: newStreak,
+        lastVisitDate: today,
+      };
+
+      setProgress(newProgress);
+      saveProgress(newProgress);
+
+      // Проверяем достижение за серию
+      checkAchievement("week_streak", newStreak);
+    }
+
+    // Проверяем достижение за первое посещение
+    if (progress.totalVisits === 0) {
+      unlockAchievement("first_visit");
+    }
+  }, [progress, checkAchievement, unlockAchievement]);
 
   // Обновление прогресса вращения
   const incrementRotations = useCallback(() => {

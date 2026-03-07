@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { Points, PointMaterial } from "@react-three/drei";
 
 interface ThemeParticleEffectProps {
   activeTheme: string;
-  onThemeChange: (theme: string) => void;
+  onThemeChange?: (theme: string) => void;
 }
 
 const PARTICLE_COUNT = 50;
@@ -28,12 +28,15 @@ export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticl
   const [previousTheme, setPreviousTheme] = useState(activeTheme);
   const particlesRef = useRef<THREE.Points>(null);
   const velocities = useRef<{ x: number; y: number; z: number }[]>([]);
+  const particleDataRef = useRef<{ positions: Float32Array; colors: Float32Array } | null>(null);
 
-  // Создаем позиции и цвета частиц с помощью useMemo
-  const { positions, colors, sizes } = useMemo(() => {
+  // onThemeChange is available but not currently used
+  void onThemeChange;
+
+  // Инициализация частиц при монтировании
+  useEffect(() => {
     const pos = new Float32Array(PARTICLE_COUNT * 3);
     const cols = new Float32Array(PARTICLE_COUNT * 3);
-    const sz = new Float32Array(PARTICLE_COUNT);
     const themeKey = activeTheme as keyof typeof THEME_COLORS;
     const baseColor = new THREE.Color(THEME_COLORS[themeKey] || THEME_COLORS.dark);
 
@@ -44,7 +47,7 @@ export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticl
       const phi = Math.random() * Math.PI;
 
       pos[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-      pos[i * 3 + 1] = radius * Math.cos(phi) + 0.6; // смещение по Y
+      pos[i * 3 + 1] = radius * Math.cos(phi) + 0.6;
       pos[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
 
       // Случайные скорости
@@ -54,17 +57,17 @@ export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticl
         z: (Math.random() - 0.5) * 0.02
       };
 
-      // Размеры частиц
-      sz[i] = Math.random() * 0.03 + 0.01;
-
       // Цвета частиц
       cols[i * 3] = baseColor.r;
       cols[i * 3 + 1] = baseColor.g;
       cols[i * 3 + 2] = baseColor.b;
     }
 
-    return { positions: pos, colors: cols, sizes: sz };
-  }, []);
+    particleDataRef.current = { positions: pos, colors: cols };
+  }, [activeTheme]);
+
+  const positions = particleDataRef.current?.positions || new Float32Array(0);
+  const colors = particleDataRef.current?.colors || new Float32Array(0);
 
   // Анимация частиц
   useFrame(() => {

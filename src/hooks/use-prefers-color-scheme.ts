@@ -12,13 +12,16 @@ export function usePrefersColorScheme(): "dark" | "light" {
   useEffect(() => {
     // Проверяем prefers-color-scheme
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    
+
     const handleChange = (e: MediaQueryListEvent) => {
       setColorScheme(e.matches ? "dark" : "light");
     };
 
     // Устанавливаем начальное значение
-    setColorScheme(mediaQuery.matches ? "dark" : "light");
+    const initial = mediaQuery.matches ? "dark" : "light";
+    if (initial !== colorScheme) {
+      setColorScheme(initial);
+    }
 
     // Подписываемся на изменения
     mediaQuery.addEventListener("change", handleChange);
@@ -26,7 +29,7 @@ export function usePrefersColorScheme(): "dark" | "light" {
     return () => {
       mediaQuery.removeEventListener("change", handleChange);
     };
-  }, []);
+  }, [colorScheme]);
 
   return colorScheme;
 }
