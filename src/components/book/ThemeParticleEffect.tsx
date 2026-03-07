@@ -23,109 +23,63 @@ const THEME_COLORS = {
   auto: 0xd4af37, // золотой (по умолчанию как dark)
 };
 
+interface ParticleData {
+  positions: Float32Array;
+  colors: Float32Array;
+  velocities: { x: number; y: number; z: number }[];
+}
+
+function createParticleData(activeTheme: keyof typeof THEME_COLORS): ParticleData {
+  const pos = new Float32Array(PARTICLE_COUNT * 3);
+  const cols = new Float32Array(PARTICLE_COUNT * 3);
+  const velocities: { x: number; y: number; z: number }[] = [];
+  const baseColor = new THREE.Color(THEME_COLORS[activeTheme]);
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const radius = 0.5 + Math.random() * 1.5;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.random() * Math.PI;
+
+    pos[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+    pos[i * 3 + 1] = radius * Math.cos(phi) + 0.6;
+    pos[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+
+    velocities[i] = {
+      x: (Math.random() - 0.5) * 0.02,
+      y: Math.random() * 0.03 + 0.01,
+      z: (Math.random() - 0.5) * 0.02
+    };
+
+    cols[i * 3] = baseColor.r;
+    cols[i * 3 + 1] = baseColor.g;
+    cols[i * 3 + 2] = baseColor.b;
+  }
+
+  return { positions: pos, colors: cols, velocities };
+}
+
 export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticleEffectProps) {
   const [showParticles, setShowParticles] = useState(false);
-  const [previousTheme, setPreviousTheme] = useState(activeTheme);
-  const [particleData, setParticleData] = useState<{ positions: Float32Array; colors: Float32Array } | null>(null);
   const particlesRef = useRef<THREE.Points>(null);
-  const velocities = useRef<{ x: number; y: number; z: number }[]>([]);
+  const particleDataRef = useRef<ParticleData | null>(null);
+  const previousThemeRef = useRef(activeTheme);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // onThemeChange is available but not currently used
   void onThemeChange;
 
   // Инициализация частиц при монтировании
   useEffect(() => {
-    const pos = new Float32Array(PARTICLE_COUNT * 3);
-    const cols = new Float32Array(PARTICLE_COUNT * 3);
-    const themeKey = activeTheme as keyof typeof THEME_COLORS;
-    const baseColor = new THREE.Color(THEME_COLORS[themeKey] || THEME_COLORS.dark);
-
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      // Случайные позиции вокруг книги
-      const radius = 0.5 + Math.random() * 1.5;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.random() * Math.PI;
-
-      pos[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-      pos[i * 3 + 1] = radius * Math.cos(phi) + 0.6;
-      pos[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
-
-      // Случайные скорости
-      velocities.current[i] = {
-        x: (Math.random() - 0.5) * 0.02,
-        y: Math.random() * 0.03 + 0.01,
-        z: (Math.random() - 0.5) * 0.02
-      };
-
-      // Цвета частиц
-      cols[i * 3] = baseColor.r;
-      cols[i * 3 + 1] = baseColor.g;
-      cols[i * 3 + 2] = baseColor.b;
-    }
-
-    setParticleData({ positions: pos, colors: cols });
-  }, [activeTheme]);
-
-  const positions = particleData?.positions || new Float32Array(0);
-  const colors = particleData?.colors || new Float32Array(0);
-
-  // Анимация частиц
-  useFrame(() => {
-    if (particlesRef.current && showParticles) {
-      const geometry = particlesRef.current.geometry as THREE.BufferGeometry;
-      const positionsArray = geometry.attributes.position.array as Float32Array;
-      const colorsArray = geometry.attributes.color.array as Float32Array;
-
-      // Обновление позиций частиц
-      for (let i = 0; i < PARTICLE_COUNT; i++) {
-        positionsArray[i * 3] += velocities.current[i].x;
-        positionsArray[i * 3 + 1] += velocities.current[i].y;
-        positionsArray[i * 3 + 2] += velocities.current[i].z;
-
-        // Уменьшение скорости по Y (эффект гравитации)
-        velocities.current[i].y -= 0.001;
-
-        // Изменение прозрачности и размера при движении вверх
-        const alpha = Math.max(0, Math.min(1, positionsArray[i * 3 + 1] / 3));
-
-        // Обновление цвета с учетом прозрачности
-        colorsArray[i * 3] = colorsArray[i * 3] * alpha;
-        colorsArray[i * 3 + 1] = colorsArray[i * 3 + 1] * alpha;
-        colorsArray[i * 3 + 2] = colorsArray[i * 3 + 2] * alpha;
-
-        // Удаление частиц, которые улетели слишком высоко
-        if (positionsArray[i * 3 + 1] > 3) {
-          // Перемещаем частицу обратно вниз с новыми параметрами
-          const radius = 0.5 + Math.random() * 1.5;
-          const theta = Math.random() * Math.PI * 2;
-          const phi = Math.random() * Math.PI;
-
-          positionsArray[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-          positionsArray[i * 3 + 1] = 0.6;
-          positionsArray[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
-
-          velocities.current[i] = {
-            x: (Math.random() - 0.5) * 0.02,
-            y: Math.random() * 0.03 + 0.01,
-            z: (Math.random() - 0.5) * 0.02
-          };
-        }
-      }
-
-      geometry.attributes.position.needsUpdate = true;
-      geometry.attributes.color.needsUpdate = true;
-    }
-  });
+    particleDataRef.current = createParticleData(activeTheme as keyof typeof THEME_COLORS);
+  }, []);
 
   // Эффект при смене темы
   useEffect(() => {
-    if (activeTheme !== previousTheme) {
+    if (activeTheme !== previousThemeRef.current && particleDataRef.current) {
       setShowParticles(true);
-      setPreviousTheme(activeTheme);
+      previousThemeRef.current = activeTheme;
 
-      // Обновление цветов частиц
-      if (particlesRef.current) {
-        const geometry = particlesRef.current.geometry as THREE.BufferGeometry;
+      const geometry = particlesRef.current?.geometry as THREE.BufferGeometry | undefined;
+      if (geometry) {
         const colorsArray = geometry.attributes.color.array as Float32Array;
         const newColor = new THREE.Color(THEME_COLORS[activeTheme as keyof typeof THEME_COLORS]);
 
@@ -138,29 +92,79 @@ export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticl
         geometry.attributes.color.needsUpdate = true;
       }
 
-      // Скрытие частиц через 2 секунды
-      const timer = setTimeout(() => {
+      timerRef.current = setTimeout(() => {
         setShowParticles(false);
       }, 2000);
 
-      return () => clearTimeout(timer);
+      return () => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+      };
     }
-  }, [activeTheme, previousTheme]);
+  }, [activeTheme]);
 
-  if (!showParticles) return null;
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  // Анимация частиц
+  useFrame(() => {
+    if (!particlesRef.current || !showParticles || !particleDataRef.current) return;
+    
+    const geometry = particlesRef.current.geometry as THREE.BufferGeometry;
+    const positionsArray = geometry.attributes.position.array as Float32Array;
+    const colorsArray = geometry.attributes.color.array as Float32Array;
+    const velocities = particleDataRef.current.velocities;
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      positionsArray[i * 3] += velocities[i].x;
+      positionsArray[i * 3 + 1] += velocities[i].y;
+      positionsArray[i * 3 + 2] += velocities[i].z;
+
+      velocities[i].y -= 0.001;
+
+      const alpha = Math.max(0, Math.min(1, positionsArray[i * 3 + 1] / 3));
+
+      colorsArray[i * 3] = colorsArray[i * 3] * alpha;
+      colorsArray[i * 3 + 1] = colorsArray[i * 3 + 1] * alpha;
+      colorsArray[i * 3 + 2] = colorsArray[i * 3 + 2] * alpha;
+
+      if (positionsArray[i * 3 + 1] > 3) {
+        const radius = 0.5 + Math.random() * 1.5;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.random() * Math.PI;
+
+        positionsArray[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+        positionsArray[i * 3 + 1] = 0.6;
+        positionsArray[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+
+        velocities[i] = {
+          x: (Math.random() - 0.5) * 0.02,
+          y: Math.random() * 0.03 + 0.01,
+          z: (Math.random() - 0.5) * 0.02
+        };
+      }
+    }
+
+    geometry.attributes.position.needsUpdate = true;
+    geometry.attributes.color.needsUpdate = true;
+  });
+
+  if (!showParticles || !particleDataRef.current) return null;
 
   return (
     <Points ref={particlesRef} limit={PARTICLE_COUNT}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          args={[positions, 3]}
+          args={[particleDataRef.current.positions, 3]}
           count={PARTICLE_COUNT}
           itemSize={3}
         />
         <bufferAttribute
           attach="attributes-color"
-          args={[colors, 3]}
+          args={[particleDataRef.current.colors, 3]}
           count={PARTICLE_COUNT}
           itemSize={3}
         />

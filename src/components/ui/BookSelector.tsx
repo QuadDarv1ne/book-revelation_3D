@@ -73,13 +73,19 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
     }
   }, [isOpen, focusedIndex, onBookChange, showToast]);
 
-  // Фокус на выбранном элементе
+  // Фокус на выбранном элементе - используем ref для избежания setState в effect
+  const isOpenRef = useRef(isOpen);
   useEffect(() => {
-    if (!isOpen) return;
-    
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpenRef.current) return;
     const selectedIndex = books.findIndex(b => b.id === activeBookId);
-    setFocusedIndex(prev => selectedIndex >= 0 ? selectedIndex : prev);
-  }, [isOpen, activeBookId]);
+    if (selectedIndex >= 0) {
+      setFocusedIndex(selectedIndex);
+    }
+  }, [activeBookId]);
 
   const handleBookSelect = useCallback((bookId: string, title: string) => {
     onBookChange(bookId);

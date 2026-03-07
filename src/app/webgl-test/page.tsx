@@ -1,20 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { checkWebGLSupport, type WebGLInfo } from "@/lib/webgl-check";
 
-export default function WebGLTestPage() {
-  const [webglInfo, setWebglInfo] = useState<WebGLInfo | null>(null);
+function getWebglInfo(): WebGLInfo {
+  return checkWebGLSupport();
+}
 
-  useEffect(() => {
-    const info = checkWebGLSupport();
-    setWebglInfo(prevInfo => {
-      if (prevInfo === null) {
-        return info;
-      }
-      return prevInfo;
-    });
-  }, []);
+export default function WebGLTestPage() {
+  const webglInfo = getWebglInfo();
 
   if (!webglInfo) {
     return (

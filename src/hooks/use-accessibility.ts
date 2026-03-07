@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useCallback, useRef, useState } from "react";
 import { usePrefersReducedMotion } from "./use-prefers-reduced-motion";
 
 interface UseAccessibility {
@@ -19,6 +19,7 @@ export function useAccessibility(): UseAccessibility {
   const [keyboardNavEnabled, setKeyboardNavEnabled] = useState(true);
   const [screenReaderAnnouncement, setScreenReaderAnnouncement] = useState("");
   const [focusTrapActive, setFocusTrapActive] = useState(false);
+  const announcementTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const motionPreference: "reduced" | "normal" = prefersReducedMotion ? "reduced" : "normal";
 
@@ -53,13 +54,15 @@ export function useAccessibility(): UseAccessibility {
   // Очистка объявления для screen reader через 3 секунды
   useEffect(() => {
     if (screenReaderAnnouncement) {
-      const timer = setTimeout(() => {
+      announcementTimerRef.current = setTimeout(() => {
         setScreenReaderAnnouncement("");
       }, 3000);
 
-      return () => clearTimeout(timer);
+      return () => {
+        if (announcementTimerRef.current) clearTimeout(announcementTimerRef.current);
+      };
     }
-  }, [screenReaderAnnouncement]);
+  }, []);
 
   return {
     prefersReducedMotion,
@@ -74,8 +77,8 @@ export function useAccessibility(): UseAccessibility {
  * Хук для управления фокусом в модальных окнах
  */
 export function useFocusTrap(isActive: boolean) {
-  const [firstFocusable, setFirstFocusable] = useState<HTMLElement | null>(null);
-  const [lastFocusable, setLastFocusable] = useState<HTMLElement | null>(null);
+  const firstFocusableRef = useRef<HTMLElement | null>(null);
+  const lastFocusableRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!isActive) return;
@@ -93,10 +96,8 @@ export function useFocusTrap(isActive: boolean) {
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
 
-    if (focusableElements.length > 0) {
-      setFirstFocusable(firstElement);
-      setLastFocusable(lastElement);
-    }
+    firstFocusableRef.current = firstElement || null;
+    lastFocusableRef.current = lastElement || null;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Tab") return;
@@ -123,10 +124,10 @@ export function useFocusTrap(isActive: boolean) {
   }, [isActive]);
 
   const focusFirst = useCallback(() => {
-    firstFocusable?.focus();
-  }, [firstFocusable]);
+    firstFocusableRef.current?.focus();
+  }, []);
 
-  return { firstFocusable, lastFocusable, focusFirst };
+  return { firstFocusable: firstFocusableRef.current, lastFocusable: lastFocusableRef.current, focusFirst };
 }
 
 /**

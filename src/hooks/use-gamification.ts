@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 
 /**
  * Структура достижения
@@ -220,24 +220,26 @@ export function useGamification() {
     });
   }, []);
 
-  // Обновление прогресса при посещении
+  // Обновление прогресса при посещении - используем ref для избежания setState в effect
+  const hasInitializedVisitRef = useRef(false);
   useEffect(() => {
+    if (hasInitializedVisitRef.current) return;
+    
     const today = new Date().toISOString().split("T")[0];
-
-    setProgress(prev => {
-      if (prev.lastVisitDate === today) return prev;
-
+    
+    const currentProgress = loadProgress();
+    if (currentProgress.lastVisitDate !== today) {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
       const yesterdayStr = yesterday.toISOString().split("T")[0];
 
-      const newStreak = prev.lastVisitDate === yesterdayStr
-        ? prev.streakDays + 1
-        : prev.streakDays > 0 ? 1 : 0;
+      const newStreak = currentProgress.lastVisitDate === yesterdayStr
+        ? currentProgress.streakDays + 1
+        : currentProgress.streakDays > 0 ? 1 : 0;
 
       const newProgress = {
-        ...prev,
-        totalVisits: prev.totalVisits + 1,
+        ...currentProgress,
+        totalVisits: currentProgress.totalVisits + 1,
         streakDays: newStreak,
         lastVisitDate: today,
       };
@@ -245,12 +247,13 @@ export function useGamification() {
       saveProgress(newProgress);
       checkAchievement("week_streak", newStreak);
 
-      if (prev.totalVisits === 0) {
+      if (currentProgress.totalVisits === 0) {
         unlockAchievement("first_visit");
       }
-
-      return newProgress;
-    });
+      
+      setProgress(newProgress);
+      hasInitializedVisitRef.current = true;
+    }
   }, [checkAchievement, unlockAchievement]);
 
   // Обновление прогресса вращения
