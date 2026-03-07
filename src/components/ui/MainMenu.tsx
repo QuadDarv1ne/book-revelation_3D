@@ -112,12 +112,12 @@ export function MainMenu({
           isOpen ? "opacity-100 visible scale-100" : "opacity-0 invisible scale-95"
         }`}
         role="menu"
-        aria-label="Главное меню"
+        aria-label={t('menu.main')}
       >
         {/* Заголовок */}
         <div className="px-5 py-4 border-b border-[rgba(212,175,55,0.15)] bg-gradient-to-r from-amber-900/20 to-transparent">
           <h2 className="text-lg font-light text-amber-100 tracking-wide">Book Revelation</h2>
-          <p className="text-xs text-amber-500/60 mt-0.5 tracking-[0.12em] uppercase">Стоическая философия</p>
+          <p className="text-xs text-amber-500/60 mt-0.5 tracking-[0.12em] uppercase">{t('stoicPhilosophy')}</p>
         </div>
 
         {/* Разделы меню */}
@@ -136,7 +136,7 @@ export function MainMenu({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span className="text-sm text-amber-100 font-medium">Настройки</span>
+                <span className="text-sm text-amber-100 font-medium">{t('settings.theme')}</span>
               </div>
               <svg
                 className={`w-4 h-4 text-amber-400/60 transition-transform duration-200 ${activeSection === "settings" ? "rotate-180" : ""}`}
@@ -176,7 +176,7 @@ export function MainMenu({
 
                 {/* Вращение книги */}
                 <div>
-                  <h4 className="text-xs uppercase tracking-[0.12em] text-amber-500/70 mb-2">Вращение</h4>
+                  <h4 className="text-xs uppercase tracking-[0.12em] text-amber-500/70 mb-2">{t('menu.rotation')}</h4>
                   <div className="flex items-center gap-3 mb-3">
                     <button
                       onClick={onToggleRotation}
@@ -192,7 +192,7 @@ export function MainMenu({
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span className="text-xs">Пауза</span>
+                          <span className="text-xs">{t('menu.pause')}</span>
                         </>
                       ) : (
                         <>
@@ -200,7 +200,7 @@ export function MainMenu({
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span className="text-xs">Вращение</span>
+                          <span className="text-xs">{t('control.rotation')}</span>
                         </>
                       )}
                     </button>
@@ -216,11 +216,11 @@ export function MainMenu({
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                       </svg>
-                      <span className="text-xs">Zen</span>
+                      <span className="text-xs">{t('menu.zenMode')}</span>
                     </button>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-amber-400/60">Скорость:</span>
+                    <span className="text-xs text-amber-400/60">{t('settings.speed')}:</span>
                     <input
                       type="range"
                       min="0.1"
@@ -229,7 +229,7 @@ export function MainMenu({
                       value={rotationSpeed}
                       onChange={(e) => handleRotationSpeedChange(parseFloat(e.target.value))}
                       className="flex-1 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400"
-                      aria-label="Скорость вращения книги"
+                      aria-label={t('settings.rotationSpeed')}
                     />
                     <span className="text-xs text-amber-400/60 w-8 text-right">{rotationSpeed}</span>
                   </div>
@@ -237,7 +237,7 @@ export function MainMenu({
 
                 {/* Избранное */}
                 <div>
-                  <h4 className="text-xs uppercase tracking-[0.12em] text-amber-500/70 mb-2">Избранные цитаты</h4>
+                  <h4 className="text-xs uppercase tracking-[0.12em] text-amber-500/70 mb-2">{t('menu.favorites')}</h4>
                   <div className="flex gap-2">
                     <button
                       onClick={onExportFavorites}
@@ -247,7 +247,7 @@ export function MainMenu({
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                       </svg>
-                      <span>Экспорт</span>
+                      <span>{t('quotes.export')}</span>
                     </button>
                     <button
                       onClick={onImportFavorites}
