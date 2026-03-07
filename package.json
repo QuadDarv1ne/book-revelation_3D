@@ -28,10 +28,12 @@
     "@types/three": "^0.183.1",
     "@vercel/analytics": "^1.6.1",
     "dompurify": "^3.3.2",
+    "html-to-image": "^1.11.13",
     "next": "^16.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sharp": "^0.34.5",
+    "tailwindcss-animate": "^1.0.7",
     "three": "^0.183.2"
   },
   "devDependencies": {
