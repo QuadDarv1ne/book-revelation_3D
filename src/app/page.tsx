@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { QuotesPanel } from "@/components/quotes";
-import { ControlButton, WebGLError, useWebGLSupport, SettingsBar, PWAInstall, ToastProvider, BookSelector, MainMenu } from "@/components/ui";
+import { ControlButton, WebGLError, useWebGLSupport, SettingsBar, PWAInstall, ToastProvider, BookSelector, MainMenu, ErrorBoundary } from "@/components/ui";
 import { useRotationControl } from "@/hooks/use-rotation";
 import { useMounted } from "@/hooks/use-mounted";
 import { LoadingFallback } from "@/components/ui/LoadingFallback";
@@ -265,7 +265,9 @@ export default function Home() {
 
           <div id="quotes" className="w-full lg:w-[42%] h-[50%] lg:h-full relative bg-gradient-to-b from-[rgba(25,25,40,0.95)] to-[rgba(20,20,35,0.97)] border-l border-[rgba(212,175,55,0.12)]" role="region" aria-label="Цитаты стоических философов">
             <div className="absolute top-0 left-0 right-0 h-20 pointer-events-none bg-gradient-to-b from-[rgba(10,10,18,1)] to-transparent" />
-            <QuotesPanel quotes={activeBook.quotes} activeQuote={activeQuote} setActiveQuote={setActiveQuote} bookTitle={activeBook.title} />
+            <ErrorBoundary>
+              <QuotesPanel quotes={activeBook.quotes} activeQuote={activeQuote} setActiveQuote={setActiveQuote} bookTitle={activeBook.title} />
+            </ErrorBoundary>
             <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none bg-gradient-to-t from-[rgba(5,5,10,1)] to-transparent" />
           </div>
         </div>
@@ -283,16 +285,18 @@ export default function Home() {
 
             {/* Кнопка меню настроек - внизу слева */}
             <div className="absolute bottom-20 left-3 z-40">
-              <MainMenu
-                theme={theme}
-                onThemeChange={(t: string) => setTheme(t as Theme)}
-                isRotating={isRotating}
-                onToggleRotation={toggleRotation}
-                zenMode={zenMode}
-                onToggleZenMode={() => setZenMode(!zenMode)}
-                onExportFavorites={handleExportFavorites}
-                onImportFavorites={handleImportFavorites}
-              />
+              <ErrorBoundary>
+                <MainMenu
+                  theme={theme}
+                  onThemeChange={(t: string) => setTheme(t as Theme)}
+                  isRotating={isRotating}
+                  onToggleRotation={toggleRotation}
+                  zenMode={zenMode}
+                  onToggleZenMode={() => setZenMode(!zenMode)}
+                  onExportFavorites={handleExportFavorites}
+                  onImportFavorites={handleImportFavorites}
+                />
+              </ErrorBoundary>
             </div>
           </>
         ) : (

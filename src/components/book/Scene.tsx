@@ -8,6 +8,7 @@ import { Podium } from "./Podium";
 import { ParticleRing } from "./ParticleRing";
 import { Lighting } from "./Lighting";
 import { ThemeParticleEffect } from "./ThemeParticleEffect";
+import { CanvasErrorBoundary } from "@/components/ui/CanvasErrorBoundary";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import * as THREE from "three";
 
@@ -175,36 +176,38 @@ export const Scene = memo(function Scene({
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {prefersReducedMotion ? 'Анимации уменьшены для доступности' : (effectiveIsRotating ? 'Книга вращается' : 'Вращение приостановлено')}
       </div>
-      <Canvas
-        ref={canvasRef}
-        camera={{ position: [0, 1.25, 4.0], fov }}
-        shadows
-        dpr={[1, 1.5]}
-        gl={{
-          antialias: true,
-          alpha: true,
-          powerPreference: "high-performance",
-          preserveDrawingBuffer: false
-        }}
-        performance={{ min: 0.5 }}
-        onError={onError}
-        style={{ outline: 'none' }}
-      >
-        <SceneContent
-          isRotating={effectiveIsRotating}
-          coverImage={coverImage}
-          spineImage={spineImage}
-          backCoverImage={backCoverImage}
-          theme={theme}
-          onThemeChange={onThemeChange}
-        />
-        <KeyboardHandler
-          onRotate={onKeyboardRotate || (() => {})}
-          onZoomIn={handleZoomIn}
-          onZoomOut={handleZoomOut}
-          onReset={handleReset}
-        />
-      </Canvas>
+      <CanvasErrorBoundary onCanvasError={onError}>
+        <Canvas
+          ref={canvasRef}
+          camera={{ position: [0, 1.25, 4.0], fov }}
+          shadows
+          dpr={[1, 1.5]}
+          gl={{
+            antialias: true,
+            alpha: true,
+            powerPreference: "high-performance",
+            preserveDrawingBuffer: false
+          }}
+          performance={{ min: 0.5 }}
+          onError={onError}
+          style={{ outline: 'none' }}
+        >
+          <SceneContent
+            isRotating={effectiveIsRotating}
+            coverImage={coverImage}
+            spineImage={spineImage}
+            backCoverImage={backCoverImage}
+            theme={theme}
+            onThemeChange={onThemeChange}
+          />
+          <KeyboardHandler
+            onRotate={onKeyboardRotate || (() => {})}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onReset={handleReset}
+          />
+        </Canvas>
+      </CanvasErrorBoundary>
     </div>
   );
 });
