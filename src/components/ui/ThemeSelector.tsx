@@ -3,11 +3,12 @@
 import { useMemo } from "react";
 import { useTheme } from "@/hooks/use-scene-controls";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { useI18n } from "@/hooks/use-i18n";
 import { ThemeType } from "@/contexts/Book3DContext";
 
 interface ThemeColor {
   id: string;
-  name: string;
+  nameKey: string;
   primary: string;
   secondary: string;
   background: string;
@@ -17,7 +18,7 @@ interface ThemeColor {
 const THEME_COLORS: Record<string, ThemeColor> = {
   dark: {
     id: "dark",
-    name: "Тёмная",
+    nameKey: "theme.dark",
     primary: "#d4af37",
     secondary: "#1a1a1a",
     background: "#0a0a0a",
@@ -25,7 +26,7 @@ const THEME_COLORS: Record<string, ThemeColor> = {
   },
   light: {
     id: "light",
-    name: "Светлая",
+    nameKey: "theme.light",
     primary: "#333333",
     secondary: "#f5f5f5",
     background: "#ffffff",
@@ -33,7 +34,7 @@ const THEME_COLORS: Record<string, ThemeColor> = {
   },
   blue: {
     id: "blue",
-    name: "Синяя",
+    nameKey: "theme.blue",
     primary: "#3b82f6",
     secondary: "#1e3a5f",
     background: "#0f172a",
@@ -41,7 +42,7 @@ const THEME_COLORS: Record<string, ThemeColor> = {
   },
   purple: {
     id: "purple",
-    name: "Фиолетовая",
+    nameKey: "theme.purple",
     primary: "#7c3aed",
     secondary: "#2e1065",
     background: "#0f0a1f",
@@ -49,7 +50,7 @@ const THEME_COLORS: Record<string, ThemeColor> = {
   },
   ambient: {
     id: "ambient",
-    name: "Изумруд",
+    nameKey: "theme.ambient",
     primary: "#059669",
     secondary: "#064e3b",
     background: "#022c22",
@@ -57,7 +58,7 @@ const THEME_COLORS: Record<string, ThemeColor> = {
   },
   relax: {
     id: "relax",
-    name: "Релакс",
+    nameKey: "theme.relax",
     primary: "#1a3f2f",
     secondary: "#0d1f17",
     background: "#05140f",
@@ -65,7 +66,7 @@ const THEME_COLORS: Record<string, ThemeColor> = {
   },
   auto: {
     id: "auto",
-    name: "Авто",
+    nameKey: "theme.auto",
     primary: "#d4af37",
     secondary: "#1a1a1a",
     background: "#0a0a0a",
@@ -80,6 +81,7 @@ interface ThemeSelectorProps {
 export function ThemeSelector({ onThemeChange }: ThemeSelectorProps) {
   const { theme, setTheme, availableThemes } = useTheme();
   const prefersReducedMotion = usePrefersReducedMotion();
+  const { t } = useI18n();
 
   const handleThemeSelect = (newTheme: ThemeType) => {
     setTheme(newTheme);
@@ -99,7 +101,7 @@ export function ThemeSelector({ onThemeChange }: ThemeSelectorProps) {
     <div className="flex flex-col gap-3 p-4 bg-white/5 rounded-lg border border-white/10">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium text-white">Цветовая схема</h3>
-        <span className="text-xs text-white/60">{currentThemeColor?.name}</span>
+        <span className="text-xs text-white/60">{t(currentThemeColor?.nameKey || '')}</span>
       </div>
 
       <div className="grid grid-cols-4 gap-2" role="radiogroup" aria-label="Выбор цветовой схемы">
@@ -112,8 +114,8 @@ export function ThemeSelector({ onThemeChange }: ThemeSelectorProps) {
               key={themeId}
               role="radio"
               aria-checked={isSelected}
-              aria-label={themeColor.name}
-              title={themeColor.name}
+              aria-label={t(themeColor.nameKey)}
+              title={t(themeColor.nameKey)}
               onClick={() => handleThemeSelect(themeId as ThemeType)}
               onKeyDown={(e) => handleKeyDown(e, themeId as ThemeType)}
               className={`
@@ -137,7 +139,7 @@ export function ThemeSelector({ onThemeChange }: ThemeSelectorProps) {
                 }}
               />
               <span className="text-[10px] text-white/70 text-center leading-tight">
-                {themeId === "auto" ? "Авто" : themeColor.name.split(" ")[0]}
+                {t(themeColor.nameKey)}
               </span>
               
               {isSelected && (
