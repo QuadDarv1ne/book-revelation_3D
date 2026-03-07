@@ -33,7 +33,7 @@ export function useFavorites() {
       }
       
       // Проверка, что все элементы массива - числа
-      if (!importData.favorites.every((index: any) => typeof index === 'number' && index >= 0)) {
+      if (!importData.favorites.every((index: unknown) => typeof index === 'number' && index >= 0)) {
         throw new Error("Неверный формат индексов цитат");
       }
       

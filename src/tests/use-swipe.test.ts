@@ -19,11 +19,11 @@ describe('useSwipe', () => {
 
     // Симулируем touch события
     const touchStartEvent = new TouchEvent('touchstart', {
-      touches: [{ clientX: 200, clientY: 100 } as any],
+      touches: [{ clientX: 200, clientY: 100 } as unknown as Touch],
     });
-    
+
     const touchMoveEvent = new TouchEvent('touchmove', {
-      touches: [{ clientX: 100, clientY: 100 } as any],
+      touches: [{ clientX: 100, clientY: 100 } as unknown as Touch],
     });
     
     const touchEndEvent = new TouchEvent('touchend');
@@ -47,11 +47,11 @@ describe('useSwipe', () => {
     }));
 
     const touchStartEvent = new TouchEvent('touchstart', {
-      touches: [{ clientX: 100, clientY: 100 } as any],
+      touches: [{ clientX: 100, clientY: 100 } as unknown as Touch],
     });
-    
+
     const touchMoveEvent = new TouchEvent('touchmove', {
-      touches: [{ clientX: 200, clientY: 100 } as any],
+      touches: [{ clientX: 200, clientY: 100 } as unknown as Touch],
     });
     
     const touchEndEvent = new TouchEvent('touchend');
@@ -75,11 +75,11 @@ describe('useSwipe', () => {
     }));
 
     const touchStartEvent = new TouchEvent('touchstart', {
-      touches: [{ clientX: 100, clientY: 100 } as any],
+      touches: [{ clientX: 100, clientY: 100 } as unknown as Touch],
     });
-    
+
     const touchMoveEvent = new TouchEvent('touchmove', {
-      touches: [{ clientX: 130, clientY: 100 } as any], // Меньше порога 50
+      touches: [{ clientX: 130, clientY: 100 } as unknown as Touch], // Меньше порога 50
     });
     
     const touchEndEvent = new TouchEvent('touchend');
@@ -104,7 +104,7 @@ describe('useSwipe', () => {
     }));
 
     const touchStartEvent = new TouchEvent('touchstart', {
-      touches: [{ clientX: 200, clientY: 100 } as any],
+      touches: [{ clientX: 200, clientY: 100 } as unknown as Touch],
     });
     
     const touchEndEvent = new TouchEvent('touchend');

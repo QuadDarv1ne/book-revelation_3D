@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 // CSP для мета-тега (резервный вариант, основной в middleware)
-const cspContent = `
+const _cspContent = `
   default-src 'self';
   script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' https://vercel.live;
   style-src 'self' 'unsafe-inline';

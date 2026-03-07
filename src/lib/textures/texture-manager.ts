@@ -199,7 +199,7 @@ class TextureManager {
   /**
    * Найти запись в кэше по пути
    */
-  private findEntryByPath(imagePath: string): TextureCacheEntry | undefined {
+  private findEntryByPath(_imagePath: string): TextureCacheEntry | undefined {
     for (const entry of this.cache.values()) {
       if (entry.promise) {
         return entry;
