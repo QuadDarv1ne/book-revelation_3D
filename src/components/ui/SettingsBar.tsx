@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useToast } from "./Toast";
 import { useFavorites } from "@/hooks/use-favorites";
+import { useI18n } from "@/hooks/use-i18n";
 
 interface IconProps {
   className?: string;
@@ -64,22 +65,6 @@ function Palette({ className }: IconProps) {
   );
 }
 
-interface ThemeOption {
-  value: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  preview: string;
-}
-
-const THEMES: ThemeOption[] = [
-  { value: "dark" as const, label: "Тёмная" as const, icon: Moon, preview: "bg-[#1a1a1a]" },
-  { value: "light" as const, label: "Светлая" as const, icon: Sun, preview: "bg-[#f5f5f5]" },
-  { value: "blue" as const, label: "Синяя" as const, icon: Palette, preview: "bg-[#1e3a5f]" },
-  { value: "purple" as const, label: "Фиолетовая" as const, icon: Palette, preview: "bg-[#3f2a5f]" },
-  { value: "ambient" as const, label: "Атмосферная" as const, icon: Palette, preview: "bg-[#1a3f2f]" },
-  { value: "relax" as const, label: "Расслабляющая" as const, icon: Palette, preview: "bg-[#d4dcc4]" },
-];
-
 interface SettingsBarProps {
   theme: string;
   onThemeChange: (theme: "dark" | "light" | "blue" | "purple" | "ambient" | "relax") => void;
@@ -89,7 +74,17 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { showToast } = useToast();
   const { exportFavorites, importFavorites } = useFavorites();
+  const { t } = useI18n();
   const [rotationSpeed, setRotationSpeed] = useState(0.5);
+
+  const THEMES = useMemo(() => [
+    { value: "dark" as const, label: t('theme.dark'), icon: Moon, preview: "bg-[#1a1a1a]" },
+    { value: "light" as const, label: t('theme.light'), icon: Sun, preview: "bg-[#f5f5f5]" },
+    { value: "blue" as const, label: t('theme.blue'), icon: Palette, preview: "bg-[#1e3a5f]" },
+    { value: "purple" as const, label: t('theme.purple'), icon: Palette, preview: "bg-[#3f2a5f]" },
+    { value: "ambient" as const, label: t('theme.ambient'), icon: Palette, preview: "bg-[#1a3f2f]" },
+    { value: "relax" as const, label: t('theme.relax'), icon: Palette, preview: "bg-[#d4dcc4]" },
+  ], [t]);
 
   const cycleTheme = () => {
     const currentIndex = THEMES.findIndex(t => t.value === theme);
@@ -103,12 +98,12 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
   // Обработчик экспорта избранных цитат
   const handleExportFavorites = useCallback(() => {
     const exportData = exportFavorites();
-    
+
     if (!exportData) {
-      showToast("Нет избранных цитат для экспорта", "info");
+      showToast(t('toast.noFavoritesToExport'), "info");
       return;
     }
-    
+
     try {
       const blob = new Blob([exportData], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -119,45 +114,45 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
-      showToast("Избранные цитаты экспортированы", "success");
+
+      showToast(t('toast.favoritesExported'), "success");
     } catch (error) {
-      showToast("Ошибка при экспорте", "error");
+      showToast(t('toast.exportError'), "error");
       console.error("Export error:", error);
     }
-  }, [exportFavorites, showToast]);
+  }, [exportFavorites, showToast, t]);
 
   // Обработчик импорта избранных цитат
   const handleImportFavorites = useCallback(() => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    
+
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement)?.files?.[0];
       if (!file) return;
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const content = e.target?.result as string;
         const result = importFavorites(content);
-        
+
         if (result.success) {
-          showToast(`Успешно импортировано ${result.count} цитат`, "success");
+          showToast(t('toast.favoritesImported').replace('{count}', String(result.count)), "success");
         } else {
-          showToast(`Ошибка импорта: ${result.error}`, "error");
+          showToast(`${t('toast.importError')}: ${result.error}`, "error");
         }
       };
-      
+
       reader.onerror = () => {
-        showToast("Ошибка чтения файла", "error");
+        showToast(t('toast.readFileError'), "error");
       };
-      
+
       reader.readAsText(file);
     };
     
     input.click();
-  }, [importFavorites, showToast]);
+  }, [importFavorites, showToast, t]);
 
   // Обработчик изменения скорости вращения
   const handleRotationSpeedChange = useCallback((speed: number) => {
