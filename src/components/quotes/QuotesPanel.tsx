@@ -239,7 +239,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
       onKeyDown={handlePanelKeyDown}
       tabIndex={0}
       role="region"
-      aria-label="Панель цитат. Используйте стрелки вверх/вниз для навигации или свайпы на сенсорных экранах."
+      aria-label={t('quotes.ariaLabel')}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -249,7 +249,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
-        <span className="text-[10px] tracking-wider">СВАЙП</span>
+        <span className="text-[10px] tracking-wider">{t('swipe')}</span>
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
@@ -261,7 +261,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
           {bookTitle}
         </h2>
         <p className="text-[10px] sm:text-xs md:text-sm text-amber-500/65 tracking-[0.18em] uppercase font-light">
-          Стоическая мудрость
+          {t('stoicWisdom')}
         </p>
 
         {/* Search input - увеличен для мобильных */}
