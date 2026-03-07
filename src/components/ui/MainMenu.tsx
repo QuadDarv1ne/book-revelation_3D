@@ -45,16 +45,19 @@ export function MainMenu({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-        setActiveSection(null);
+        setIsOpen(prev => {
+          if (prev) {
+            setActiveSection(null);
+            return false;
+          }
+          return prev;
+        });
       }
     };
 
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isOpen]);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Закрытие по Escape
   useEffect(() => {
