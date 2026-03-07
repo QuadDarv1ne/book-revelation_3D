@@ -9,34 +9,34 @@ export function AchievementNotification() {
   const [isLeaving, setIsLeaving] = useState(false);
 
   useEffect(() => {
-    if (showAchievement) {
-      // Показываем уведомление
-      setIsVisible(true);
+    if (!showAchievement) return;
 
-      // Автоматически скрываем через 4 секунды
-      const timer = setTimeout(() => {
-        setIsLeaving(true);
-        setTimeout(() => {
-          setIsVisible(false);
-          setIsLeaving(false);
-          dismissAchievement();
-        }, 300); // Ждем завершения анимации
-      }, 4000);
+    // Показываем уведомление
+    setIsVisible(true);
 
-      return () => clearTimeout(timer);
-    }
-  }, [showAchievement, dismissAchievement]);
-
-  // Обновление состояния видимости
-  useEffect(() => {
-    if (isVisible && isLeaving) {
-      const timer = setTimeout(() => {
+    // Автоматически скрываем через 4 секунды
+    const timer = setTimeout(() => {
+      setIsLeaving(true);
+      setTimeout(() => {
         setIsVisible(false);
         setIsLeaving(false);
         dismissAchievement();
       }, 300);
-      return () => clearTimeout(timer);
-    }
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, [showAchievement, dismissAchievement]);
+
+  useEffect(() => {
+    if (!isVisible || !isLeaving) return;
+    
+    const timer = setTimeout(() => {
+      setIsVisible(false);
+      setIsLeaving(false);
+      dismissAchievement();
+    }, 300);
+    
+    return () => clearTimeout(timer);
   }, [isVisible, isLeaving, dismissAchievement]);
 
   const handleClose = useCallback(() => {

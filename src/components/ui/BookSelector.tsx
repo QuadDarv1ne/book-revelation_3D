@@ -75,10 +75,10 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
 
   // Фокус на выбранном элементе
   useEffect(() => {
-    if (isOpen) {
-      const selectedIndex = books.findIndex(b => b.id === activeBookId);
-      setFocusedIndex(prev => selectedIndex >= 0 ? selectedIndex : prev);
-    }
+    if (!isOpen) return;
+    
+    const selectedIndex = books.findIndex(b => b.id === activeBookId);
+    setFocusedIndex(prev => selectedIndex >= 0 ? selectedIndex : prev);
   }, [isOpen, activeBookId]);
 
   const handleBookSelect = useCallback((bookId: string, title: string) => {

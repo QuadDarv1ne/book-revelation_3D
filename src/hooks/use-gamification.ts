@@ -225,11 +225,8 @@ export function useGamification() {
     const today = new Date().toISOString().split("T")[0];
 
     setProgress(prev => {
-      if (prev.lastVisitDate === today) {
-        return prev;
-      }
+      if (prev.lastVisitDate === today) return prev;
 
-      // Новый день — обновляем серию
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
       const yesterdayStr = yesterday.toISOString().split("T")[0];
@@ -246,11 +243,8 @@ export function useGamification() {
       };
 
       saveProgress(newProgress);
-
-      // Проверяем достижение за серию
       checkAchievement("week_streak", newStreak);
 
-      // Проверяем достижение за первое посещение
       if (prev.totalVisits === 0) {
         unlockAchievement("first_visit");
       }
