@@ -17,10 +17,11 @@ export function usePrefersColorScheme(): "dark" | "light" {
       setColorScheme(e.matches ? "dark" : "light");
     };
 
-    // Устанавливаем начальное значение через setTimeout для избежания каскадных рендеров
-    setTimeout(() => {
-      setColorScheme(mediaQuery.matches ? "dark" : "light");
-    }, 0);
+    // Устанавливаем начальное значение
+    const initial = mediaQuery.matches ? "dark" : "light";
+    if (initial !== colorScheme) {
+      setColorScheme(initial);
+    }
 
     // Подписываемся на изменения
     mediaQuery.addEventListener("change", handleChange);
@@ -28,7 +29,7 @@ export function usePrefersColorScheme(): "dark" | "light" {
     return () => {
       mediaQuery.removeEventListener("change", handleChange);
     };
-  }, []);
+  }, [colorScheme]);
 
   return colorScheme;
 }

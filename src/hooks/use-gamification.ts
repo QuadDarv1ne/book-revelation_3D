@@ -241,23 +241,16 @@ export function useGamification() {
         lastVisitDate: today,
       };
 
-      // Используем setTimeout для избежания каскадных рендеров
-      setTimeout(() => {
-        setProgress(newProgress);
-      }, 0);
+      setProgress(newProgress);
       saveProgress(newProgress);
 
       // Проверяем достижение за серию
-      setTimeout(() => {
-        checkAchievement("week_streak", newStreak);
-      }, 0);
+      checkAchievement("week_streak", newStreak);
     }
 
     // Проверяем достижение за первое посещение
     if (progress.totalVisits === 0) {
-      setTimeout(() => {
-        unlockAchievement("first_visit");
-      }, 0);
+      unlockAchievement("first_visit");
     }
   }, [progress, checkAchievement, unlockAchievement]);
 

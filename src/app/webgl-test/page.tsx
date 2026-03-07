@@ -8,10 +8,12 @@ export default function WebGLTestPage() {
 
   useEffect(() => {
     const info = checkWebGLSupport();
-    // Используем setTimeout для избежания каскадных рендеров
-    setTimeout(() => {
-      setWebglInfo(info);
-    }, 0);
+    setWebglInfo(prevInfo => {
+      if (prevInfo === null) {
+        return info;
+      }
+      return prevInfo;
+    });
   }, []);
 
   if (!webglInfo) {
