@@ -82,17 +82,10 @@ export function useSwipe({
     };
   }, [enabled, handleTouchStart, handleTouchMove, handleTouchEnd]);
 
-  const getSwipeState = useCallback(() => ({
-    touchStartX: touchStartX.current,
-    touchStartY: touchStartY.current,
-    isSwiping: isSwiping.current,
-  }), []);
-
-  // Возвращаем функции для получения состояния, а не само состояние
+  // Возвращаем только функции для получения состояния
   return {
-    getSwipeState,
-    touchStartX: touchStartX.current,
-    touchStartY: touchStartY.current,
-    isSwiping: isSwiping.current,
+    getTouchStartX: () => touchStartX.current,
+    getTouchStartY: () => touchStartY.current,
+    getIsSwiping: () => isSwiping.current,
   };
 }
