@@ -62,7 +62,7 @@ export function useAccessibility(): UseAccessibility {
         if (announcementTimerRef.current) clearTimeout(announcementTimerRef.current);
       };
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     prefersReducedMotion,
