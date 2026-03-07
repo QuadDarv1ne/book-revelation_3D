@@ -17,9 +17,10 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
   const [visibleQuotes, setVisibleQuotes] = useState<number[]>([]);
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const { favorites, isLoaded, toggleFavorite, isFavorite } = useFavorites();
+  const { favorites, isLoaded, toggleFavorite, isFavorite, exportFavorites, importFavorites } = useFavorites();
   const { showToast } = useToast();
   const panelRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Touch handling for swipe gestures
   const touchStartX = useRef<number>(0);
@@ -109,6 +110,48 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
     const newIndex = quotes.findIndex(q => q.text === firstQuote.text);
     setActiveQuote(newIndex);
   }, [quotes, setActiveQuote]);
+
+  // Экспорт избранных цитат
+  const handleExportFavorites = useCallback(() => {
+    const exported = exportFavorites();
+    if (!exported) {
+      showToast("Нет избранных цитат для экспорта", "error");
+      return;
+    }
+
+    const blob = new Blob([exported], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `stoic-favorites-${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("Избранные цитаты экспортированы", "success");
+  }, [exportFavorites, showToast]);
+
+  // Импорт избранных цитат
+  const handleImportFavorites = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      const importResult = importFavorites(result);
+      if (importResult?.success) {
+        showToast(`Импортировано ${importResult.count} цитат`, "success");
+      } else {
+        showToast(`Ошибка импорта: ${importResult?.error}`, "error");
+      }
+    };
+    reader.onerror = () => {
+      showToast("Ошибка чтения файла", "error");
+    };
+    reader.readAsText(file);
+    event.target.value = "";
+  }, [importFavorites, showToast]);
 
   // Клавиатурная навигация по цитатам
   const handlePanelKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -253,6 +296,37 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
           </button>
+          <button
+            onClick={handleExportFavorites}
+            className="px-3 py-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm rounded-lg text-gray-400 hover:text-amber-300 hover:bg-amber-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            title="Экспорт избранных"
+            aria-label="Экспортировать избранные цитаты в JSON файл"
+            type="button"
+            disabled={favorites.length === 0}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="px-3 py-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm rounded-lg text-gray-400 hover:text-amber-300 hover:bg-amber-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            title="Импорт избранных"
+            aria-label="Импортировать избранные цитаты из JSON файла"
+            type="button"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json,application/json"
+            onChange={handleImportFavorites}
+            className="hidden"
+            aria-hidden="true"
+          />
         </div>
 
         <div className="flex items-center gap-2 mt-3">
