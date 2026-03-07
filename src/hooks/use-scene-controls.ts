@@ -141,16 +141,16 @@ export function useBookTextures(): UseBookTextures {
   const { bookImages, setBookImages } = useBook3D();
 
   const setCoverImage = useCallback((url: string | undefined) => {
-    setBookImages({ ...bookImages, cover: url });
-  }, [bookImages, setBookImages]);
+    setBookImages(prev => ({ ...prev, cover: url }));
+  }, [setBookImages]);
 
   const setSpineImage = useCallback((url: string | undefined) => {
-    setBookImages({ ...bookImages, spine: url });
-  }, [bookImages, setBookImages]);
+    setBookImages(prev => ({ ...prev, spine: url }));
+  }, [setBookImages]);
 
   const setBackCoverImage = useCallback((url: string | undefined) => {
-    setBookImages({ ...bookImages, backCover: url });
-  }, [bookImages, setBookImages]);
+    setBookImages(prev => ({ ...prev, backCover: url }));
+  }, [setBookImages]);
 
   const resetImages = useCallback(() => {
     setBookImages({});

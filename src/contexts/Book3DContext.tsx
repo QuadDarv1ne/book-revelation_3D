@@ -22,7 +22,7 @@ interface Book3DContextType {
 
   // Изображения книги
   bookImages: BookImages;
-  setBookImages: (images: BookImages) => void;
+  setBookImages: (images: BookImages | ((prev: BookImages) => BookImages)) => void;
 
   // Масштаб камеры
   cameraZoom: number;
@@ -54,7 +54,16 @@ export function Book3DProvider({
 }: Book3DProviderProps) {
   const [isRotating, setIsRotating] = useState(true);
   const [theme, setTheme] = useState<ThemeType>(initialTheme);
-  const [bookImages, setBookImages] = useState<BookImages>(initialBookImages);
+  const [bookImages, setBookImagesState] = useState<BookImages>(initialBookImages);
+  
+  const setBookImages = useCallback((images: BookImages | ((prev: BookImages) => BookImages)) => {
+    setBookImagesState(prev => {
+      if (typeof images === 'function') {
+        return (images as (prev: BookImages) => BookImages)(prev);
+      }
+      return images;
+    });
+  }, []);
   const [cameraZoom, setCameraZoom] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

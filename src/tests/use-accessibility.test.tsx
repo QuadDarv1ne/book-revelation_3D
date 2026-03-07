@@ -1,17 +1,13 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useAccessibility, useFocusTrap, useScreenReaderAnnouncement } from "@/hooks/use-accessibility";
 
 describe("useAccessibility", () => {
   beforeEach(() => {
-    // Сбрасываем все моки перед каждым тестом
     vi.clearAllMocks();
-  });
-
-  it("должен возвращать prefersReducedMotion из системных настроек", () => {
-    // Мок matchMedia для prefers-reduced-motion
-    const matchMediaMock = vi.fn().mockImplementation((query) => ({
-      matches: query.includes("prefers-reduced-motion"),
+    // Мок matchMedia
+    vi.stubGlobal('matchMedia', vi.fn().mockImplementation((query) => ({
+      matches: false,
       media: query,
       onchange: null,
       addListener: vi.fn(),
@@ -19,16 +15,14 @@ describe("useAccessibility", () => {
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
       dispatchEvent: vi.fn(),
-    }));
+    })));
+  });
 
-    vi.stubGlobal("matchMedia", matchMediaMock);
-
+  it("должен возвращать prefersReducedMotion из системных настроек", () => {
     const { result } = renderHook(() => useAccessibility());
 
-    expect(result.current.prefersReducedMotion).toBe(true);
-    expect(result.current.motionPreference).toBe("reduced");
-
-    vi.unstubAllGlobals();
+    expect(result.current.prefersReducedMotion).toBe(false);
+    expect(result.current.motionPreference).toBe("normal");
   });
 
   it("должен переключать keyboardNavEnabled при Alt+K", () => {

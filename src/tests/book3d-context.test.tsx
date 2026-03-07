@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { Book3DProvider, useBook3D } from "@/contexts/Book3DContext";
 
 // Тестовый компонент для проверки контекста
@@ -36,11 +36,11 @@ describe("Book3DContext", () => {
     );
 
     const toggleButton = screen.getByText("Toggle Rotation");
-    toggleButton.click();
+    fireEvent.click(toggleButton);
     
     expect(screen.getByTestId("rotation-state")).toHaveTextContent("stopped");
     
-    toggleButton.click();
+    fireEvent.click(toggleButton);
     expect(screen.getByTestId("rotation-state")).toHaveTextContent("rotating");
   });
 
@@ -52,7 +52,7 @@ describe("Book3DContext", () => {
     );
 
     const themeButton = screen.getByText("Set Light Theme");
-    themeButton.click();
+    fireEvent.click(themeButton);
     
     expect(screen.getByTestId("theme-state")).toHaveTextContent("light");
   });
@@ -141,7 +141,7 @@ describe("Book3DContext - управление зумом", () => {
       </Book3DProvider>
     );
 
-    screen.getByText("Zoom In").click();
+    fireEvent.click(screen.getByText("Zoom In"));
     expect(screen.getByTestId("zoom")).toHaveTextContent("1.2");
   });
 
@@ -162,17 +162,18 @@ describe("Book3DContext - управление зумом", () => {
       </Book3DProvider>
     );
 
-    screen.getByText("Zoom Out").click();
+    fireEvent.click(screen.getByText("Zoom Out"));
     expect(screen.getByTestId("zoom")).toHaveTextContent("0.8");
   });
 
   it("должен иметь максимальный зум 2", () => {
     function ZoomTestComponent() {
       const { cameraZoom, zoomIn } = useBook3D();
+      const handleClick = () => { for (let i = 0; i < 10; i++) zoomIn(); };
       return (
         <div>
           <span data-testid="zoom">{cameraZoom}</span>
-          <button onClick={() => { for (let i = 0; i < 10; i++) zoomIn(); }}>Zoom Max</button>
+          <button onClick={handleClick}>Zoom Max</button>
         </div>
       );
     }
@@ -183,17 +184,18 @@ describe("Book3DContext - управление зумом", () => {
       </Book3DProvider>
     );
 
-    screen.getByText("Zoom Max").click();
+    fireEvent.click(screen.getByText("Zoom Max"));
     expect(screen.getByTestId("zoom")).toHaveTextContent("2");
   });
 
   it("должен иметь минимальный зум 0.5", () => {
     function ZoomTestComponent() {
       const { cameraZoom, zoomOut } = useBook3D();
+      const handleClick = () => { for (let i = 0; i < 10; i++) zoomOut(); };
       return (
         <div>
           <span data-testid="zoom">{cameraZoom}</span>
-          <button onClick={() => { for (let i = 0; i < 10; i++) zoomOut(); }}>Zoom Min</button>
+          <button onClick={handleClick}>Zoom Min</button>
         </div>
       );
     }
@@ -204,7 +206,7 @@ describe("Book3DContext - управление зумом", () => {
       </Book3DProvider>
     );
 
-    screen.getByText("Zoom Min").click();
+    fireEvent.click(screen.getByText("Zoom Min"));
     expect(screen.getByTestId("zoom")).toHaveTextContent("0.5");
   });
 });
@@ -242,7 +244,7 @@ describe("Book3DContext - управление состоянием загруз
       </Book3DProvider>
     );
 
-    screen.getByText("Start Loading").click();
+    fireEvent.click(screen.getByText("Start Loading"));
     expect(screen.getByTestId("loading")).toHaveTextContent("loading");
   });
 
@@ -278,7 +280,7 @@ describe("Book3DContext - управление состоянием загруз
       </Book3DProvider>
     );
 
-    screen.getByText("Set Error").click();
+    fireEvent.click(screen.getByText("Set Error"));
     expect(screen.getByTestId("error")).toHaveTextContent("WebGL not supported");
   });
 });
