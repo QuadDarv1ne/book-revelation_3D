@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
 import dynamic from "next/dynamic";
 import { QuotesPanel } from "@/components/quotes";
-import { ControlButton, WebGLError, useWebGLSupport, SettingsBar, PWAInstall, ToastProvider, BookSelector, MainMenu, ErrorBoundary } from "@/components/ui";
+import { ControlButton, WebGLError, useWebGLSupport, SettingsBar, PWAInstall, ToastProvider, BookSelector, MainMenu, ErrorBoundary, LoadingFallback } from "@/components/ui";
 import { useRotationControl } from "@/hooks/use-rotation";
 import { useMounted } from "@/hooks/use-mounted";
-import { LoadingFallback } from "@/components/ui/LoadingFallback";
 import { getBookById, getDefaultBook } from "@/data/books";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useToast } from "@/components/ui/Toast";
@@ -266,7 +265,16 @@ export default function Home() {
           <div id="quotes" className="w-full lg:w-[42%] h-[50%] lg:h-full relative bg-gradient-to-b from-[rgba(25,25,40,0.95)] to-[rgba(20,20,35,0.97)] border-l border-[rgba(212,175,55,0.12)]" role="region" aria-label="Цитаты стоических философов">
             <div className="absolute top-0 left-0 right-0 h-20 pointer-events-none bg-gradient-to-b from-[rgba(10,10,18,1)] to-transparent" />
             <ErrorBoundary>
-              <QuotesPanel quotes={activeBook.quotes} activeQuote={activeQuote} setActiveQuote={setActiveQuote} bookTitle={activeBook.title} />
+              <Suspense fallback={
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center">
+                    <div className="w-8 h-8 border-2 border-amber-400/30 border-t-amber-400 rounded-full animate-spin mx-auto mb-2" />
+                    <p className="text-amber-100/40 text-xs">Загрузка цитат...</p>
+                  </div>
+                </div>
+              }>
+                <QuotesPanel quotes={activeBook.quotes} activeQuote={activeQuote} setActiveQuote={setActiveQuote} bookTitle={activeBook.title} />
+              </Suspense>
             </ErrorBoundary>
             <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none bg-gradient-to-t from-[rgba(5,5,10,1)] to-transparent" />
           </div>

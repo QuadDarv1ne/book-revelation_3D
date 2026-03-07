@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="60" height="600" viewBox="0 0 60 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="spine-grad-marcus-aurelius-meditations" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#78350f;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#78350fee;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#78350f;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Фон -->
+  <rect width="60" height="600" fill="url(#spine-grad-marcus-aurelius-meditations)"/>
+  
+  <!-- Вертикальный текст названия -->
+  <text x="30" y="350" text-anchor="middle" fill="white" font-family="Georgia, serif" font-size="16" font-weight="bold" transform="rotate(-90 30 350)">
+    Meditations
+  </text>
+  
+  <!-- Автор внизу -->
+  <text x="30" y="550" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="Georgia, serif" font-size="12" transform="rotate(-90 30 550)">
+    Aurelius
+  </text>
+</svg>

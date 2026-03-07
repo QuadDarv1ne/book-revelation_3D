@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad-sun-tzu-art-of-war" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#991b1b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#991b1bdd;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Фон -->
+  <rect width="400" height="600" fill="url(#grad-sun-tzu-art-of-war)"/>
+  
+  <!-- Декоративная рамка -->
+  <rect x="20" y="20" width="360" height="560" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+  
+  <!-- Название книги -->
+  <text x="200" y="200" text-anchor="middle" fill="white" font-family="Georgia, serif" font-size="32" font-weight="bold" filter="url(#shadow)">
+    The Art of
+  </text>
+  
+  <text x="200" y="240" text-anchor="middle" fill="white" font-family="Georgia, serif" font-size="28" filter="url(#shadow)">
+    War
+  </text>
+  
+  
+  <!-- Автор -->
+  <text x="200" y="320" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-family="Georgia, serif" font-size="20" font-style="italic">
+    Sun Tzu
+  </text>
+  
+  <!-- Декоративная линия -->
+  <line x1="100" y1="380" x2="300" y2="380" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+  
+  <!-- Нижняя надпись -->
+  <text x="200" y="550" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-family="Georgia, serif" font-size="14">
+    Book Revelation 3D
+  </text>
+</svg>

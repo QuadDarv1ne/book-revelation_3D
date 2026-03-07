@@ -1,0 +1,128 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+/**
+ * Content Security Policy (CSP) конфигурация
+ * Защищает от XSS и других атак через инъекцию контента
+ */
+
+// CSP директивы для production
+const cspDirectives = {
+  'default-src': ["'self'"],
+  'script-src': [
+    "'self'",
+    "'unsafe-eval'", // Требуется для Next.js гидратации
+    "'wasm-unsafe-eval'", // Для WebAssembly
+    'https://vercel.live', // Vercel Analytics
+  ],
+  'style-src': [
+    "'self'",
+    "'unsafe-inline'", // Требуется для Tailwind CSS в runtime
+  ],
+  'img-src': [
+    "'self'",
+    'data:',
+    'blob:',
+    'https:', // Разрешаем загрузку изображений с HTTPS
+  ],
+  'font-src': [
+    "'self'",
+    'data:',
+    'https://fonts.gstatic.com', // Google Fonts
+  ],
+  'connect-src': [
+    "'self'",
+    'https://vercel.live', // Vercel Analytics
+    'https://analytics.vercel.com',
+  ],
+  'frame-src': ["'self'"],
+  'object-src': ["'none'"], // Запрещаем Flash и другие плагины
+  'base-uri': ["'self'"], // Запрещаем изменение base URI
+  'form-action': ["'self'"], // Ограничиваем куда можно отправлять формы
+  'frame-ancestors': ["'none'"], // Запрещаем встраивание в iframe (clickjacking)
+  'worker-src': ["'self'", 'blob:'], // Разрешаем Web Workers для Three.js
+  'child-src': ["'self'", 'blob:'], // Для совместимости
+  'upgrade-insecure-requests': [], // Автоматически обновлять HTTP до HTTPS
+};
+
+// CSP для development (более разрешающий)
+const devCspDirectives = {
+  ...cspDirectives,
+  'script-src': [
+    ...cspDirectives['script-src'],
+    "'unsafe-inline'", // Требуется для Hot Reload
+    'https://cdn.vercel-insights.com',
+  ],
+  'connect-src': [
+    ...cspDirectives['connect-src'],
+    'ws:', // WebSocket для Hot Reload
+    'wss:', // Secure WebSocket
+    'http://localhost:*', // Local development
+    'https://localhost:*',
+  ],
+};
+
+/**
+ * Построение CSP строки из директив
+ */
+function buildCSPString(directives: Record<string, string[]>): string {
+  return Object.entries(directives)
+    .map(([directive, values]) => {
+      if (values.length === 0) return directive;
+      return `${directive} ${values.join(' ')}`;
+    })
+    .join('; ');
+}
+
+/**
+ * Middleware для добавления security headers
+ */
+export function middleware(request: NextRequest) {
+  const isDev = process.env.NODE_ENV === 'development';
+  
+  // Выбираем CSP конфигурацию
+  const directives = isDev ? devCspDirectives : cspDirectives;
+  const cspString = buildCSPString(directives);
+
+  // Создаем ответ
+  const response = NextResponse.next();
+
+  // Добавляем CSP заголовок
+  response.headers.set('Content-Security-Policy', cspString);
+
+  // Дополнительные security заголовки
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), interest-cohort=()'
+  );
+  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin');
+  response.headers.set('Cross-Origin-Embedder-Policy', 'require-corp');
+
+  // Для production добавляем HSTS
+  if (!isDev) {
+    response.headers.set(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains; preload'
+    );
+  }
+
+  return response;
+}
+
+// Конфигурация middleware
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
+};
