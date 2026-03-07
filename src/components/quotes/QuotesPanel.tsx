@@ -5,6 +5,7 @@ import type { Quote } from "@/types/quote";
 import { QuoteCard } from "./QuoteCard";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useToast } from "@/components/ui/Toast";
+import { useI18n } from "@/hooks/use-i18n";
 
 interface QuotesPanelProps {
   quotes: Quote[];
@@ -19,6 +20,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
   const [searchQuery, setSearchQuery] = useState('');
   const { favorites, isLoaded, toggleFavorite, isFavorite, exportFavorites, importFavorites } = useFavorites();
   const { showToast } = useToast();
+  const { t } = useI18n();
   const panelRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -115,7 +117,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
   const handleExportFavorites = useCallback(() => {
     const exported = exportFavorites();
     if (!exported) {
-      showToast("Нет избранных цитат для экспорта", "error");
+      showToast(t('toast.noFavoritesToExport'), "error");
       return;
     }
 
@@ -128,8 +130,8 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showToast("Избранные цитаты экспортированы", "success");
-  }, [exportFavorites, showToast]);
+    showToast(t('toast.favoritesExported'), "success");
+  }, [exportFavorites, showToast, t]);
 
   // Импорт избранных цитат
   const handleImportFavorites = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,17 +143,17 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
       const result = e.target?.result as string;
       const importResult = importFavorites(result);
       if (importResult?.success) {
-        showToast(`Импортировано ${importResult.count} цитат`, "success");
+        showToast(t('toast.favoritesImported').replace('{count}', String(importResult.count)), "success");
       } else {
-        showToast(`Ошибка импорта: ${importResult?.error}`, "error");
+        showToast(`${t('toast.importError')}: ${importResult?.error}`, "error");
       }
     };
     reader.onerror = () => {
-      showToast("Ошибка чтения файла", "error");
+      showToast(t('toast.readFileError'), "error");
     };
     reader.readAsText(file);
     event.target.value = "";
-  }, [importFavorites, showToast]);
+  }, [importFavorites, showToast, t]);
 
   // Поделиться цитатой (генерация изображения)
   const handleShareQuote = useCallback(async (quote: import('@/types/quote').Quote) => {
@@ -209,8 +211,8 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
       return (
         <p className="text-gray-500 text-sm">
           {filter === 'favorites'
-            ? 'Нет избранных цитат. Нажмите на сердце, чтобы добавить цитату в избранное.'
-            : `Цитаты из книги "${bookTitle}" загружаются...`}
+            ? t('quotes.noFavorites')
+            : t('quotes.loading').replace('{book}', bookTitle)}
         </p>
       );
     }
@@ -228,7 +230,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
         onShare={handleShareQuote}
       />
     ));
-  }, [isLoaded, filteredQuotesWithIndex, visibleQuotes, activeQuote, isFavorite, handleToggleFavorite, handleCopyQuote, handleShareQuote, setActiveQuote, filter, bookTitle]);
+  }, [isLoaded, filteredQuotesWithIndex, visibleQuotes, activeQuote, isFavorite, handleToggleFavorite, handleCopyQuote, handleShareQuote, setActiveQuote, filter, bookTitle, t]);
 
   return (
     <div
@@ -289,7 +291,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
         </div>
 
         {/* Filter tabs - увеличенные кнопки для мобильных */}
-        <div className="flex items-center gap-1.5 sm:gap-2 mt-3 flex-wrap" role="group" aria-label="Фильтры цитат">
+        <div className="flex items-center gap-1.5 sm:gap-2 mt-3 flex-wrap" role="group" aria-label={t('quotes.filters')}>
           <button
             onClick={() => setFilter('all')}
             className={`px-3 py-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[44px] ${
@@ -300,7 +302,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
             aria-pressed={filter === 'all'}
             type="button"
           >
-            Все ({quotes.length})
+            {t('quotes.all')} ({quotes.length})
           </button>
           <button
             onClick={() => setFilter('favorites')}
@@ -312,13 +314,13 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
             aria-pressed={filter === 'favorites'}
             type="button"
           >
-            Избранные ({favorites.length})
+            {t('quotes.favorites')} ({favorites.length})
           </button>
           <button
             onClick={shuffleQuotes}
             className="px-3 py-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm rounded-lg text-gray-400 hover:text-amber-300 hover:bg-amber-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[44px] min-w-[44px] flex items-center justify-center"
-            title="Перемешать цитаты"
-            aria-label="Перемешать цитаты случайным образом"
+            title={t('quotes.shuffle')}
+            aria-label={t('quotes.shuffle')}
             type="button"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -328,8 +330,8 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
           <button
             onClick={handleExportFavorites}
             className="px-3 py-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm rounded-lg text-gray-400 hover:text-amber-300 hover:bg-amber-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[44px] min-w-[44px] flex items-center justify-center"
-            title="Экспорт избранных"
-            aria-label="Экспортировать избранные цитаты в JSON файл"
+            title={t('quotes.export')}
+            aria-label={t('quotes.export')}
             type="button"
             disabled={favorites.length === 0}
           >
@@ -340,8 +342,8 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
           <button
             onClick={() => fileInputRef.current?.click()}
             className="px-3 py-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm rounded-lg text-gray-400 hover:text-amber-300 hover:bg-amber-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[44px] min-w-[44px] flex items-center justify-center"
-            title="Импорт избранных"
-            aria-label="Импортировать избранные цитаты из JSON файла"
+            title={t('quotes.import')}
+            aria-label={t('quotes.import')}
             type="button"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
