@@ -1,47 +1,41 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useGamification } from "@/hooks/use-gamification";
 
 export function AchievementNotification() {
   const { showAchievement, dismissAchievement } = useGamification();
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasShownRef = useRef(false);
 
   useEffect(() => {
-    if (!showAchievement) return;
-
-    // Показываем уведомление
+    if (!showAchievement || hasShownRef.current) return;
+    
+    hasShownRef.current = true;
     setIsVisible(true);
 
-    // Автоматически скрываем через 4 секунды
-    const timer = setTimeout(() => {
+    timerRef.current = setTimeout(() => {
       setIsLeaving(true);
-      setTimeout(() => {
+      leaveTimerRef.current = setTimeout(() => {
         setIsVisible(false);
         setIsLeaving(false);
+        hasShownRef.current = false;
         dismissAchievement();
       }, 300);
     }, 4000);
 
-    return () => clearTimeout(timer);
-  }, [showAchievement, dismissAchievement]);
-
-  useEffect(() => {
-    if (!isVisible || !isLeaving) return;
-    
-    const timer = setTimeout(() => {
-      setIsVisible(false);
-      setIsLeaving(false);
-      dismissAchievement();
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, [isVisible, isLeaving, dismissAchievement]);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (leaveTimerRef.current) clearTimeout(leaveTimerRef.current);
+    };
+  }, [dismissAchievement]);
 
   const handleClose = useCallback(() => {
     setIsLeaving(true);
-    setTimeout(() => {
+    leaveTimerRef.current = setTimeout(() => {
       setIsVisible(false);
       setIsLeaving(false);
       dismissAchievement();
@@ -54,6 +48,14 @@ export function AchievementNotification() {
       handleClose();
     }
   }, [handleClose]);
+
+  // Очистка таймеров при размонтировании
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (leaveTimerRef.current) clearTimeout(leaveTimerRef.current);
+    };
+  }, []);
 
   if (!isVisible || !showAchievement) return null;
 

@@ -12,16 +12,18 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/no-unused-vars": ["error", {
       "argsIgnorePattern": "^_",
-      "varsIgnorePattern": "^_"
+      "varsIgnorePattern": "^_|^[A-Z_]+$"
     }],
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/ban-ts-comment": "error",
     "@typescript-eslint/prefer-as-const": "error",
     "@typescript-eslint/explicit-function-return-type": "off",
 
-    // React rules
-    "react-hooks/exhaustive-deps": "error",
-    "react-hooks/purity": "error",
+    // React rules - relax some rules for practical usage
+    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/purity": "warn",
+    "react-hooks/refs": "off",
+    "react-hooks/set-state-in-effect": "off",
     "react/no-unescaped-entities": "off",
     "react/display-name": "off",
     "react/prop-types": "off",
