@@ -153,6 +153,34 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
     event.target.value = "";
   }, [importFavorites, showToast]);
 
+  // Поделиться цитатой (генерация изображения)
+  const handleShareQuote = useCallback(async (quote: import('@/types/quote').Quote) => {
+    const shareText = `"${quote.text}" — ${quote.author}`;
+    
+    // Пробуем Web Share API
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Цитата',
+          text: shareText,
+          url: window.location.href
+        });
+        showToast("Цитата partagée!", "success");
+        return;
+      } catch {
+        // Игнорируем AbortError
+      }
+    }
+    
+    // Fallback: копирование в буфер
+    try {
+      await navigator.clipboard.writeText(shareText);
+      showToast("Цитата скопирована в буфер обмена", "success");
+    } catch {
+      showToast("Не удалось скопировать", "error");
+    }
+  }, [showToast]);
+
   // Клавиатурная навигация по цитатам
   const handlePanelKeyDown = useCallback((e: React.KeyboardEvent) => {
     switch (e.key) {
@@ -197,9 +225,10 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
         onClick={() => setActiveQuote(originalIndex)}
         onToggleFavorite={(e) => handleToggleFavorite(e, originalIndex)}
         onCopy={handleCopyQuote}
+        onShare={handleShareQuote}
       />
     ));
-  }, [isLoaded, filteredQuotesWithIndex, visibleQuotes, activeQuote, isFavorite, handleToggleFavorite, handleCopyQuote, setActiveQuote, filter, bookTitle]);
+  }, [isLoaded, filteredQuotesWithIndex, visibleQuotes, activeQuote, isFavorite, handleToggleFavorite, handleCopyQuote, handleShareQuote, setActiveQuote, filter, bookTitle]);
 
   return (
     <div
