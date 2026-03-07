@@ -20,6 +20,23 @@ const geistMono = Geist_Mono({
   fallback: ["monospace", "courier", "monospace"],
 });
 
+// CSP для мета-тега (резервный вариант, основной в middleware)
+const _cspContent = `
+  default-src 'self';
+  script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' https://vercel.live;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: blob: https:;
+  font-src 'self' data: https://fonts.gstatic.com;
+  connect-src 'self' https://vercel.live https://analytics.vercel.com;
+  frame-src 'self';
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self';
+  frame-ancestors 'none';
+  worker-src 'self' blob:;
+  child-src 'self' blob:;
+`.replace(/\s+/g, ' ').trim();
+
 export const metadata: Metadata = {
   title: "Stoic Book 3D — В чём наше благо?",
   description: "Интерактивный 3D модуль с вращающейся книгой стоической философии. Цитаты Марка Аврелия и Эпиктета.",

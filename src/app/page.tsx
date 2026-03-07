@@ -6,6 +6,7 @@ import { QuotesPanel } from "@/components/quotes";
 import { ControlButton, WebGLError, useWebGLSupport, SettingsBar, PWAInstall, ToastProvider, BookSelector, MainMenu, ErrorBoundary, LoadingFallback } from "@/components/ui";
 import { useRotationControl } from "@/hooks/use-rotation";
 import { useMounted } from "@/hooks/use-mounted";
+import { LoadingFallback } from "@/components/ui/LoadingFallback";
 import { getBookById, getDefaultBook } from "@/data/books";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useToast } from "@/components/ui/Toast";
