@@ -241,39 +241,39 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
           </div>
 
           {isExpanded && (
-            <div id="settings-panel" className="px-3 pb-3 pt-1 border-t border-[rgba(212,175,55,0.1)]" role="region" aria-label="Настройки приложения">
+            <div id="settings-panel" className="px-3 pb-3 pt-1 border-t border-[rgba(212,175,55,0.1)]" role="region" aria-label={t('settings.app')}>
               <div className="grid grid-cols-2 gap-2">
-                <button 
+                <button
                   className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  aria-label="Общие настройки"
+                  aria-label={t('settings.general')}
                   type="button"
                 >
                   <Settings className="w-4 h-4" aria-hidden="true" />
-                  <span>Общие</span>
+                  <span>{t('settings.general')}</span>
                 </button>
-                <button 
+                <button
                   className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  aria-label="Настройки аккаунта"
+                  aria-label={t('settings.account')}
                   type="button"
                 >
                   <User className="w-4 h-4" aria-hidden="true" />
-                  <span>Аккаунт</span>
+                  <span>{t('settings.account')}</span>
                 </button>
-                <button 
+                <button
                   className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  aria-label="Настройки внешнего вида"
+                  aria-label={t('settings.appearance')}
                   type="button"
                 >
                   <Moon className="w-4 h-4" aria-hidden="true" />
-                  <span>Внешний вид</span>
+                  <span>{t('settings.appearance')}</span>
                 </button>
-                <button 
+                <button
                   className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  aria-label="Настройки уведомлений"
+                  aria-label={t('settings.notifications')}
                   type="button"
                 >
                   <span className="w-4 h-4 flex items-center justify-center text-[10px]" aria-hidden="true">🔔</span>
-                  <span>Уведомления</span>
+                  <span>{t('settings.notifications')}</span>
                 </button>
               </div>
 
