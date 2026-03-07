@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "@/hooks/use-i18n";
+
 interface ControlButtonProps {
   isRotating: boolean;
   onClick: () => void;
@@ -23,6 +25,8 @@ function PlayIcon() {
 }
 
 export function ControlButton({ isRotating, onClick }: ControlButtonProps) {
+  const { t } = useI18n();
+  
   return (
     <button
       onClick={onClick}
@@ -31,7 +35,7 @@ export function ControlButton({ isRotating, onClick }: ControlButtonProps) {
         background: 'rgba(10, 10, 20, 0.85)',
         border: '2px solid rgba(212, 175, 55, 0.4)',
       }}
-      aria-label={isRotating ? 'Приостановить вращение книги' : 'Включить вращение книги'}
+      aria-label={isRotating ? t('control.pause') : t('control.play')}
       aria-pressed={isRotating}
       type="button"
     >
@@ -39,12 +43,12 @@ export function ControlButton({ isRotating, onClick }: ControlButtonProps) {
         {isRotating ? (
           <>
             <PauseIcon />
-            <span className="hidden sm:inline">Пауза</span>
+            <span className="hidden sm:inline">{t('menu.pause')}</span>
           </>
         ) : (
           <>
             <PlayIcon />
-            <span className="hidden sm:inline">Вращение</span>
+            <span className="hidden sm:inline">{t('control.rotation')}</span>
           </>
         )}
       </span>
