@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { books } from "@/data/books";
 import { useToast } from "@/components/ui/Toast";
+import { useI18n } from "@/hooks/use-i18n";
 
 interface BookSelectorProps {
   activeBookId: string;
@@ -12,6 +13,7 @@ interface BookSelectorProps {
 export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) {
   const activeBook = books.find(b => b.id === activeBookId) || books[0];
   const { showToast } = useToast();
+  const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -89,10 +91,10 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
 
   const handleBookSelect = useCallback((bookId: string, title: string) => {
     onBookChange(bookId);
-    showToast(`Книга изменена на: ${title}`, "success");
+    showToast(`${t('book.changed')}: ${title}`, "success");
     setIsOpen(false);
     buttonRef.current?.focus();
-  }, [onBookChange, showToast]);
+  }, [onBookChange, showToast, t]);
 
   return (
     <div className="absolute top-3 right-3 z-40" ref={dropdownRef}>
