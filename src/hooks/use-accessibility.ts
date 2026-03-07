@@ -87,10 +87,13 @@ export function useFocusTrap(isActive: boolean) {
     ].join(", ");
 
     const focusableElements = document.querySelectorAll<HTMLElement>(focusableSelectors);
-    
+
     if (focusableElements.length > 0) {
-      setFirstFocusable(focusableElements[0]);
-      setLastFocusable(focusableElements[focusableElements.length - 1]);
+      // Используем setTimeout для избежания каскадных рендеров
+      setTimeout(() => {
+        setFirstFocusable(focusableElements[0]);
+        setLastFocusable(focusableElements[focusableElements.length - 1]);
+      }, 0);
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {

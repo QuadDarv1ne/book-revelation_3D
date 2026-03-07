@@ -77,7 +77,10 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
   useEffect(() => {
     if (isOpen) {
       const selectedIndex = books.findIndex(b => b.id === activeBookId);
-      setFocusedIndex(selectedIndex >= 0 ? selectedIndex : 0);
+      // Используем setTimeout для избежания каскадных рендеров
+      setTimeout(() => {
+        setFocusedIndex(selectedIndex >= 0 ? selectedIndex : 0);
+      }, 0);
     }
   }, [isOpen, activeBookId]);
 

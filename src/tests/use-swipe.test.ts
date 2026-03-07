@@ -10,22 +10,22 @@ describe('useSwipe', () => {
   it('должен вызывать onSwipeLeft при свайпе влево', () => {
     const onSwipeLeft = vi.fn();
     const onSwipeRight = vi.fn();
-    
-    renderHook(() => useSwipe({ 
-      onSwipeLeft, 
+
+    renderHook(() => useSwipe({
+      onSwipeLeft,
       onSwipeRight,
-      threshold: 50 
+      threshold: 50
     }));
 
     // Симулируем touch события
     const touchStartEvent = new TouchEvent('touchstart', {
-      touches: [{ clientX: 200, clientY: 100 } as any],
+      touches: [{ clientX: 200, clientY: 100 } as unknown as Touch],
     });
-    
+
     const touchMoveEvent = new TouchEvent('touchmove', {
-      touches: [{ clientX: 100, clientY: 100 } as any],
+      touches: [{ clientX: 100, clientY: 100 } as unknown as Touch],
     });
-    
+
     const touchEndEvent = new TouchEvent('touchend');
 
     document.dispatchEvent(touchStartEvent);
@@ -47,11 +47,11 @@ describe('useSwipe', () => {
     }));
 
     const touchStartEvent = new TouchEvent('touchstart', {
-      touches: [{ clientX: 100, clientY: 100 } as any],
+      touches: [{ clientX: 100, clientY: 100 } as unknown as Touch],
     });
-    
+
     const touchMoveEvent = new TouchEvent('touchmove', {
-      touches: [{ clientX: 200, clientY: 100 } as any],
+      touches: [{ clientX: 200, clientY: 100 } as unknown as Touch],
     });
     
     const touchEndEvent = new TouchEvent('touchend');
@@ -75,11 +75,11 @@ describe('useSwipe', () => {
     }));
 
     const touchStartEvent = new TouchEvent('touchstart', {
-      touches: [{ clientX: 100, clientY: 100 } as any],
+      touches: [{ clientX: 100, clientY: 100 } as unknown as Touch],
     });
-    
+
     const touchMoveEvent = new TouchEvent('touchmove', {
-      touches: [{ clientX: 130, clientY: 100 } as any], // Меньше порога 50
+      touches: [{ clientX: 130, clientY: 100 } as unknown as Touch], // Меньше порога 50
     });
     
     const touchEndEvent = new TouchEvent('touchend');
@@ -104,7 +104,7 @@ describe('useSwipe', () => {
     }));
 
     const touchStartEvent = new TouchEvent('touchstart', {
-      touches: [{ clientX: 200, clientY: 100 } as any],
+      touches: [{ clientX: 200, clientY: 100 } as unknown as Touch],
     });
     
     const touchEndEvent = new TouchEvent('touchend');

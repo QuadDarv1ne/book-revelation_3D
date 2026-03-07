@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, waitFor } from "@testing-library/react";
 import { useAccessibility, useFocusTrap, useScreenReaderAnnouncement } from "@/hooks/use-accessibility";
 
 describe("useAccessibility", () => {
@@ -92,11 +92,15 @@ describe("useFocusTrap", () => {
     `;
   });
 
-  it("должен находить первый и последний фокусируемые элементы", () => {
+  it("должен находить первый и последний фокусируемые элементы", async () => {
     const { result } = renderHook(() => useFocusTrap(true));
 
-    expect(result.current.firstFocusable).toBe(document.getElementById("first"));
-    expect(result.current.lastFocusable).toBe(document.getElementById("last"));
+    await waitFor(() => {
+      expect(result.current.firstFocusable).toBe(document.getElementById("first"));
+    });
+    await waitFor(() => {
+      expect(result.current.lastFocusable).toBe(document.getElementById("last"));
+    });
   });
 
   it("должен возвращать null при неактивном trap", () => {
@@ -106,11 +110,15 @@ describe("useFocusTrap", () => {
     expect(result.current.lastFocusable).toBeNull();
   });
 
-  it("должен предоставлять метод focusFirst", () => {
+  it("должен предоставлять метод focusFirst", async () => {
     const firstButton = document.getElementById("first") as HTMLButtonElement;
     const focusSpy = vi.spyOn(firstButton, "focus");
 
     const { result } = renderHook(() => useFocusTrap(true));
+
+    await waitFor(() => {
+      expect(result.current.firstFocusable).toBeTruthy();
+    });
 
     act(() => {
       result.current.focusFirst();

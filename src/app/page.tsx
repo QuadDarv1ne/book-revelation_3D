@@ -7,9 +7,7 @@ import { ControlButton, WebGLError, useWebGLSupport, SettingsBar, PWAInstall, To
 import { useRotationControl } from "@/hooks/use-rotation";
 import { useMounted } from "@/hooks/use-mounted";
 import { LoadingFallback } from "@/components/ui/LoadingFallback";
-import { books, getBookById, getDefaultBook } from "@/data/books";
-import type { Quote } from "@/types/quote";
-import { textureManager } from "@/lib/textures/texture-manager";
+import { getBookById, getDefaultBook } from "@/data/books";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useToast } from "@/components/ui/Toast";
 import { usePrefersColorScheme } from "@/hooks/use-prefers-color-scheme";
@@ -199,27 +197,6 @@ export default function Home() {
     input.click();
   }, [importFavorites, showToast]);
 
-  // Компонент статистики текстур (для отладки)
-  const TextureStats = () => {
-    const [stats, setStats] = useState(textureManager.getStats());
-    
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setStats(textureManager.getStats());
-      }, 1000);
-      return () => clearInterval(interval);
-    }, []);
-    
-    return (
-      <div className="space-y-0.5">
-        <div>hits: {stats.hits}</div>
-        <div>misses: {stats.misses}</div>
-        <div>loads: {stats.loads}</div>
-        <div>cache: {stats.cacheSize}</div>
-      </div>
-    );
-  };
-
   if (hasWebGL === false || webGLError) {
     return <WebGLError onRetry={handleRetry} />;
   }
@@ -262,8 +239,6 @@ export default function Home() {
                 <div>hasWebGL: {hasWebGL === true ? 'yes' : hasWebGL === false ? 'no' : 'checking'}</div>
                 <div>sceneError: {sceneError ? 'yes' : 'no'}</div>
                 <div>activeBook: {activeBook.id}</div>
-                <div className="mt-1 text-amber-400/50">--- Texture Stats ---</div>
-                <TextureStats />
               </div>
             )}
 

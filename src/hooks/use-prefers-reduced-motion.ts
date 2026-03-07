@@ -12,7 +12,11 @@ export function usePrefersReducedMotion(): boolean {
   useEffect(() => {
     // Проверяем медиа-запрос
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mediaQuery.matches);
+
+    // Устанавливаем начальное значение через setTimeout для избежания каскадных рендеров
+    setTimeout(() => {
+      setPrefersReducedMotion(mediaQuery.matches);
+    }, 0);
 
     // Слушаем изменения
     const handleChange = (event: MediaQueryListEvent) => {

@@ -12,13 +12,15 @@ export function usePrefersColorScheme(): "dark" | "light" {
   useEffect(() => {
     // Проверяем prefers-color-scheme
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    
+
     const handleChange = (e: MediaQueryListEvent) => {
       setColorScheme(e.matches ? "dark" : "light");
     };
 
-    // Устанавливаем начальное значение
-    setColorScheme(mediaQuery.matches ? "dark" : "light");
+    // Устанавливаем начальное значение через setTimeout для избежания каскадных рендеров
+    setTimeout(() => {
+      setColorScheme(mediaQuery.matches ? "dark" : "light");
+    }, 0);
 
     // Подписываемся на изменения
     mediaQuery.addEventListener("change", handleChange);

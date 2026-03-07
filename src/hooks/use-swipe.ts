@@ -82,9 +82,10 @@ export function useSwipe({
     };
   }, [enabled, handleTouchStart, handleTouchMove, handleTouchEnd]);
 
+  // Возвращаем функции для получения значений ref (не сами значения)
   return {
-    touchStartX: touchStartX.current,
-    touchStartY: touchStartY.current,
-    isSwiping: isSwiping.current,
+    getTouchStartX: () => touchStartX.current,
+    getTouchStartY: () => touchStartY.current,
+    isSwiping: () => isSwiping.current,
   };
 }

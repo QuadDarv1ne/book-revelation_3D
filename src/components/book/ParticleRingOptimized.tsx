@@ -8,6 +8,31 @@ const PARTICLE_COUNT = 150;
 const RING_RADIUS = 1.5;
 const RING_WIDTH = 0.4;
 
+interface ParticleData {
+  angle: number;
+  radius: number;
+  baseY: number;
+  speed: number;
+  phase: number;
+}
+
+// Генерируем данные частиц вне компонента (чистая функция)
+function generateParticleData(): ParticleData[] {
+  const data: ParticleData[] = [];
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const angle = (i / PARTICLE_COUNT) * Math.PI * 2;
+    const radius = RING_RADIUS + (Math.random() - 0.5) * RING_WIDTH;
+    const baseY = 0.3 + Math.random() * 1.5;
+    const speed = 0.5 + Math.random() * 0.5;
+    const phase = Math.random() * Math.PI * 2;
+    data.push({ angle, radius, baseY, speed, phase });
+  }
+  return data;
+}
+
+// Предварительно генерируем данные один раз при загрузке модуля
+const PRE_GENERATED_PARTICLE_DATA = generateParticleData();
+
 interface ParticleRingProps {
   isRotating: boolean;
 }
@@ -16,29 +41,9 @@ export function ParticleRingOptimized({ isRotating }: ParticleRingProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const dummyRef = useRef(new THREE.Object3D());
   const colorsRef = useRef(new THREE.Color());
-  
-  // Генерируем начальные данные частиц
-  const particleData = useMemo(() => {
-    const data: Array<{
-      angle: number;
-      radius: number;
-      baseY: number;
-      speed: number;
-      phase: number;
-    }> = [];
 
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const angle = (i / PARTICLE_COUNT) * Math.PI * 2;
-      const radius = RING_RADIUS + (Math.random() - 0.5) * RING_WIDTH;
-      const baseY = 0.3 + Math.random() * 1.5;
-      const speed = 0.5 + Math.random() * 0.5;
-      const phase = Math.random() * Math.PI * 2;
-
-      data.push({ angle, radius, baseY, speed, phase });
-    }
-
-    return data;
-  }, []);
+  // Используем предгенерированные данные
+  const particleData = useMemo(() => PRE_GENERATED_PARTICLE_DATA, []);
 
   // Создаем геометрию для инстанса (маленькая сфера)
   const instanceGeometry = useMemo(() => {

@@ -10,9 +10,11 @@ export function AchievementNotification() {
 
   useEffect(() => {
     if (showAchievement) {
-      // Показываем уведомление
-      setIsVisible(true);
-      
+      // Используем setTimeout для избежания каскадных рендеров
+      setTimeout(() => {
+        setIsVisible(true);
+      }, 0);
+
       // Автоматически скрываем через 4 секунды
       const timer = setTimeout(() => {
         setIsLeaving(true);

@@ -7,21 +7,81 @@ import { Points, PointMaterial } from "@react-three/drei";
 
 interface ThemeParticleEffectProps {
   activeTheme: string;
-  onThemeChange: (theme: string) => void;
+  onThemeChange?: (theme: string) => void;
 }
 
 const PARTICLE_COUNT = 50;
 
 // Цвета частиц для разных тем
 const THEME_COLORS = {
-  dark: 0xd4af37, // золотой
-  light: 0x333333, // темно-серый
-  blue: 0x3b82f6, // синий
-  purple: 0x7c3aed, // фиолетовый
-  ambient: 0x059669, // изумрудный
-  relax: 0x1a3f2f, // темно-зеленый
-  auto: 0xd4af37, // золотой (по умолчанию как dark)
+  dark: 0xd4af37,
+  light: 0x333333,
+  blue: 0x3b82f6,
+  purple: 0x7c3aed,
+  ambient: 0x059669,
+  relax: 0x1a3f2f,
+  auto: 0xd4af37,
 };
+
+interface ParticleInitData {
+  positions: Float32Array;
+  colors: Float32Array;
+  sizes: Float32Array;
+  velocities: { x: number; y: number; z: number }[];
+}
+
+// Генерируем начальные данные частиц вне компонента
+function generateParticleData(themeKey: keyof typeof THEME_COLORS): ParticleInitData {
+  const pos = new Float32Array(PARTICLE_COUNT * 3);
+  const cols = new Float32Array(PARTICLE_COUNT * 3);
+  const sz = new Float32Array(PARTICLE_COUNT);
+  const velocities: { x: number; y: number; z: number }[] = [];
+  const baseColor = new THREE.Color(THEME_COLORS[themeKey] || THEME_COLORS.dark);
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const radius = 0.5 + Math.random() * 1.5;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.random() * Math.PI;
+
+    pos[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+    pos[i * 3 + 1] = radius * Math.cos(phi) + 0.6;
+    pos[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+
+    velocities[i] = {
+      x: (Math.random() - 0.5) * 0.02,
+      y: Math.random() * 0.03 + 0.01,
+      z: (Math.random() - 0.5) * 0.02
+    };
+
+    sz[i] = Math.random() * 0.03 + 0.01;
+    cols[i * 3] = baseColor.r;
+    cols[i * 3 + 1] = baseColor.g;
+    cols[i * 3 + 2] = baseColor.b;
+  }
+
+  return { positions: pos, colors: cols, sizes: sz, velocities };
+}
+
+// Вспомогательная функция для сброса частицы (вызывается в useFrame, не во время рендера)
+function resetParticle(
+  positionsArray: Float32Array,
+  velocitiesArray: { x: number; y: number; z: number }[],
+  i: number
+) {
+  const radius = 0.5 + Math.random() * 1.5;
+  const theta = Math.random() * Math.PI * 2;
+  const phi = Math.random() * Math.PI;
+
+  positionsArray[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+  positionsArray[i * 3 + 1] = 0.6;
+  positionsArray[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+
+  velocitiesArray[i] = {
+    x: (Math.random() - 0.5) * 0.02,
+    y: Math.random() * 0.03 + 0.01,
+    z: (Math.random() - 0.5) * 0.02
+  };
+}
 
 export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticleEffectProps) {
   const [showParticles, setShowParticles] = useState(false);
@@ -29,42 +89,21 @@ export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticl
   const particlesRef = useRef<THREE.Points>(null);
   const velocities = useRef<{ x: number; y: number; z: number }[]>([]);
 
-  // Создаем позиции и цвета частиц с помощью useMemo
-  const { positions, colors, sizes } = useMemo(() => {
-    const pos = new Float32Array(PARTICLE_COUNT * 3);
-    const cols = new Float32Array(PARTICLE_COUNT * 3);
-    const sz = new Float32Array(PARTICLE_COUNT);
+  // onThemeChange is reserved for future use
+  void onThemeChange;
+
+  // Генерируем данные частиц для текущей темы
+  const particleInitData = useMemo(() => {
     const themeKey = activeTheme as keyof typeof THEME_COLORS;
-    const baseColor = new THREE.Color(THEME_COLORS[themeKey] || THEME_COLORS.dark);
+    return generateParticleData(themeKey);
+  }, [activeTheme]);
 
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      // Случайные позиции вокруг книги
-      const radius = 0.5 + Math.random() * 1.5;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.random() * Math.PI;
+  const { positions, colors } = particleInitData;
 
-      pos[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-      pos[i * 3 + 1] = radius * Math.cos(phi) + 0.6; // смещение по Y
-      pos[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
-
-      // Случайные скорости
-      velocities.current[i] = {
-        x: (Math.random() - 0.5) * 0.02,
-        y: Math.random() * 0.03 + 0.01,
-        z: (Math.random() - 0.5) * 0.02
-      };
-
-      // Размеры частиц
-      sz[i] = Math.random() * 0.03 + 0.01;
-
-      // Цвета частиц
-      cols[i * 3] = baseColor.r;
-      cols[i * 3 + 1] = baseColor.g;
-      cols[i * 3 + 2] = baseColor.b;
-    }
-
-    return { positions: pos, colors: cols, sizes: sz };
-  }, []);
+  // Инициализируем скорости при монтировании
+  useEffect(() => {
+    velocities.current = particleInitData.velocities;
+  }, [particleInitData.velocities]);
 
   // Анимация частиц
   useFrame(() => {
@@ -92,20 +131,7 @@ export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticl
 
         // Удаление частиц, которые улетели слишком высоко
         if (positionsArray[i * 3 + 1] > 3) {
-          // Перемещаем частицу обратно вниз с новыми параметрами
-          const radius = 0.5 + Math.random() * 1.5;
-          const theta = Math.random() * Math.PI * 2;
-          const phi = Math.random() * Math.PI;
-
-          positionsArray[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-          positionsArray[i * 3 + 1] = 0.6;
-          positionsArray[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
-
-          velocities.current[i] = {
-            x: (Math.random() - 0.5) * 0.02,
-            y: Math.random() * 0.03 + 0.01,
-            z: (Math.random() - 0.5) * 0.02
-          };
+          resetParticle(positionsArray, velocities.current, i);
         }
       }
 
@@ -117,8 +143,11 @@ export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticl
   // Эффект при смене темы
   useEffect(() => {
     if (activeTheme !== previousTheme) {
-      setShowParticles(true);
-      setPreviousTheme(activeTheme);
+      // Используем setTimeout для избежания каскадных рендеров
+      setTimeout(() => {
+        setShowParticles(true);
+        setPreviousTheme(activeTheme);
+      }, 0);
 
       // Обновление цветов частиц
       if (particlesRef.current) {
