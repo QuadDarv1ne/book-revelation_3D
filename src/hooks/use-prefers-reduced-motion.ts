@@ -13,11 +13,11 @@ export function usePrefersReducedMotion(): boolean {
     // Проверяем медиа-запрос
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     
-    // Устанавливаем начальное значение
-    const initial = mediaQuery.matches;
-    if (initial !== prefersReducedMotion) {
-      setPrefersReducedMotion(initial);
-    }
+    // Устанавливаем начальное значение через функциональное обновление
+    setPrefersReducedMotion(prev => {
+      const initial = mediaQuery.matches;
+      return initial !== prev ? initial : prev;
+    });
 
     // Слушаем изменения
     const handleChange = (event: MediaQueryListEvent) => {
@@ -29,7 +29,7 @@ export function usePrefersReducedMotion(): boolean {
     return () => {
       mediaQuery.removeEventListener("change", handleChange);
     };
-  }, [prefersReducedMotion]);
+  }, []);
 
   return prefersReducedMotion;
 }
