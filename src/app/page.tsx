@@ -13,6 +13,7 @@ import { useFavorites } from "@/hooks/use-favorites";
 import { useToast } from "@/components/ui/Toast";
 import { usePrefersColorScheme } from "@/hooks/use-prefers-color-scheme";
 import { useOfflineQuotes } from "@/hooks/use-offline-quotes";
+import { useAnalytics, trackBookChange, trackThemeChange } from "@/hooks/use-analytics";
 import type { Quote } from "@/types/quote";
 
 const Scene = dynamic(() => import("@/components/book").then(mod => ({ default: mod.Scene })), {
@@ -46,6 +47,7 @@ export default function Home() {
   const mounted = useMounted();
   const hasWebGL = useWebGLSupport();
   const { isRotating, toggleRotation } = useRotationControl();
+  const { trackEvent } = useAnalytics();
   const [activeQuote, setActiveQuote] = useState(0);
   const [webGLError, setWebGLError] = useState(false);
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
@@ -114,12 +116,16 @@ export default function Home() {
     document.body.className = `${effectiveTheme}-theme`;
     localStorage.setItem("theme", theme);
 
+    // Track theme change
+    trackThemeChange(theme);
+    trackEvent("settings", "theme_change", theme);
+
     const timer = setTimeout(() => {
       document.body.classList.remove('theme-transitioning');
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [effectiveTheme, theme]);
+  }, [effectiveTheme, theme, trackEvent]);
 
   // Автоматическое переключение цитат
   useEffect(() => {
@@ -130,9 +136,11 @@ export default function Home() {
   }, [activeBook.quotes.length]);
 
   const handleBookChange = useCallback((bookId: string) => {
+    trackBookChange(activeBookId, bookId);
+    trackEvent("navigation", "book_change", bookId);
     setActiveBookId(bookId);
     setActiveQuote(0); // Сбрасываем на первую цитату новой книги
-  }, []);
+  }, [activeBookId, trackEvent]);
 
   const handleRetry = useCallback(() => {
     setWebGLError(false);
