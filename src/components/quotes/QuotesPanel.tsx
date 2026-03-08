@@ -361,7 +361,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
                 aria-pressed={categoryFilter === cat}
                 type="button"
               >
-                {cat === 'all' ? 'Все' : cat}
+                {cat === 'all' ? t('category.all') : t(`category.${cat}`) || cat}
               </button>
             ))}
             {categories.length > 5 && (
@@ -369,11 +369,11 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 className="px-2 py-1.5 text-xs bg-white/5 border border-amber-500/20 rounded-md text-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[36px]"
-                aria-label="Фильтр по категории"
+                aria-label={t('quotes.categories')}
               >
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
-                    {cat === 'all' ? 'Все категории' : cat}
+                    {cat === 'all' ? t('category.all') : t(`category.${cat}`) || cat}
                   </option>
                 ))}
               </select>
