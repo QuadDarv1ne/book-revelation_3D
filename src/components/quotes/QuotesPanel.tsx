@@ -14,6 +14,13 @@ interface QuotesPanelProps {
   bookTitle: string;
 }
 
+// Haptic feedback для мобильных
+const triggerHaptic = (pattern: number | number[]) => {
+  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+    navigator.vibrate(pattern);
+  }
+};
+
 export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: QuotesPanelProps) {
   const [visibleQuotes, setVisibleQuotes] = useState<number[]>([]);
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
@@ -24,7 +31,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
   const panelRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Touch handling for swipe gestures
+  // Touch handling for swipe gestures с haptic feedback
   const touchStartX = useRef<number>(0);
   const touchEndX = useRef<number>(0);
   const minSwipeDistance = 50;
@@ -40,15 +47,23 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
 
   const onTouchEnd = useCallback(() => {
     if (!touchStartX.current || !touchEndX.current) return;
-    
+
     const distance = touchStartX.current - touchEndX.current;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
 
     if (isLeftSwipe) {
-      setActiveQuote(prev => (prev + 1) % quotes.length);
+      setActiveQuote(prev => {
+        const next = (prev + 1) % quotes.length;
+        triggerHaptic(15); // Лёгкая вибрация при переключении
+        return next;
+      });
     } else if (isRightSwipe) {
-      setActiveQuote(prev => (prev - 1 + quotes.length) % quotes.length);
+      setActiveQuote(prev => {
+        const next = (prev - 1 + quotes.length) % quotes.length;
+        triggerHaptic(15);
+        return next;
+      });
     }
 
     touchStartX.current = 0;

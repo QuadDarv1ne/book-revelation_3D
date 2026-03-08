@@ -21,9 +21,17 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
   const safeAuthor = sanitizeText(quote.author);
   const safeEra = sanitizeText(quote.era);
 
+  // Haptic feedback
+  const triggerHaptic = (pattern: number | number[]) => {
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate(pattern);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
+      triggerHaptic(10);
       onClick();
     }
   };
@@ -31,6 +39,7 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
   const handleCopyKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
+      triggerHaptic(5);
       onCopy?.(`"${quote.text}" — ${quote.author}`);
     }
   };
@@ -38,6 +47,7 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
   const handleFavoriteKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
+      triggerHaptic(isFavorite ? [5, 10, 5] : 10);
       onToggleFavorite(e);
     }
   };
@@ -45,13 +55,17 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
   const handleShareKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
+      triggerHaptic(10);
       onShare?.(quote);
     }
   };
 
   return (
     <div
-      onClick={onClick}
+      onClick={() => {
+        triggerHaptic(10);
+        onClick();
+      }}
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="button"
@@ -81,7 +95,11 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
           {/* Copy button */}
           {onCopy && (
             <button
-              onClick={(e) => { e.stopPropagation(); onCopy(`"${quote.text}" — ${quote.author}`); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                triggerHaptic(5);
+                onCopy(`"${quote.text}" — ${quote.author}`);
+              }}
               onKeyDown={handleCopyKeyDown}
               tabIndex={0}
               className="p-1.5 rounded-full hover:bg-amber-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus-visible:ring-4"
@@ -96,7 +114,11 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
           {/* Share button */}
           {onShare && (
             <button
-              onClick={(e) => { e.stopPropagation(); onShare(quote); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                triggerHaptic(10);
+                onShare(quote);
+              }}
               onKeyDown={handleShareKeyDown}
               tabIndex={0}
               className="p-1.5 rounded-full hover:bg-amber-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus-visible:ring-4"
@@ -110,7 +132,11 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
           )}
           {/* Favorite button */}
           <button
-            onClick={(e) => { e.stopPropagation(); onToggleFavorite(e); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              triggerHaptic(isFavorite ? [5, 10, 5] : 10);
+              onToggleFavorite(e);
+            }}
             onKeyDown={handleFavoriteKeyDown}
             tabIndex={0}
             className="p-1.5 rounded-full hover:bg-amber-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus-visible:ring-4"
