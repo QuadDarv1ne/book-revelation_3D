@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Нет подключения — Stoic Book 3D</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e4e4e4;
+      padding: 2rem;
+    }
+    .container {
+      text-align: center;
+      max-width: 400px;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #d4af37;
+    }
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #a0a0a0;
+      margin-bottom: 2rem;
+    }
+    .icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.5;
+    }
+    .quote {
+      font-style: italic;
+      padding: 1.5rem;
+      background: rgba(212, 175, 55, 0.1);
+      border-left: 3px solid #d4af37;
+      border-radius: 8px;
+      margin-top: 2rem;
+    }
+    .quote-text {
+      font-size: 0.95rem;
+      color: #d4af37;
+    }
+    button {
+      margin-top: 1.5rem;
+      padding: 0.75rem 2rem;
+      background: #d4af37;
+      color: #1a1a2e;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+    button:hover {
+      background: #c9a961;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon">📴</div>
+    <h1>Нет подключения</h1>
+    <p>Похоже, вы офлайн. Проверьте подключение к интернету или попробуйте обновить страницу.</p>
+    <button onclick="location.reload()">Обновить</button>
+    <div class="quote">
+      <p class="quote-text">«Нас расстраивают не вещи, а наше мнение о вещах.»</p>
+      <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #888;">— Эпиктет</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,137 +1,88 @@
-const STATIC_CACHE = 'stoic-static-v2';
-const TEXTURE_CACHE = 'stoic-textures-v2';
-
+const CACHE_NAME = 'stoic-book-v1';
 const STATIC_ASSETS = [
   '/',
-  '/index.html',
   '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
+  '/offline.html',
 ];
 
-// Паттерны для кэширования
-const CACHE_PATTERNS = {
-  textures: [
-    '/book-covers/',
-    '/book-spines/',
-  ],
-  static: [
-    '/_next/static/',
-  ],
-};
-
-const isCacheable = (url) => {
-  try {
-    const parsed = new URL(url, location.origin);
-    return parsed.origin === location.origin;
-  } catch {
-    return false;
-  }
-};
-
-// Установка SW - кэширование статики
+// Install event - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) => {
+    caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(STATIC_ASSETS);
     })
   );
   self.skipWaiting();
 });
 
-// Активация - очистка старых кэшей
+// Activate event - clean old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((names) =>
-      Promise.all(
-        names.filter((name) => 
-          name.startsWith('stoic-') && 
-          name !== STATIC_CACHE && 
-          name !== TEXTURE_CACHE
-        ).map((name) => caches.delete(name))
-      )
-    ).then(() => {
-      self.clients.claim();
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames
+          .filter((name) => name !== CACHE_NAME)
+          .map((name) => caches.delete(name))
+      );
     })
   );
+  self.clients.claim();
 });
 
-// Стратегия кэширования
+// Fetch event - network first, fallback to cache
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  
-  // Только GET запросы
-  if (request.method !== 'GET') return;
-  
-  // Не кэшируем чужие ресурсы
-  if (!isCacheable(request.url)) return;
-  
-  // Определяем тип запроса
-  const isTexture = CACHE_PATTERNS.textures.some(pattern => request.url.includes(pattern));
-  const isStatic = CACHE_PATTERNS.static.some(pattern => request.url.includes(pattern));
-  
-  if (isTexture) {
-    // Для текстур: cache-first с network fallback
+  const url = new URL(request.url);
+
+  // Skip cross-origin requests
+  if (url.origin !== location.origin) {
+    return;
+  }
+
+  // Handle navigation requests
+  if (request.mode === 'navigate') {
     event.respondWith(
-      caches.open(TEXTURE_CACHE).then(async (cache) => {
-        const cached = await cache.match(request);
-        if (cached) {
-          return cached;
-        }
-        
-        try {
-          const response = await fetch(request);
-          if (response.status === 200) {
-            cache.put(request, response.clone());
-          }
-          return response;
-        } catch {
-          // Offline - возвращаем placeholder
-          return new Response('', { status: 408, statusText: 'Offline' });
-        }
-      })
+      fetch(request)
+        .catch(() => caches.match('/offline.html'))
     );
-  } else if (isStatic) {
-    // Для статики: cache-first
+    return;
+  }
+
+  // For static assets: cache first, then network
+  if (
+    request.destination === 'image' ||
+    request.destination === 'style' ||
+    request.destination === 'script' ||
+    request.destination === 'font'
+  ) {
     event.respondWith(
-      caches.match(request).then((cached) => {
-        return cached || fetch(request).then((response) => {
-          if (response.status === 200) {
-            caches.open(STATIC_CACHE).then((cache) => cache.put(request, response.clone()));
-          }
-          return response;
+      caches.match(request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        return fetch(request).then((networkResponse) => {
+          // Clone the response for caching
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, responseClone);
+          });
+          return networkResponse;
         });
       })
     );
-  } else {
-    // Для остального: network-first с cache fallback
-    event.respondWith(
-      fetch(request).then((response) => {
-        if (response?.status === 200) {
-          caches.open(STATIC_CACHE).then((cache) => cache.put(request, response.clone()));
-        }
-        return response;
-      }).catch(() => {
-        return caches.match(request);
-      })
-    );
+    return;
   }
-});
 
-// Сообщение для обновления кэша текстур
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'CACHE_TEXTURE') {
-    const { url, response } = event.data;
-    
-    event.waitUntil(
-      caches.open(TEXTURE_CACHE).then((cache) => {
-        return cache.put(url, new Response(response));
+  // Default: network first
+  event.respondWith(
+    fetch(request)
+      .then((response) => {
+        const responseClone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(request, responseClone);
+        });
+        return response;
       })
-    );
-  }
-  
-  // Пропуск ожидания для обновления
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+      .catch(() => caches.match(request))
+  );
 });

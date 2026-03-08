@@ -23,5 +23,7 @@
   ],
   "categories": ["education", "lifestyle"],
   "lang": "ru",
-  "dir": "ltr"
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "offline_enabled": true
 }

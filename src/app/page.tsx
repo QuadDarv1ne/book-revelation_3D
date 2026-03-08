@@ -7,11 +7,13 @@ import { ControlButton, WebGLError, useWebGLSupport, SettingsBar, PWAInstall, To
 import { useRotationControl } from "@/hooks/use-rotation";
 import { useMounted } from "@/hooks/use-mounted";
 import { LoadingFallback } from "@/components/ui/LoadingFallback";
-import { getBookById, getDefaultBook } from "@/data/books";
+import { getBookById, getDefaultBook, books } from "@/data/books";
 import { textureManager } from "@/lib/textures/texture-manager";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useToast } from "@/components/ui/Toast";
 import { usePrefersColorScheme } from "@/hooks/use-prefers-color-scheme";
+import { useOfflineQuotes } from "@/hooks/use-offline-quotes";
+import type { Quote } from "@/types/quote";
 
 const Scene = dynamic(() => import("@/components/book").then(mod => ({ default: mod.Scene })), {
   ssr: false,
@@ -140,6 +142,16 @@ export default function Home() {
   // Экспорт/импорт избранных цитат
   const { exportFavorites, importFavorites } = useFavorites();
   const { showToast } = useToast();
+  const { cacheQuotes } = useOfflineQuotes();
+
+  // Кэширование цитат для offline режима
+  useEffect(() => {
+    const quotesByBook: Record<string, Quote[]> = {};
+    books.forEach(book => {
+      quotesByBook[book.id] = book.quotes;
+    });
+    cacheQuotes(quotesByBook);
+  }, [cacheQuotes]);
 
   const handleExportFavorites = useCallback(() => {
     const exportData = exportFavorites();
