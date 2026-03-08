@@ -37,8 +37,11 @@ export interface UserProgress {
   booksViewed: string[];
   achievementsUnlocked: string[];
   quotesLiked: string[];
+  quotesRead: number;
   streakDays: number;
   lastVisitDate: string;
+  totalTimeSeconds: number;
+  firstVisitDate: string;
 }
 
 const INITIAL_ACHIEVEMENTS: Achievement[] = [
@@ -63,6 +66,16 @@ const INITIAL_ACHIEVEMENTS: Achievement[] = [
     category: "interaction",
   },
   {
+    id: "rotation_expert",
+    title: "Виртуоз вращения",
+    description: "Включите/выключите вращение 50 раз",
+    icon: "⚡",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 50,
+    category: "interaction",
+  },
+  {
     id: "theme_explorer",
     title: "Исследователь тем",
     description: "Попробуйте 3 различные цветовые схемы",
@@ -70,6 +83,16 @@ const INITIAL_ACHIEVEMENTS: Achievement[] = [
     unlocked: false,
     progress: 0,
     maxProgress: 3,
+    category: "exploration",
+  },
+  {
+    id: "theme_master",
+    title: "Мастер тем",
+    description: "Попробуйте все 8 цветовых схем",
+    icon: "🌈",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 8,
     category: "exploration",
   },
   {
@@ -83,6 +106,16 @@ const INITIAL_ACHIEVEMENTS: Achievement[] = [
     category: "knowledge",
   },
   {
+    id: "stoic_philosopher",
+    title: "Стоический философ",
+    description: "Прочитайте 25 цитат",
+    icon: "🏛️",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 25,
+    category: "knowledge",
+  },
+  {
     id: "week_streak",
     title: "Недельная серия",
     description: "Посещайте приложение 7 дней подряд",
@@ -93,13 +126,33 @@ const INITIAL_ACHIEVEMENTS: Achievement[] = [
     category: "special",
   },
   {
-    id: "custom_cover",
-    title: "Библиотекарь",
-    description: "Загрузите свою обложку книги",
+    id: "month_streak",
+    title: "Месячная серия",
+    description: "Посещайте приложение 30 дней подряд",
+    icon: "🏆",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 30,
+    category: "special",
+  },
+  {
+    id: "book_collector",
+    title: "Коллекционер книг",
+    description: "Посмотрите все 5 книг",
     icon: "📖",
     unlocked: false,
     progress: 0,
-    maxProgress: 1,
+    maxProgress: 5,
+    category: "exploration",
+  },
+  {
+    id: "favorites_curator",
+    title: "Куратор избранного",
+    description: "Добавьте 10 цитат в избранное",
+    icon: "💛",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 10,
     category: "interaction",
   },
 ];
@@ -128,10 +181,13 @@ function getDayOfYear(): number {
 function getQuoteForToday(): QuoteOfDay {
   const dayIndex = getDayOfYear() % STOIC_QUOTES.length;
   const quote = STOIC_QUOTES[dayIndex];
-  
+
   // Проверяем, лайкнул ли пользователь эту цитату ранее
-  const likedQuotes = JSON.parse(localStorage.getItem("stoic_quotes_liked") || "[]");
-  
+  let likedQuotes: string[] = [];
+  if (typeof window !== "undefined") {
+    likedQuotes = JSON.parse(localStorage.getItem("stoic_quotes_liked") || "[]");
+  }
+
   return {
     ...quote,
     date: new Date().toISOString().split("T")[0],
@@ -140,11 +196,27 @@ function getQuoteForToday(): QuoteOfDay {
 }
 
 function loadProgress(): UserProgress {
+  if (typeof window === "undefined") {
+    return {
+      totalVisits: 0,
+      totalRotations: 0,
+      themesExplored: [],
+      booksViewed: [],
+      achievementsUnlocked: [],
+      quotesLiked: [],
+      quotesRead: 0,
+      streakDays: 0,
+      lastVisitDate: "",
+      totalTimeSeconds: 0,
+      firstVisitDate: "",
+    };
+  }
+
   const saved = localStorage.getItem("stoic_user_progress");
   if (saved) {
     return JSON.parse(saved);
   }
-  
+
   return {
     totalVisits: 0,
     totalRotations: 0,
@@ -152,12 +224,16 @@ function loadProgress(): UserProgress {
     booksViewed: [],
     achievementsUnlocked: [],
     quotesLiked: [],
+    quotesRead: 0,
     streakDays: 0,
     lastVisitDate: "",
+    totalTimeSeconds: 0,
+    firstVisitDate: "",
   };
 }
 
 function saveProgress(progress: UserProgress): void {
+  if (typeof window === "undefined") return;
   localStorage.setItem("stoic_user_progress", JSON.stringify(progress));
 }
 
@@ -224,9 +300,9 @@ export function useGamification() {
   const hasInitializedVisitRef = useRef(false);
   useEffect(() => {
     if (hasInitializedVisitRef.current) return;
-    
+
     const today = new Date().toISOString().split("T")[0];
-    
+
     const currentProgress = loadProgress();
     if (currentProgress.lastVisitDate !== today) {
       const yesterday = new Date();
@@ -242,6 +318,7 @@ export function useGamification() {
         totalVisits: currentProgress.totalVisits + 1,
         streakDays: newStreak,
         lastVisitDate: today,
+        firstVisitDate: currentProgress.firstVisitDate || today,
       };
 
       saveProgress(newProgress);
@@ -250,7 +327,7 @@ export function useGamification() {
       if (currentProgress.totalVisits === 0) {
         unlockAchievement("first_visit");
       }
-      
+
       setProgress(newProgress);
       hasInitializedVisitRef.current = true;
     }
@@ -264,10 +341,11 @@ export function useGamification() {
         totalRotations: prev.totalRotations + 1,
       };
       saveProgress(newProgress);
-      
-      // Проверяем достижение
+
+      // Проверяем достижения
       checkAchievement("rotation_master", Math.floor(newProgress.totalRotations / 10));
-      
+      checkAchievement("rotation_expert", Math.floor(newProgress.totalRotations / 50));
+
       return newProgress;
     });
   }, [checkAchievement]);
@@ -276,24 +354,60 @@ export function useGamification() {
   const addThemeExplored = useCallback((theme: string) => {
     setProgress(prev => {
       if (prev.themesExplored.includes(theme)) return prev;
-      
+
       const newProgress = {
         ...prev,
         themesExplored: [...prev.themesExplored, theme],
       };
       saveProgress(newProgress);
-      
+
       checkAchievement("theme_explorer", newProgress.themesExplored.length);
+      checkAchievement("theme_master", newProgress.themesExplored.length);
+
+      return newProgress;
+    });
+  }, [checkAchievement]);
+
+  // Добавление просмотренной книги
+  const addBookViewed = useCallback((bookId: string) => {
+    setProgress(prev => {
+      if (prev.booksViewed.includes(bookId)) return prev;
+
+      const newProgress = {
+        ...prev,
+        booksViewed: [...prev.booksViewed, bookId],
+      };
+      saveProgress(newProgress);
+
+      checkAchievement("book_collector", newProgress.booksViewed.length);
+
+      return newProgress;
+    });
+  }, [checkAchievement]);
+
+  // Инкремент прочитанных цитат
+  const incrementQuotesRead = useCallback(() => {
+    setProgress(prev => {
+      const newProgress = {
+        ...prev,
+        quotesRead: prev.quotesRead + 1,
+      };
+      saveProgress(newProgress);
+      
+      checkAchievement("stoic_scholar", Math.floor(newProgress.quotesRead / 5));
+      checkAchievement("stoic_philosopher", Math.floor(newProgress.quotesRead / 25));
       
       return newProgress;
     });
   }, [checkAchievement]);
 
-  // Лайк цитаты
+  // Лайк цитаты с проверкой достижения
   const toggleQuoteLike = useCallback((quoteText: string) => {
+    if (typeof window === "undefined") return;
+
     setQuoteOfDay(prev => {
       const newLiked = !prev.liked;
-      
+
       // Сохраняем в localStorage
       const likedQuotes = JSON.parse(localStorage.getItem("stoic_quotes_liked") || "[]");
       if (newLiked) {
@@ -303,45 +417,75 @@ export function useGamification() {
         if (index > -1) likedQuotes.splice(index, 1);
       }
       localStorage.setItem("stoic_quotes_liked", JSON.stringify(likedQuotes));
-      
+
+      // Проверяем достижение
+      checkAchievement("favorites_curator", likedQuotes.length);
+
       return { ...prev, liked: newLiked };
     });
-  }, []);
-
-  // Инкремент прочитанных цитат
-  const incrementQuotesRead = useCallback(() => {
-    checkAchievement("stoic_scholar", Math.floor(progress.totalVisits / 5));
-  }, [checkAchievement, progress.totalVisits]);
+  }, [checkAchievement]);
 
   // Разблокировка достижения за загрузку обложки
   const unlockCustomCoverAchievement = useCallback(() => {
-    unlockAchievement("custom_cover");
-  }, [unlockAchievement]);
+    // Достижение удалено из списка
+  }, []);
 
   const dismissAchievement = useCallback(() => {
     setShowAchievement(null);
   }, []);
 
-  const totalUnlocked = useMemo(() => 
-    achievements.filter(a => a.unlocked).length, 
+  const totalUnlocked = useMemo(() =>
+    achievements.filter(a => a.unlocked).length,
     [achievements]
   );
 
-  const completionPercentage = useMemo(() => 
-    Math.round((totalUnlocked / achievements.length) * 100), 
+  const completionPercentage = useMemo(() =>
+    Math.round((totalUnlocked / achievements.length) * 100),
     [totalUnlocked, achievements.length]
   );
+
+  // Статистика для dashboard
+  const stats = useMemo(() => ({
+    totalAchievements: achievements.length,
+    totalUnlocked,
+    completionPercentage,
+    totalVisits: progress.totalVisits,
+    totalRotations: progress.totalRotations,
+    quotesRead: progress.quotesRead,
+    quotesLiked: progress.quotesLiked.length,
+    booksViewed: progress.booksViewed.length,
+    themesExplored: progress.themesExplored.length,
+    streakDays: progress.streakDays,
+    totalTimeSeconds: progress.totalTimeSeconds,
+    firstVisitDate: progress.firstVisitDate,
+    lastVisitDate: progress.lastVisitDate,
+  }), [achievements, progress, totalUnlocked, completionPercentage]);
+
+  // Отслеживание времени в приложении
+  const trackTime = useCallback((seconds: number) => {
+    setProgress(prev => {
+      const newProgress = {
+        ...prev,
+        totalTimeSeconds: prev.totalTimeSeconds + seconds,
+      };
+      saveProgress(newProgress);
+      return newProgress;
+    });
+  }, []);
 
   return {
     progress,
     achievements,
     quoteOfDay,
     showAchievement,
+    stats,
     incrementRotations,
     addThemeExplored,
+    addBookViewed,
     toggleQuoteLike,
     incrementQuotesRead,
     unlockCustomCoverAchievement,
+    trackTime,
     dismissAchievement,
     totalUnlocked,
     completionPercentage,

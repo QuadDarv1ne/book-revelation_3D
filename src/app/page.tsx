@@ -15,6 +15,7 @@ import { usePrefersColorScheme } from "@/hooks/use-prefers-color-scheme";
 import { useOfflineQuotes } from "@/hooks/use-offline-quotes";
 import { useAnalytics, trackBookChange, trackThemeChange } from "@/hooks/use-analytics";
 import { useAutoTheme } from "@/hooks/use-auto-theme";
+import { useGamification } from "@/hooks/use-gamification";
 import type { Quote } from "@/types/quote";
 
 const Scene = dynamic(() => import("@/components/book").then(mod => ({ default: mod.Scene })), {
@@ -50,6 +51,7 @@ export default function Home() {
   const { isRotating, toggleRotation } = useRotationControl();
   const { trackEvent } = useAnalytics();
   const { themeConfig: autoThemeConfig } = useAutoTheme();
+  const { addThemeExplored, addBookViewed, trackTime } = useGamification();
   const [activeQuote, setActiveQuote] = useState(0);
   const [webGLError, setWebGLError] = useState(false);
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
@@ -113,9 +115,9 @@ export default function Home() {
 
   // Смена темы оформления - оптимизировано
   useEffect(() => {
-    // Анимация при смене темы
+    // Анимация при смене теме
     document.body.classList.add('theme-transitioning');
-    
+
     // Применяем тему с учётом auto-time
     const bodyTheme = theme === "auto-time" ? autoThemeConfig.colorClass : `${effectiveTheme}-theme`;
     document.body.className = bodyTheme;
@@ -124,13 +126,22 @@ export default function Home() {
     // Track theme change
     trackThemeChange(theme);
     trackEvent("settings", "theme_change", theme);
+    addThemeExplored(theme);
 
     const timer = setTimeout(() => {
       document.body.classList.remove('theme-transitioning');
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [effectiveTheme, theme, trackEvent, autoThemeConfig]);
+  }, [effectiveTheme, theme, trackEvent, autoThemeConfig, addThemeExplored]);
+
+  // Отслеживание времени в приложении
+  useEffect(() => {
+    const interval = setInterval(() => {
+      trackTime(10); // Каждые 10 секунд добавляем время
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [trackTime]);
 
   // Автоматическое переключение цитат
   useEffect(() => {
@@ -143,9 +154,10 @@ export default function Home() {
   const handleBookChange = useCallback((bookId: string) => {
     trackBookChange(activeBookId, bookId);
     trackEvent("navigation", "book_change", bookId);
+    addBookViewed(bookId);
     setActiveBookId(bookId);
     setActiveQuote(0); // Сбрасываем на первую цитату новой книги
-  }, [activeBookId, trackEvent]);
+  }, [activeBookId, trackEvent, addBookViewed]);
 
   const handleRetry = useCallback(() => {
     setWebGLError(false);
