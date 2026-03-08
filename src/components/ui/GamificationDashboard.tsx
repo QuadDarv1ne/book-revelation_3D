@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { useGamification } from "@/hooks/use-gamification";
 import { useI18n } from "@/hooks/use-i18n";
+import { DailyChallenge } from "./DailyChallenge";
 
 interface IconProps {
   className?: string;
@@ -229,6 +230,11 @@ export function GamificationDashboard({ onClose }: GamificationDashboardProps) {
             </div>
           </div>
         )}
+
+        {/* Daily Challenge */}
+        <div className="p-4 border-b border-amber-500/20">
+          <DailyChallenge />
+        </div>
 
         {/* Progress bar */}
         <div className="p-4 border-b border-amber-500/20">
