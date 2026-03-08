@@ -119,6 +119,21 @@ export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFA
     blending: THREE.AdditiveBlending
   }), []);
 
+  // Очистка материалов при размонтировании
+  useEffect(() => {
+    return () => {
+      coverMaterial.dispose();
+      backCoverMaterial.dispose();
+      spineMaterial.dispose();
+      fallbackCoverMaterial.dispose();
+      fallbackSpineMaterial.dispose();
+      pagesMaterial.dispose();
+      pagesEdgeMaterial.dispose();
+      goldMaterial.dispose();
+      glowMaterial.dispose();
+    };
+  }, [coverMaterial, backCoverMaterial, spineMaterial, fallbackCoverMaterial, fallbackSpineMaterial, pagesMaterial, pagesEdgeMaterial, goldMaterial, glowMaterial]);
+
   // Geometries - используем константы
 
   const handleTouchStart = useCallback((e: TouchEvent) => {

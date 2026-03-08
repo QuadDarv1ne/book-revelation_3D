@@ -4,6 +4,7 @@
  * - Кэширование загруженных текстур
  * - Предзагрузка для быстрой смены книг
  * - Очистка неиспользуемых текстур из памяти
+ * - Автоматическая очистка при unmount
  */
 
 import * as THREE from "three";
@@ -19,7 +20,8 @@ class TextureManager {
   private cache = new Map<string, TextureCacheEntry>();
   private maxCacheSize = 10; // Максимум текстур в кэше
   private placeholderCache = new Map<string, THREE.Texture>();
-  
+  private cleanupScheduled = false;
+
   // Статистика для отладки
   public stats = {
     hits: 0,
@@ -277,7 +279,37 @@ class TextureManager {
       }
     }
     this.cache.clear();
+    this.placeholderCache.clear();
     this.stats = { hits: 0, misses: 0, loads: 0, cacheSize: 0 };
+  }
+
+  /**
+   * Очистка старых текстур по таймеру
+   */
+  scheduleCleanup() {
+    if (this.cleanupScheduled) return;
+    this.cleanupScheduled = true;
+    setTimeout(() => {
+      this.evictOldestTextures();
+      this.cleanupScheduled = false;
+    }, 60000); // Каждую минуту
+  }
+
+  /**
+   * Принудительная очистка памяти
+   */
+  dispose() {
+    this.clear();
+    if (typeof window !== 'undefined') {
+      const win = window as unknown as { gl?: WebGLRenderingContext };
+      if (win.gl) {
+        const loseContextExt = win.gl.getExtension('WEBGL_lose_context');
+        if (loseContextExt) {
+          loseContextExt.loseContext();
+          setTimeout(() => loseContextExt.restoreContext(), 100);
+        }
+      }
+    }
   }
 
   /**
