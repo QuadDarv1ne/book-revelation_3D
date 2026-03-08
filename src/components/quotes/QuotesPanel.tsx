@@ -24,6 +24,7 @@ const triggerHaptic = (pattern: number | number[]) => {
 export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: QuotesPanelProps) {
   const [visibleQuotes, setVisibleQuotes] = useState<number[]>([]);
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const { favorites, isLoaded, toggleFavorite, isFavorite, exportFavorites, importFavorites } = useFavorites();
   const { showToast } = useToast();
@@ -94,16 +95,30 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
       result = result.filter(({ originalIndex }) => favorites.includes(originalIndex));
     }
 
+    if (categoryFilter !== 'all') {
+      result = result.filter(({ quote }) => quote.category === categoryFilter);
+    }
+
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter(({ quote }) =>
         quote.text.toLowerCase().includes(query) ||
-        quote.author.toLowerCase().includes(query)
+        quote.author.toLowerCase().includes(query) ||
+        (quote.category && quote.category.toLowerCase().includes(query))
       );
     }
 
     return result;
-  }, [quotes, filter, favorites, searchQuery]);
+  }, [quotes, filter, favorites, categoryFilter, searchQuery]);
+
+  // Получаем уникальные категории
+  const categories = useMemo(() => {
+    const cats = new Set<string>();
+    quotes.forEach(q => {
+      if (q.category) cats.add(q.category);
+    });
+    return ['all', ...Array.from(cats)];
+  }, [quotes]);
 
   const handleToggleFavorite = useCallback((e: React.MouseEvent | React.KeyboardEvent, index: number) => {
     e.stopPropagation();
@@ -331,6 +346,40 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
           >
             {t('quotes.favorites')} ({favorites.length})
           </button>
+
+          {/* Category filter */}
+          <div className="flex items-center gap-1 flex-wrap">
+            {categories.slice(0, 5).map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setCategoryFilter(cat)}
+                className={`px-2.5 py-1.5 text-xs rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[36px] ${
+                  categoryFilter === cat
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    : 'text-gray-500 hover:text-amber-300 hover:bg-amber-500/10 border border-transparent'
+                }`}
+                aria-pressed={categoryFilter === cat}
+                type="button"
+              >
+                {cat === 'all' ? 'Все' : cat}
+              </button>
+            ))}
+            {categories.length > 5 && (
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="px-2 py-1.5 text-xs bg-white/5 border border-amber-500/20 rounded-md text-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[36px]"
+                aria-label="Фильтр по категории"
+              >
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat === 'all' ? 'Все категории' : cat}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
           <button
             onClick={shuffleQuotes}
             className="px-3 py-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm rounded-lg text-gray-400 hover:text-amber-300 hover:bg-amber-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[44px] min-w-[44px] flex items-center justify-center"
