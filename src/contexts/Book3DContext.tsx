@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from "react";
 
-export type ThemeType = "dark" | "light" | "blue" | "purple" | "ambient" | "relax" | "auto";
+export type ThemeType = "dark" | "light" | "blue" | "purple" | "ambient" | "relax" | "auto" | "auto-time";
 
 export type BookImages = {
   cover?: string;
