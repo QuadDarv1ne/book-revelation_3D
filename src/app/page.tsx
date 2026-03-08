@@ -249,7 +249,6 @@ export default function Home() {
                 spineImage={activeBook.spineImage}
                 backCoverImage={activeBook.backCoverImage}
                 theme={effectiveTheme}
-                onThemeChange={(t: string) => setTheme(t as Theme)}
                 onKeyboardRotate={toggleRotation}
               />
             )}
@@ -289,6 +288,10 @@ export default function Home() {
 
           <div id="quotes" className="w-full lg:w-[42%] h-[50%] lg:h-full relative bg-gradient-to-b from-[rgba(25,25,40,0.95)] to-[rgba(20,20,35,0.97)] border-l border-[rgba(212,175,55,0.12)]" role="region" aria-label="Цитаты стоических философов">
             <div className="absolute top-0 left-0 right-0 h-20 pointer-events-none bg-gradient-to-b from-[rgba(10,10,18,1)] to-transparent" />
+            {/* Live region для объявления о смене цитаты */}
+            <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+              {`Цитата ${activeQuote + 1} из ${activeBook.quotes.length}: ${activeBook.quotes[activeQuote]?.text.substring(0, 100)}${activeBook.quotes[activeQuote]?.text.length > 100 ? '...' : ''}. Автор: ${activeBook.quotes[activeQuote]?.author}`}
+            </div>
             <QuotesPanel quotes={activeBook.quotes} activeQuote={activeQuote} setActiveQuote={setActiveQuote} bookTitle={activeBook.title} />
             <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none bg-gradient-to-t from-[rgba(5,5,10,1)] to-transparent" />
           </div>

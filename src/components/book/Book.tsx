@@ -41,17 +41,36 @@ export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFA
   const touchRotation = useRef({ x: 0, y: 0 });
   const targetRotation = useRef(0);
 
-  // Загружаем текстуры через оптимизированный менеджер
-  const coverTexture = useMemo(() => textureManager.getTexture(coverImage, 'cover'), [coverImage]);
-  const spineTexture = useMemo(() => textureManager.getTexture(spineImage, 'spine'), [spineImage]);
-  const backCoverTexture = useMemo(() => textureManager.getTexture(backCoverImage, 'back'), [backCoverImage]);
+  // Текстуры хранятся в state для ленивой загрузки
+  const [coverTexture, setCoverTexture] = useState<THREE.Texture | null>(null);
+  const [spineTexture, setSpineTexture] = useState<THREE.Texture | null>(null);
+  const [backCoverTexture, setBackCoverTexture] = useState<THREE.Texture | null>(null);
 
-  // Предзагрузка текстур при изменении книги
+  // Ленивая загрузка текстур при смене книги
   useEffect(() => {
+    // Предзагрузка всех текстур книги
     textureManager.preloadBookTextures(coverImage, spineImage, backCoverImage);
+    
+    // Загружаем текстуры через менеджер
+    setCoverTexture(textureManager.getTexture(coverImage, 'cover'));
+    setSpineTexture(textureManager.getTexture(spineImage, 'spine'));
+    setBackCoverTexture(textureManager.getTexture(backCoverImage, 'back'));
   }, [coverImage, spineImage, backCoverImage]);
 
-  // Reusable materials - обновляем map при смене текстур
+  // Фолбэк материалы если текстуры ещё не загружены
+  const fallbackCoverMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    color: "#1a0f0a",
+    roughness: 0.45,
+    metalness: 0.15
+  }), []);
+
+  const fallbackSpineMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    color: "#150c08",
+    roughness: 0.45,
+    metalness: 0.15
+  }), []);
+
+  // Материалы с текстурами (обновляются при загрузке)
   const coverMaterial = useMemo(() => new THREE.MeshStandardMaterial({
     map: coverTexture,
     roughness: 0.45,
@@ -196,7 +215,7 @@ export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFA
           {/* Задняя обложка */}
           <mesh position={[0, 0, -BOOK_DEPTH/2 + COVER_THICKNESS/2]} castShadow>
             <primitive object={COVER_GEOMETRY} />
-            <primitive object={backCoverMaterial} />
+            <primitive object={backCoverTexture ? backCoverMaterial : fallbackCoverMaterial} />
           </mesh>
 
           {/* Страницы */}
@@ -208,12 +227,12 @@ export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFA
           {/* Передняя обложка */}
           <mesh position={[0, 0, BOOK_DEPTH/2 - COVER_THICKNESS/2]} castShadow>
             <primitive object={COVER_GEOMETRY} />
-            <primitive object={coverMaterial} />
+            <primitive object={coverTexture ? coverMaterial : fallbackCoverMaterial} />
           </mesh>
 
           <mesh position={[-BOOK_WIDTH/2 - 0.008, 0, 0]} castShadow>
             <primitive object={SPINE_GEOMETRY} />
-            <primitive object={spineMaterial} />
+            <primitive object={spineTexture ? spineMaterial : fallbackSpineMaterial} />
           </mesh>
 
           <mesh position={[BOOK_WIDTH/2 - 0.035, 0, 0]}>

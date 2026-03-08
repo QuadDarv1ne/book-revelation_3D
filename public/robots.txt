@@ -1,14 +1,39 @@
+# robots.txt для Stoic Book 3D
+# https://stoic-book-3d.vercel.app
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://stoic-book-3d.vercel.app/sitemap.xml
+
+# Хост
+Host: https://stoic-book-3d.vercel.app
+
+# Запрет на сканирование служебных путей
+Disallow: /_next/
+Disallow: /api/
+Disallow: /*?*
+
+# Основные боты
 User-agent: Googlebot
 Allow: /
+Max-video-preview: -1
+Max-image-preview: large
+Max-snippet: -1
 
 User-agent: Bingbot
 Allow: /
 
+User-agent: Yandex
+Allow: /
+
+# Социальные сети (для предпросмотра ссылок)
 User-agent: Twitterbot
 Allow: /
 
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
+User-agent: LinkedInBot
 Allow: /

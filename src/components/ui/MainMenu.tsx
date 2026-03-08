@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useToast } from "./Toast";
 import { useI18n } from "@/hooks/use-i18n";
+import { BottomSheet } from "./BottomSheet";
 
 interface MainMenuProps {
   theme: string;
@@ -89,39 +90,17 @@ export function MainMenu({
     setActiveSection(activeSection === section ? null : section);
   };
 
-  return (
-    <div ref={menuRef} className="relative">
-      {/* Кнопка открытия меню */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2.5 rounded-xl backdrop-blur-xl bg-[rgba(15,15,25,0.9)] border border-[rgba(212,175,55,0.25)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-amber-100 hover:text-amber-50 hover:bg-[rgba(15,15,25,0.95)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(15,15,25,0.9)]"
-        aria-label="Открыть меню настроек"
-        aria-expanded={isOpen}
-        type="button"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-        <span className="text-sm font-medium hidden sm:inline">Настройки</span>
-      </button>
+  // Контент меню (переиспользуется для desktop и mobile)
+  const menuContent = (
+    <>
+      {/* Заголовок */}
+      <div className="px-5 py-4 border-b border-[rgba(212,175,55,0.15)] bg-gradient-to-r from-amber-900/20 to-transparent">
+        <h2 className="text-lg font-light text-amber-100 tracking-wide">Book Revelation</h2>
+        <p className="text-xs text-amber-500/60 mt-0.5 tracking-[0.12em] uppercase">{t('stoicPhilosophy')}</p>
+      </div>
 
-      {/* Выпадающее меню */}
-      <div
-        className={`absolute top-full right-0 mt-2 w-80 md:w-96 rounded-2xl overflow-hidden backdrop-blur-xl bg-[rgba(15,15,25,0.98)] border border-[rgba(212,175,55,0.3)] shadow-[0_16px_48px_rgba(0,0,0,0.6)] transition-all duration-300 transform origin-top-right ${
-          isOpen ? "opacity-100 visible scale-100" : "opacity-0 invisible scale-95"
-        }`}
-        role="menu"
-        aria-label={t('menu.main')}
-      >
-        {/* Заголовок */}
-        <div className="px-5 py-4 border-b border-[rgba(212,175,55,0.15)] bg-gradient-to-r from-amber-900/20 to-transparent">
-          <h2 className="text-lg font-light text-amber-100 tracking-wide">Book Revelation</h2>
-          <p className="text-xs text-amber-500/60 mt-0.5 tracking-[0.12em] uppercase">{t('stoicPhilosophy')}</p>
-        </div>
-
-        {/* Разделы меню */}
-        <div className="max-h-[70vh] overflow-y-auto custom-scrollbar">
+      {/* Разделы меню */}
+      <div className="max-h-[70vh] overflow-y-auto custom-scrollbar">
 
           {/* Настройки */}
           <div className="border-b border-[rgba(212,175,55,0.1)]">
@@ -322,7 +301,55 @@ export function MainMenu({
             )}
           </div>
         </div>
+    </>
+  );
+
+  return (
+    <div ref={menuRef} className="relative">
+      {/* Кнопка открытия меню (видима только на desktop) */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl backdrop-blur-xl bg-[rgba(15,15,25,0.9)] border border-[rgba(212,175,55,0.25)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-amber-100 hover:text-amber-50 hover:bg-[rgba(15,15,25,0.95)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(15,15,25,0.9)]"
+        aria-label="Открыть меню настроек"
+        aria-expanded={isOpen}
+        type="button"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span className="text-sm font-medium">Настройки</span>
+      </button>
+
+      {/* Мобильная кнопка (видима только на mobile) */}
+      <button
+        onClick={() => setIsOpen(true)}
+        className="sm:hidden flex items-center justify-center p-3 rounded-xl backdrop-blur-xl bg-[rgba(15,15,25,0.9)] border border-[rgba(212,175,55,0.25)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-amber-100 hover:text-amber-50 hover:bg-[rgba(15,15,25,0.95)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[48px] min-w-[48px]"
+        aria-label="Открыть меню настроек"
+        aria-expanded={isOpen}
+        type="button"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      </button>
+
+      {/* Desktop dropdown меню */}
+      <div
+        className={`hidden sm:block absolute top-full right-0 mt-2 w-80 md:w-96 rounded-2xl overflow-hidden backdrop-blur-xl bg-[rgba(15,15,25,0.98)] border border-[rgba(212,175,55,0.3)] shadow-[0_16px_48px_rgba(0,0,0,0.6)] transition-all duration-300 transform origin-top-right ${
+          isOpen ? "opacity-100 visible scale-100" : "opacity-0 invisible scale-95"
+        }`}
+        role="menu"
+        aria-label={t('menu.main')}
+      >
+        {menuContent}
       </div>
+
+      {/* Mobile Bottom Sheet */}
+      <BottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} title="Настройки">
+        {menuContent}
+      </BottomSheet>
     </div>
   );
 }

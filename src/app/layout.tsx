@@ -38,11 +38,37 @@ const _cspContent = `
 `.replace(/\s+/g, ' ').trim();
 
 export const metadata: Metadata = {
-  title: "Stoic Book 3D — В чём наше благо?",
-  description: "Интерактивный 3D модуль с вращающейся книгой стоической философии. Цитаты Марка Аврелия и Эпиктета.",
-  keywords: ["стоицизм", "3D книга", "Марк Аврелий", "Эпиктет", "философия", "Three.js", "React"],
+  title: {
+    default: "Stoic Book 3D — В чём наше благо?",
+    template: "%s | Stoic Book 3D",
+  },
+  description: "Интерактивный 3D модуль с вращающейся книгой стоической философии. Цитаты Марка Аврелия, Эпиктета, Сенеки, Сунь-цзы и Стивена Хокинга.",
+  keywords: ["стоицизм", "3D книга", "Марк Аврелий", "Эпиктет", "Сенека", "Сунь-цзы", "Стивен Хокинг", "философия", "Three.js", "React", "цитаты великих людей"],
   authors: [{ name: "Stoic Book 3D Team" }],
+  creator: "Stoic Book 3D Team",
+  publisher: "Stoic Book 3D",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -53,11 +79,18 @@ export const metadata: Metadata = {
     description: "Интерактивный 3D модуль с цитатами стоических философов",
     type: "website",
     locale: "ru_RU",
+    siteName: "Stoic Book 3D",
+    url: "https://stoic-book-3d.vercel.app",
   },
   twitter: {
     card: "summary_large_image",
     title: "Stoic Book 3D — В чём наше благо?",
     description: "Интерактивный 3D модуль с цитатами стоических философов",
+    creator: "@stoicbook3d",
+  },
+  metadataBase: new URL("https://stoic-book-3d.vercel.app"),
+  alternates: {
+    canonical: "/",
   },
 };
 

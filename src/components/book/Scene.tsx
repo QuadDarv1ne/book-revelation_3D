@@ -18,11 +18,10 @@ interface SceneProps {
   spineImage?: string;
   backCoverImage?: string;
   theme?: string;
-  onThemeChange?: (theme: string) => void;
   onKeyboardRotate?: () => void;
 }
 
-const SceneContent = memo(function SceneContent({ isRotating, coverImage, spineImage, backCoverImage, theme, onThemeChange }: { isRotating: boolean; coverImage?: string; spineImage?: string; backCoverImage?: string; theme?: string; onThemeChange?: (theme: string) => void }) {
+const SceneContent = memo(function SceneContent({ isRotating, coverImage, spineImage, backCoverImage, theme }: { isRotating: boolean; coverImage?: string; spineImage?: string; backCoverImage?: string; theme?: string }) {
   return (
     <>
       <Lighting theme={theme} />
@@ -31,7 +30,7 @@ const SceneContent = memo(function SceneContent({ isRotating, coverImage, spineI
       <ParticleRing isRotating={isRotating} />
       <Sparkles count={20} scale={4} size={1.5} speed={0.1} color="#d4af37" opacity={0.25} />
       <ContactShadows position={[0, -0.78, 0]} opacity={0.4} scale={5} blur={2.5} far={3} color="#000" />
-      {theme && onThemeChange && <ThemeParticleEffect activeTheme={theme} onThemeChange={onThemeChange} />}
+      {theme && <ThemeParticleEffect activeTheme={theme} />}
     </>
   );
 });
@@ -116,7 +115,6 @@ export const Scene = memo(function Scene({
   spineImage,
   backCoverImage,
   theme,
-  onThemeChange,
   onKeyboardRotate
 }: SceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -196,7 +194,6 @@ export const Scene = memo(function Scene({
           spineImage={spineImage}
           backCoverImage={backCoverImage}
           theme={theme}
-          onThemeChange={onThemeChange}
         />
         <KeyboardHandler
           onRotate={onKeyboardRotate || (() => {})}

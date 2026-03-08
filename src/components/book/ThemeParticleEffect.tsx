@@ -7,7 +7,6 @@ import { Points, PointMaterial } from "@react-three/drei";
 
 interface ThemeParticleEffectProps {
   activeTheme: string;
-  onThemeChange?: (theme: string) => void;
 }
 
 const PARTICLE_COUNT = 50;
@@ -58,42 +57,42 @@ function createParticleData(activeTheme: keyof typeof THEME_COLORS): ParticleDat
   return { positions: pos, colors: cols, velocities };
 }
 
-export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticleEffectProps) {
+export function ThemeParticleEffect({ activeTheme }: ThemeParticleEffectProps) {
   const [showParticles, setShowParticles] = useState(false);
   const particlesRef = useRef<THREE.Points>(null);
   const particleDataRef = useRef<ParticleData | null>(null);
   const previousThemeRef = useRef(activeTheme);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  void onThemeChange;
+  const targetColorRef = useRef<THREE.Color | null>(null);
+  const colorVelocityRef = useRef<{ r: number; g: number; b: number }>({ r: 0, g: 0, b: 0 });
 
   // Инициализация частиц при монтировании
   useEffect(() => {
     particleDataRef.current = createParticleData(activeTheme as keyof typeof THEME_COLORS);
-  }, []);
+  }, [activeTheme]);
 
-  // Эффект при смене темы
+  // Эффект при смене темы с плавным переходом цвета
   useEffect(() => {
     if (activeTheme !== previousThemeRef.current && particleDataRef.current) {
       setShowParticles(true);
+      const oldTheme = previousThemeRef.current;
       previousThemeRef.current = activeTheme;
 
-      const geometry = particlesRef.current?.geometry as THREE.BufferGeometry | undefined;
-      if (geometry) {
-        const colorsArray = geometry.attributes.color.array as Float32Array;
-        const newColor = new THREE.Color(THEME_COLORS[activeTheme as keyof typeof THEME_COLORS]);
+      const oldColor = new THREE.Color(THEME_COLORS[oldTheme as keyof typeof THEME_COLORS]);
+      const newColor = new THREE.Color(THEME_COLORS[activeTheme as keyof typeof THEME_COLORS]);
+      targetColorRef.current = newColor;
 
-        for (let i = 0; i < PARTICLE_COUNT; i++) {
-          colorsArray[i * 3] = newColor.r;
-          colorsArray[i * 3 + 1] = newColor.g;
-          colorsArray[i * 3 + 2] = newColor.b;
-        }
-
-        geometry.attributes.color.needsUpdate = true;
-      }
+      // Вычисляем скорость изменения цвета для плавного перехода
+      const colorDiff = {
+        r: (newColor.r - oldColor.r) / 60,
+        g: (newColor.g - oldColor.g) / 60,
+        b: (newColor.b - oldColor.b) / 60
+      };
+      colorVelocityRef.current = colorDiff;
 
       timerRef.current = setTimeout(() => {
         setShowParticles(false);
+        targetColorRef.current = null;
       }, 2000);
 
       return () => {
@@ -108,14 +107,25 @@ export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticl
     };
   }, []);
 
-  // Анимация частиц
+  // Анимация частиц с плавным переходом цвета
   useFrame(() => {
     if (!particlesRef.current || !showParticles || !particleDataRef.current) return;
-    
+
     const geometry = particlesRef.current.geometry as THREE.BufferGeometry;
     const positionsArray = geometry.attributes.position.array as Float32Array;
     const colorsArray = geometry.attributes.color.array as Float32Array;
     const velocities = particleDataRef.current.velocities;
+
+    // Плавное изменение цвета к целевому
+    if (targetColorRef.current) {
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const idx = i * 3;
+        // Интерполяция к целевому цвету
+        colorsArray[idx] += colorVelocityRef.current.r;
+        colorsArray[idx + 1] += colorVelocityRef.current.g;
+        colorsArray[idx + 2] += colorVelocityRef.current.b;
+      }
+    }
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       positionsArray[i * 3] += velocities[i].x;
@@ -126,9 +136,10 @@ export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticl
 
       const alpha = Math.max(0, Math.min(1, positionsArray[i * 3 + 1] / 3));
 
-      colorsArray[i * 3] = colorsArray[i * 3] * alpha;
-      colorsArray[i * 3 + 1] = colorsArray[i * 3 + 1] * alpha;
-      colorsArray[i * 3 + 2] = colorsArray[i * 3 + 2] * alpha;
+      // Применяем альфа-затухание к текущему цвету
+      colorsArray[i * 3] *= (0.95 + alpha * 0.05);
+      colorsArray[i * 3 + 1] *= (0.95 + alpha * 0.05);
+      colorsArray[i * 3 + 2] *= (0.95 + alpha * 0.05);
 
       if (positionsArray[i * 3 + 1] > 3) {
         const radius = 0.5 + Math.random() * 1.5;
@@ -144,6 +155,14 @@ export function ThemeParticleEffect({ activeTheme, onThemeChange }: ThemeParticl
           y: Math.random() * 0.03 + 0.01,
           z: (Math.random() - 0.5) * 0.02
         };
+
+        // При респауне частица получает текущий целевой цвет
+        if (targetColorRef.current) {
+          const idx = i * 3;
+          colorsArray[idx] = targetColorRef.current.r;
+          colorsArray[idx + 1] = targetColorRef.current.g;
+          colorsArray[idx + 2] = targetColorRef.current.b;
+        }
       }
     }
 
