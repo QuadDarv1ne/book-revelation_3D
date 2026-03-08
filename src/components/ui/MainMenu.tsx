@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useToast } from "./Toast";
 import { useI18n } from "@/hooks/use-i18n";
 import { BottomSheet } from "./BottomSheet";
+import { GamificationDashboard } from "./GamificationDashboard";
 
 interface MainMenuProps {
   theme: string;
@@ -30,6 +31,7 @@ export function MainMenu({
 }: MainMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<MenuSection>(null);
+  const [showGamification, setShowGamification] = useState(false);
   const [rotationSpeed, setRotationSpeed] = useState(0.5);
   const menuRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
@@ -97,6 +99,26 @@ export function MainMenu({
       <div className="px-5 py-4 border-b border-[rgba(212,175,55,0.15)] bg-gradient-to-r from-amber-900/20 to-transparent">
         <h2 className="text-lg font-light text-amber-100 tracking-wide">Book Revelation</h2>
         <p className="text-xs text-amber-500/60 mt-0.5 tracking-[0.12em] uppercase">{t('stoicPhilosophy')}</p>
+      </div>
+
+      {/* Кнопка прогресс */}
+      <div className="px-5 py-3 border-b border-[rgba(212,175,55,0.1)]">
+        <button
+          onClick={() => setShowGamification(true)}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-600/20 to-yellow-600/20 border border-amber-500/30 text-amber-100 hover:from-amber-600/30 hover:to-yellow-600/30 transition-all focus:outline-none focus:ring-2 focus:ring-amber-400"
+          type="button"
+        >
+          <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+          </svg>
+          <div className="flex-1 text-left">
+            <div className="text-sm font-medium">Прогресс и достижения</div>
+            <div className="text-xs text-amber-400/60">Отслеживайте свой путь</div>
+          </div>
+          <svg className="w-5 h-5 text-amber-400/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
       </div>
 
       {/* Разделы меню */}
@@ -350,6 +372,11 @@ export function MainMenu({
       <BottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} title="Настройки">
         {menuContent}
       </BottomSheet>
+
+      {/* Gamification Dashboard */}
+      {showGamification && (
+        <GamificationDashboard onClose={() => setShowGamification(false)} />
+      )}
     </div>
   );
 }
