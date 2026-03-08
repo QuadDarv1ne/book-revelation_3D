@@ -34,7 +34,7 @@ function getInitialBook(): string {
   return DEFAULT_BOOK_ID;
 }
 
-const THEMES = ["dark", "light", "blue", "purple", "ambient", "relax", "auto"] as const;
+const THEMES = ["dark", "light", "blue", "purple", "ambient", "relax", "auto", "auto-time"] as const;
 type Theme = (typeof THEMES)[number];
 
 function getInitialTheme(): Theme {
@@ -49,7 +49,7 @@ export default function Home() {
   const hasWebGL = useWebGLSupport();
   const { isRotating, toggleRotation } = useRotationControl();
   const { trackEvent } = useAnalytics();
-  const { timeTheme, themeConfig: autoThemeConfig } = useAutoTheme();
+  const { themeConfig: autoThemeConfig } = useAutoTheme();
   const [activeQuote, setActiveQuote] = useState(0);
   const [webGLError, setWebGLError] = useState(false);
   const [theme, setTheme] = useState<Theme>(getInitialTheme);

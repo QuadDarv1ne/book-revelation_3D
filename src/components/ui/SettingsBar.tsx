@@ -65,9 +65,25 @@ function Palette({ className }: IconProps) {
   );
 }
 
+function Clock({ className }: IconProps) {
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+    </svg>
+  );
+}
+
+function Monitor({ className }: IconProps) {
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>
+    </svg>
+  );
+}
+
 interface SettingsBarProps {
   theme: string;
-  onThemeChange: (theme: "dark" | "light" | "blue" | "purple" | "ambient" | "relax") => void;
+  onThemeChange: (theme: "dark" | "light" | "blue" | "purple" | "ambient" | "relax" | "auto" | "auto-time") => void;
 }
 
 export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
@@ -84,6 +100,8 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
     { value: "purple" as const, label: t('theme.purple'), icon: Palette, preview: "bg-[#3f2a5f]" },
     { value: "ambient" as const, label: t('theme.ambient'), icon: Palette, preview: "bg-[#1a3f2f]" },
     { value: "relax" as const, label: t('theme.relax'), icon: Palette, preview: "bg-[#d4dcc4]" },
+    { value: "auto" as const, label: t('theme.auto'), icon: Monitor, preview: "bg-gradient-to-br from-[#1a1a1a] to-[#f5f5f5]" },
+    { value: "auto-time" as const, label: t('theme.autoTime'), icon: Clock, preview: "bg-gradient-to-br from-[#1a1a2e] to-[#f5f5dc]" },
   ], [t]);
 
   const cycleTheme = () => {

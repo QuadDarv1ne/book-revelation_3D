@@ -112,14 +112,12 @@ export function ThemeSelector({ onThemeChange }: ThemeSelectorProps) {
     return THEME_COLORS[theme];
   }, [theme, timeTheme]);
 
-  const effectiveTheme = theme === "auto-time" ? timeTheme : theme;
-
   return (
     <div className="flex flex-col gap-3 p-4 bg-white/5 rounded-lg border border-white/10">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium text-white">Цветовая схема</h3>
         <span className="text-xs text-white/60">
-          {theme === "auto-time" 
+          {theme === "auto-time"
             ? `${t('theme.autoTime')} (${t(autoThemeConfig.label)})`
             : t(currentThemeColor?.nameKey || '')}
         </span>
@@ -129,8 +127,6 @@ export function ThemeSelector({ onThemeChange }: ThemeSelectorProps) {
         {[...availableThemes, "auto-time"].map((themeId) => {
           const themeColor = THEME_COLORS[themeId];
           const isSelected = theme === themeId;
-          const displayTheme = themeId === "auto-time" ? timeTheme : themeId;
-          const displayColor = THEME_COLORS[displayTheme];
 
           return (
             <button
