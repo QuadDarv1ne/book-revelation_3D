@@ -82,6 +82,9 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
       aria-modal="true"
       aria-label={title}
       onClick={handleOverlayClick}
+      style={{
+        paddingBottom: 'var(--safe-area-inset-bottom)'
+      }}
     >
       {/* Overlay */}
       <div
@@ -96,6 +99,10 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        style={{
+          paddingLeft: 'var(--safe-area-inset-left)',
+          paddingRight: 'var(--safe-area-inset-right)'
+        }}
       >
         {/* Handle bar */}
         <div className="flex items-center justify-center pt-3 pb-2">

@@ -228,7 +228,16 @@ export default function Home() {
 
   return (
     <ToastProvider>
-      <main className="relative w-full h-screen overflow-hidden select-none bg-[#07070d]" role="main">
+      <main
+        className="relative w-full h-screen overflow-hidden select-none bg-[#07070d]"
+        role="main"
+        style={{
+          paddingTop: 'var(--safe-area-inset-top)',
+          paddingBottom: 'var(--safe-area-inset-bottom)',
+          paddingLeft: 'var(--safe-area-inset-left)',
+          paddingRight: 'var(--safe-area-inset-right)'
+        }}
+      >
         <a href="#quotes" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-amber-600 focus:text-white focus:rounded-lg">
           Перейти к цитатам
         </a>
