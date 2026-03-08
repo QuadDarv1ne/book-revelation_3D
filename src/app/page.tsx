@@ -14,6 +14,7 @@ import { useToast } from "@/components/ui/Toast";
 import { usePrefersColorScheme } from "@/hooks/use-prefers-color-scheme";
 import { useOfflineQuotes } from "@/hooks/use-offline-quotes";
 import { useAnalytics, trackBookChange, trackThemeChange } from "@/hooks/use-analytics";
+import { useAutoTheme } from "@/hooks/use-auto-theme";
 import type { Quote } from "@/types/quote";
 
 const Scene = dynamic(() => import("@/components/book").then(mod => ({ default: mod.Scene })), {
@@ -33,7 +34,7 @@ function getInitialBook(): string {
   return DEFAULT_BOOK_ID;
 }
 
-const THEMES = ["dark", "light", "blue", "purple", "ambient", "relax", "auto"] as const;
+const THEMES = ["dark", "light", "blue", "purple", "ambient", "relax", "auto", "auto-time"] as const;
 type Theme = (typeof THEMES)[number];
 
 function getInitialTheme(): Theme {
@@ -48,6 +49,7 @@ export default function Home() {
   const hasWebGL = useWebGLSupport();
   const { isRotating, toggleRotation } = useRotationControl();
   const { trackEvent } = useAnalytics();
+  const { themeConfig: autoThemeConfig } = useAutoTheme();
   const [activeQuote, setActiveQuote] = useState(0);
   const [webGLError, setWebGLError] = useState(false);
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
@@ -113,7 +115,10 @@ export default function Home() {
   useEffect(() => {
     // Анимация при смене темы
     document.body.classList.add('theme-transitioning');
-    document.body.className = `${effectiveTheme}-theme`;
+    
+    // Применяем тему с учётом auto-time
+    const bodyTheme = theme === "auto-time" ? autoThemeConfig.colorClass : `${effectiveTheme}-theme`;
+    document.body.className = bodyTheme;
     localStorage.setItem("theme", theme);
 
     // Track theme change
@@ -125,7 +130,7 @@ export default function Home() {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [effectiveTheme, theme, trackEvent]);
+  }, [effectiveTheme, theme, trackEvent, autoThemeConfig]);
 
   // Автоматическое переключение цитат
   useEffect(() => {

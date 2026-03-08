@@ -5,7 +5,7 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { Sparkles, ContactShadows } from "@react-three/drei";
 import { Book } from "./Book";
 import { Podium } from "./Podium";
-import { ParticleRing } from "./ParticleRing";
+import { ParticleRingOptimized } from "./ParticleRingOptimized";
 import { Lighting } from "./Lighting";
 import { ThemeParticleEffect } from "./ThemeParticleEffect";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
@@ -27,7 +27,7 @@ const SceneContent = memo(function SceneContent({ isRotating, coverImage, spineI
       <Lighting theme={theme} />
       <Book isRotating={isRotating} coverImage={coverImage} spineImage={spineImage} backCoverImage={backCoverImage} />
       <Podium />
-      <ParticleRing isRotating={isRotating} />
+      <ParticleRingOptimized isRotating={isRotating} />
       <Sparkles count={20} scale={4} size={1.5} speed={0.1} color="#d4af37" opacity={0.25} />
       <ContactShadows position={[0, -0.78, 0]} opacity={0.4} scale={5} blur={2.5} far={3} color="#000" />
       {theme && <ThemeParticleEffect activeTheme={theme} />}
