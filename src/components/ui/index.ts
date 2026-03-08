@@ -12,3 +12,4 @@ export { ThemeSelector } from "./ThemeSelector";
 export { ErrorBoundary } from "./ErrorBoundary";
 export { BottomSheet } from "./BottomSheet";
 export { GamificationDashboard } from "./GamificationDashboard";
+export { DailyChallenge } from "./DailyChallenge";
