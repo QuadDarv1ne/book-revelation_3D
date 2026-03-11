@@ -91,7 +91,6 @@ export default function Home() {
 
   // Обработчик ошибок сцены
   const handleSceneError = useCallback(() => {
-    console.error('3D Scene error occurred');
     setSceneError(true);
     setWebGLError(true);
   }, []);
@@ -209,9 +208,8 @@ export default function Home() {
       URL.revokeObjectURL(url);
 
       showToast("Избранные цитаты экспортированы", "success");
-    } catch (error) {
+    } catch {
       showToast("Ошибка при экспорте", "error");
-      console.error("Export error:", error);
     }
   }, [exportFavorites, showToast]);
 
