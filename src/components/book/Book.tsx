@@ -12,6 +12,7 @@ interface BookProps {
   coverImage?: string;
   spineImage?: string;
   backCoverImage?: string;
+  rotationSpeed?: number;
 }
 
 const BOOK_WIDTH = 1.35;
@@ -21,6 +22,7 @@ const COVER_THICKNESS = 0.018;
 const DEFAULT_COVER = "/book-cover.jpg";
 const DEFAULT_SPINE = "/book-spine.jpg";
 const DEFAULT_BACK_COVER = "/book-cover.jpg";
+const DEFAULT_ROTATION_SPEED = 0.5;
 
 // Выносим геометрии за пределы компонента для оптимизации
 const COVER_GEOMETRY = new THREE.BoxGeometry(BOOK_WIDTH, BOOK_HEIGHT, COVER_THICKNESS);
@@ -30,7 +32,7 @@ const PAGES_EDGE_GEOMETRY = new THREE.BoxGeometry(0.07, BOOK_HEIGHT - 0.08, BOOK
 const GOLD_TOP_GEOMETRY = new THREE.BoxGeometry(BOOK_WIDTH - 0.08, 0.012, BOOK_DEPTH - 0.015);
 const GLOW_GEOMETRY = new THREE.CircleGeometry(1.1, 32);
 
-export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFAULT_SPINE, backCoverImage = DEFAULT_BACK_COVER }: BookProps) {
+export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFAULT_SPINE, backCoverImage = DEFAULT_BACK_COVER, rotationSpeed = DEFAULT_ROTATION_SPEED }: BookProps) {
   const bookRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   const glowRef = useRef<THREE.Mesh>(null);
@@ -176,7 +178,7 @@ export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFA
 
     // Вращение книги (отключаем при reduced-motion)
     if (isRotating && !touchState.current.isDragging && !prefersReducedMotion) {
-      targetRotation.current += clampedDelta * 0.5;
+      targetRotation.current += clampedDelta * rotationSpeed;
     }
 
     // Обработка touch вращения

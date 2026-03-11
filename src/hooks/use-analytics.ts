@@ -21,11 +21,6 @@ export function useAnalytics() {
       timestamp: Date.now(),
     };
 
-    // Log in development
-    if (process.env.NODE_ENV === "development") {
-      console.warn("[Analytics]", event);
-    }
-
     // Send to Vercel Analytics
     if (typeof window !== "undefined" && (window as unknown as Record<string, unknown>).va) {
       (window as unknown as Record<string, (type: string, data: unknown) => void>).va("event", {
