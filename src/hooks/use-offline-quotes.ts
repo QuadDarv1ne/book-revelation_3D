@@ -47,8 +47,8 @@ export function useOfflineQuotes() {
     try {
       localStorage.setItem(QUOTES_CACHE_KEY, JSON.stringify(cacheData));
       setHasCachedQuotes(true);
-    } catch (error) {
-      console.warn("Failed to cache quotes:", error);
+    } catch {
+      // Ignore cache errors
     }
   }, []);
 
@@ -60,7 +60,7 @@ export function useOfflineQuotes() {
       if (!cached) return null;
 
       const parsed: CachedQuotes = JSON.parse(cached);
-      
+
       // Check if cache is still valid (24 hours)
       const maxAge = 24 * 60 * 60 * 1000;
       if (Date.now() - parsed.timestamp > maxAge) {
@@ -68,8 +68,7 @@ export function useOfflineQuotes() {
       }
 
       return parsed.data;
-    } catch (error) {
-      console.warn("Failed to get cached quotes:", error);
+    } catch {
       return null;
     }
   }, []);
@@ -79,8 +78,8 @@ export function useOfflineQuotes() {
     try {
       localStorage.removeItem(QUOTES_CACHE_KEY);
       setHasCachedQuotes(false);
-    } catch (error) {
-      console.warn("Failed to clear cache:", error);
+    } catch {
+      // Ignore storage errors
     }
   }, []);
 

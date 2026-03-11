@@ -50,8 +50,8 @@ export function useFavorites() {
       if (stored) {
         setFavorites(JSON.parse(stored));
       }
-    } catch (error) {
-      console.warn("Failed to load favorites:", error);
+    } catch {
+      // Ignore parse errors
     } finally {
       setIsLoaded(true);
     }
@@ -61,8 +61,8 @@ export function useFavorites() {
     if (isLoaded) {
       try {
         localStorage.setItem("stoic-favorites", JSON.stringify(favorites));
-      } catch (error) {
-        console.warn("Failed to save favorites:", error);
+      } catch {
+        // Ignore storage errors
       }
     }
   }, [favorites, isLoaded]);

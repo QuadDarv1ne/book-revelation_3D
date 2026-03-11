@@ -129,9 +129,8 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
   const handleCopyQuote = useCallback((text: string) => {
     navigator.clipboard.writeText(text).then(() => {
       showToast("Цитата скопирована!", "success");
-    }).catch(err => {
+    }).catch(() => {
       showToast("Не удалось скопировать", "error");
-      console.warn('Failed to copy:', err);
     });
   }, [showToast]);
 

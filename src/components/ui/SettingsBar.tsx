@@ -133,9 +133,8 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
       URL.revokeObjectURL(url);
 
       showToast(t('toast.favoritesExported'), "success");
-    } catch (error) {
+    } catch {
       showToast(t('toast.exportError'), "error");
-      console.error("Export error:", error);
     }
   }, [exportFavorites, showToast, t]);
 
