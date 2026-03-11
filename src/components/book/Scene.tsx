@@ -19,13 +19,14 @@ interface SceneProps {
   backCoverImage?: string;
   theme?: string;
   onKeyboardRotate?: () => void;
+  rotationSpeed?: number;
 }
 
-const SceneContent = memo(function SceneContent({ isRotating, coverImage, spineImage, backCoverImage, theme }: { isRotating: boolean; coverImage?: string; spineImage?: string; backCoverImage?: string; theme?: string }) {
+const SceneContent = memo(function SceneContent({ isRotating, coverImage, spineImage, backCoverImage, theme, rotationSpeed }: { isRotating: boolean; coverImage?: string; spineImage?: string; backCoverImage?: string; theme?: string; rotationSpeed?: number }) {
   return (
     <>
       <Lighting theme={theme} />
-      <Book isRotating={isRotating} coverImage={coverImage} spineImage={spineImage} backCoverImage={backCoverImage} />
+      <Book isRotating={isRotating} coverImage={coverImage} spineImage={spineImage} backCoverImage={backCoverImage} rotationSpeed={rotationSpeed} />
       <Podium />
       <ParticleRingOptimized isRotating={isRotating} />
       <Sparkles count={20} scale={4} size={1.5} speed={0.1} color="#d4af37" opacity={0.25} />

@@ -35,6 +35,16 @@ function getInitialBook(): string {
   return DEFAULT_BOOK_ID;
 }
 
+function getInitialRotationSpeed(): number {
+  if (typeof window === "undefined") return 0.5;
+  const saved = localStorage.getItem("rotationSpeed");
+  if (saved) {
+    const speed = parseFloat(saved);
+    if (!isNaN(speed) && speed >= 0.1 && speed <= 2) return speed;
+  }
+  return 0.5;
+}
+
 const THEMES = ["dark", "light", "blue", "purple", "ambient", "relax", "auto", "auto-time"] as const;
 type Theme = (typeof THEMES)[number];
 
@@ -58,6 +68,7 @@ export default function Home() {
   const [zenMode, setZenMode] = useState(false);
   const [activeBookId, setActiveBookId] = useState<string>(getInitialBook);
   const [sceneError, setSceneError] = useState(false);
+  const rotationSpeed = getInitialRotationSpeed();
   
   // Получаем системную цветовую схему для режима "auto"
   const systemColorScheme = usePrefersColorScheme();
@@ -296,6 +307,7 @@ export default function Home() {
                 backCoverImage={activeBook.backCoverImage}
                 theme={effectiveTheme}
                 onKeyboardRotate={toggleRotation}
+                rotationSpeed={rotationSpeed}
               />
             )}
             
