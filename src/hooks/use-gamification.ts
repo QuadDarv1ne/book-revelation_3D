@@ -255,11 +255,20 @@ export function useGamification() {
 
         if (shouldUnlock) {
           setTimeout(() => setShowAchievement({ ...ach, unlocked: true }), 500);
+          // Сохраняем в прогресс
+          setProgress(p => {
+            const newProgress = {
+              ...p,
+              achievementsUnlocked: [...p.achievementsUnlocked, achievementId],
+            };
+            saveProgress(newProgress);
+            return newProgress;
+          });
         }
 
         return {
           ...ach,
-          progress: newProgress,
+          progress: ach.unlocked ? ach.maxProgress : newProgress,
           unlocked: ach.unlocked || shouldUnlock,
           unlockedAt: shouldUnlock ? new Date() : ach.unlockedAt,
         };
@@ -343,8 +352,12 @@ export function useGamification() {
       saveProgress(newProgress);
 
       // Проверяем достижения
-      checkAchievement("rotation_master", Math.floor(newProgress.totalRotations / 10));
-      checkAchievement("rotation_expert", Math.floor(newProgress.totalRotations / 50));
+      if (newProgress.totalRotations >= 10) {
+        checkAchievement("rotation_master", 1);
+      }
+      if (newProgress.totalRotations >= 50) {
+        checkAchievement("rotation_expert", 1);
+      }
 
       return newProgress;
     });
@@ -393,10 +406,15 @@ export function useGamification() {
         quotesRead: prev.quotesRead + 1,
       };
       saveProgress(newProgress);
-      
-      checkAchievement("stoic_scholar", Math.floor(newProgress.quotesRead / 5));
-      checkAchievement("stoic_philosopher", Math.floor(newProgress.quotesRead / 25));
-      
+
+      // Проверяем достижения
+      if (newProgress.quotesRead >= 5) {
+        checkAchievement("stoic_scholar", 1);
+      }
+      if (newProgress.quotesRead >= 25) {
+        checkAchievement("stoic_philosopher", 1);
+      }
+
       return newProgress;
     });
   }, [checkAchievement]);
