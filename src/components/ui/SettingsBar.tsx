@@ -91,7 +91,6 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
   const { showToast } = useToast();
   const { exportFavorites, importFavorites } = useFavorites();
   const { t } = useI18n();
-  const [rotationSpeed, setRotationSpeed] = useState(0.5);
 
   const THEMES = useMemo(() => [
     { value: "dark" as const, label: t('theme.dark'), icon: Moon, preview: "bg-[#1a1a1a]" },
@@ -171,15 +170,6 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
     
     input.click();
   }, [importFavorites, showToast, t]);
-
-  // Обработчик изменения скорости вращения
-  const handleRotationSpeedChange = useCallback((speed: number) => {
-    setRotationSpeed(speed);
-    // Здесь можно отправить событие в родительский компонент
-    // или сохранить в localStorage
-    localStorage.setItem('rotationSpeed', speed.toString());
-    showToast(`Скорость вращения: ${speed}`, "success");
-  }, [showToast]);
 
   return (
     <>
@@ -323,28 +313,6 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
                     </svg>
                     <span>{t('quotes.import')}</span>
                   </button>
-                </div>
-              </div>
-
-              {/* Секция для настройки вращения книги */}
-              <div className="mt-3 pt-3 border-t border-[rgba(212,175,55,0.1)]">
-                <h3 className="text-xs uppercase tracking-[0.15em] text-amber-500/70 mb-2">{t('settings.rotation')}</h3>
-                <div className="flex items-center gap-3">
-                  <span className="text-amber-400/60 text-sm" id="rotation-speed-label">{t('settings.speed')}:</span>
-                  <div className="flex-1">
-                    <input
-                      type="range"
-                      min="0.1"
-                      max="2"
-                      step="0.1"
-                      value={rotationSpeed}
-                      onChange={(e) => handleRotationSpeedChange(parseFloat(e.target.value))}
-                      className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer slider focus:outline-none focus:ring-2 focus:ring-amber-400"
-                      aria-label={t('settings.rotationSpeed')}
-                      aria-labelledby="rotation-speed-label"
-                    />
-                  </div>
-                  <span className="text-amber-400/60 text-sm w-8 text-right" aria-live="polite">{rotationSpeed}</span>
                 </div>
               </div>
             </div>
