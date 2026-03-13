@@ -2,40 +2,6 @@
 
 import { useCallback, useMemo } from "react";
 import { useBook3D, ThemeType } from "@/contexts/Book3DContext";
-import * as THREE from "three";
-
-interface UseCameraControls {
-  cameraZoom: number;
-  zoomIn: () => void;
-  zoomOut: () => void;
-  resetZoom: () => void;
-  setZoom: (zoom: number) => void;
-  fov: number;
-  position: THREE.Vector3;
-}
-
-const DEFAULT_CAMERA_POSITION = new THREE.Vector3(0, 1.25, 4.0);
-const BASE_FOV = 38;
-
-export function useCameraControls(): UseCameraControls {
-  const { cameraZoom, zoomIn, zoomOut, resetZoom, setZoom } = useBook3D();
-
-  const fov = useMemo(() => BASE_FOV / cameraZoom, [cameraZoom]);
-
-  const position = useMemo(() => {
-    return DEFAULT_CAMERA_POSITION.clone().multiplyScalar(cameraZoom);
-  }, [cameraZoom]);
-
-  return {
-    cameraZoom,
-    zoomIn,
-    zoomOut,
-    resetZoom,
-    setZoom,
-    fov,
-    position,
-  };
-}
 
 interface UseBookRotation {
   isRotating: boolean;
