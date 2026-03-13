@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { ServiceWorkerRegistration } from "@/components/ui/ServiceWorkerRegistration";
 import { WebVitalsMonitor } from "@/components/analytics/WebVitalsMonitor";
+import { Book3DProvider } from "@/contexts/Book3DContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -120,7 +121,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
-        {children}
+        <Book3DProvider>
+          {children}
+        </Book3DProvider>
         <Analytics />
         <WebVitalsMonitor />
         <ServiceWorkerRegistration />
