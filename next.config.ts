@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
     unoptimized: process.env.DOCKER !== "true",
+    // Оптимизация изображений
+    formats: ["image/webp", "image/avif"],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   devIndicators: {
     position: "bottom-left",
@@ -19,6 +23,13 @@ const nextConfig: NextConfig = {
   },
   poweredByHeader: false,
   compress: true,
+  // Предзагрузка страниц
+  optimizePackageImports: ["@react-three/fiber", "@react-three/drei", "three"],
+  // Experimental функции для производительности
+  experimental: {
+    // Оптимизация CSS
+    optimizeCss: true,
+  },
 };
 
 export default withBundleAnalyzer(nextConfig);

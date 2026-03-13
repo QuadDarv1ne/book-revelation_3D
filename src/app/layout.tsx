@@ -117,6 +117,10 @@ export default function RootLayout({
         <meta name="color-scheme" content="dark light" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
+        {/* Preload критических ресурсов */}
+        <link rel="preload" href="/book-covers/marcus-aurelius-meditations.jpg" as="image" />
+        <link rel="preconnect" href="https://covers.openlibrary.org" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://books.google.com" crossOrigin="anonymous" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
