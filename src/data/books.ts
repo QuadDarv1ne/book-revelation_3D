@@ -67,6 +67,17 @@ const hawkingQuotes: Quote[] = [
   { text: "Тихие люди имеют самый громкий ум.", author: "Стивен Хокинг", era: "Современность", category: "мудрость" },
 ];
 
+const christensenQuotes: Quote[] = [
+  { text: "Ваши клиенты «нанимают» ваш продукт, чтобы выполнить определённую работу.", author: "Клейтон Кристенсен", era: "Современность", category: "инновации" },
+  { text: "Инновации должны решать проблему, которую клиент пытается решить.", author: "Клейтон Кристенсен", era: "Современность", category: "инновации" },
+  { text: "Успешные компании растут не тогда, когда делают то, что хотят клиенты, а когда понимают, какую работу клиенты хотят выполнить.", author: "Клейтон Кристенсен", era: "Современность", category: "бизнес" },
+  { text: "Теория «найма» помогает понять, почему клиенты выбирают один продукт вместо другого.", author: "Клейтон Кристенсен", era: "Современность", category: "стратегия" },
+  { text: "Инноваторы, которые понимают «работу», которую должен выполнить продукт, создают более успешные решения.", author: "Клейтон Кристенсен", era: "Современность", category: "инновации" },
+  { text: "Клиенты не покупают продукты — они «нанимают» их для прогресса в своей жизни.", author: "Клейтон Кристенсен", era: "Современность", category: "бизнес" },
+  { text: "Понимание контекста, в котором клиент «нанимает» продукт, важнее демографических данных.", author: "Клейтон Кристенсен", era: "Современность", category: "стратегия" },
+  { text: "Закон успешных инноваций: создавайте решения для работы, которую клиенты хотят выполнить.", author: "Клейтон Кристенсен", era: "Современность", category: "инновации" },
+];
+
 export const books: Book[] = [
   {
     id: "marcus-aurelius-meditations",
@@ -122,6 +133,17 @@ export const books: Book[] = [
     backCoverImage: "/book-covers/hawking-theory-of-everything-back.png",
     quotes: hawkingQuotes,
     color: "#8b7355",
+  },
+  {
+    id: "christensen-innovators-solution",
+    title: "Закон успешных инноваций",
+    author: "Клейтон Кристенсен",
+    description: "Зачем клиент «нанимает» ваш продукт и как это помогает новым разработкам",
+    coverImage: "/book-covers/christensen-innovators-solution.svg",
+    spineImage: "/book-spines/christensen-innovators-solution.svg",
+    backCoverImage: "/book-covers/christensen-innovators-solution.svg",
+    quotes: christensenQuotes,
+    color: "#9a7b4f",
   },
 ];
 

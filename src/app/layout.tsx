@@ -40,14 +40,14 @@ const _cspContent = `
 
 export const metadata: Metadata = {
   title: {
-    default: "Stoic Book 3D — В чём наше благо?",
-    template: "%s | Stoic Book 3D",
+    default: "Book Revelation 3D — Откровение Книги",
+    template: "%s | Book Revelation 3D",
   },
-  description: "Интерактивный 3D модуль с вращающейся книгой стоической философии. Цитаты Марка Аврелия, Эпиктета, Сенеки, Сунь-цзы и Стивена Хокинга.",
-  keywords: ["стоицизм", "3D книга", "Марк Аврелий", "Эпиктет", "Сенека", "Сунь-цзы", "Стивен Хокинг", "философия", "Three.js", "React", "цитаты великих людей"],
-  authors: [{ name: "Stoic Book 3D Team" }],
-  creator: "Stoic Book 3D Team",
-  publisher: "Stoic Book 3D",
+  description: "Интерактивный 3D модуль с вращающейся книгой стоической философии. Цитаты Марка Аврелия, Эпиктета, Стивена Хокинга и других великих мыслителей.",
+  keywords: ["стоицизм", "3D книга", "Марк Аврелий", "Эпиктет", "Стивен Хокинг", "философия", "Three.js", "React", "цитаты великих людей"],
+  authors: [{ name: "Book Revelation 3D Team" }],
+  creator: "Book Revelation 3D Team",
+  publisher: "Book Revelation 3D",
   robots: {
     index: true,
     follow: true,
@@ -73,23 +73,23 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Stoic Book 3D",
+    title: "Book Revelation 3D",
   },
   openGraph: {
-    title: "Stoic Book 3D — В чём наше благо?",
+    title: "Book Revelation 3D — Откровение Книги",
     description: "Интерактивный 3D модуль с цитатами стоических философов",
     type: "website",
     locale: "ru_RU",
-    siteName: "Stoic Book 3D",
-    url: "https://stoic-book-3d.vercel.app",
+    siteName: "Book Revelation 3D",
+    url: "https://book-revelation-3d.vercel.app",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Stoic Book 3D — В чём наше благо?",
+    title: "Book Revelation 3D — Откровение Книги",
     description: "Интерактивный 3D модуль с цитатами стоических философов",
-    creator: "@stoicbook3d",
+    creator: "@bookrevelation3d",
   },
-  metadataBase: new URL("https://stoic-book-3d.vercel.app"),
+  metadataBase: new URL("https://book-revelation-3d.vercel.app"),
   alternates: {
     canonical: "/",
   },

@@ -7,16 +7,16 @@
 
   <!-- Главная страница -->
   <url>
-    <loc>https://stoic-book-3d.vercel.app/</loc>
-    <lastmod>2026-03-08</lastmod>
+    <loc>https://book-revelation-3d.vercel.app/</loc>
+    <lastmod>2026-03-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <!-- Страница веб-гл теста (если используется) -->
   <url>
-    <loc>https://stoic-book-3d.vercel.app/webgl-test</loc>
-    <lastmod>2026-03-08</lastmod>
+    <loc>https://book-revelation-3d.vercel.app/webgl-test</loc>
+    <lastmod>2026-03-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>

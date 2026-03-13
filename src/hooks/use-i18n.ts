@@ -87,6 +87,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'settings.expand': 'Expand settings',
     'settings.collapse': 'Collapse settings',
     'settings.open': 'Open settings',
+    'app.title': 'Book Revelation 3D',
   },
   ru: {
     'quotes.search': 'Поиск цитат...',
@@ -170,6 +171,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'settings.expand': 'Развернуть настройки',
     'settings.collapse': 'Свернуть настройки',
     'settings.open': 'Открыть настройки',
+    'app.title': 'Откровение Книги 3D',
   },
   zh: {
     'quotes.search': '搜索名言...',
@@ -253,6 +255,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'settings.expand': '展开设置',
     'settings.collapse': '收起设置',
     'settings.open': '打开设置',
+    'app.title': '书籍启示 3D',
   },
   he: {
     'quotes.search': 'חיפוש ציטוטים...',
@@ -336,6 +339,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'settings.expand': 'הרחב הגדרות',
     'settings.collapse': 'כווץ הגדרות',
     'settings.open': 'פתח הגדרות',
+    'app.title': 'גילוי הספר 3D',
   },
 };
 

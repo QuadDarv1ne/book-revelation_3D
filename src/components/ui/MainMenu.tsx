@@ -97,7 +97,7 @@ export function MainMenu({
     <>
       {/* Заголовок */}
       <div className="px-5 py-4 border-b border-[rgba(212,175,55,0.15)] bg-gradient-to-r from-amber-900/20 to-transparent">
-        <h2 className="text-lg font-light text-amber-100 tracking-wide">Book Revelation</h2>
+        <h2 className="text-lg font-light text-amber-100 tracking-wide">{t('app.title')}</h2>
         <p className="text-xs text-amber-500/60 mt-0.5 tracking-[0.12em] uppercase">{t('stoicPhilosophy')}</p>
       </div>
 
