@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 import { QuotesPanel } from "@/components/quotes";
 import { ControlButton, WebGLError, useWebGLSupport, SettingsBar, PWAInstall, ToastProvider, BookSelector, MainMenu } from "@/components/ui";
 import { useBook3D } from "@/contexts/Book3DContext";
-import { useMounted } from "@/hooks/use-mounted";
 import { LoadingFallback } from "@/components/ui/LoadingFallback";
 import { getBookById, getDefaultBook, books } from "@/data/books";
 import { textureManager } from "@/lib/textures/texture-manager";
@@ -58,7 +57,6 @@ function getInitialTheme(): Theme {
 }
 
 export default function Home() {
-  const mounted = useMounted();
   const hasWebGL = useWebGLSupport();
   const { isRotating, toggleRotation } = useBook3D();
   const { trackEvent } = useAnalytics();
@@ -307,7 +305,7 @@ export default function Home() {
 
         <div className="relative z-10 h-full flex flex-col lg:flex-row">
           <div className="w-full lg:w-[58%] h-[50%] lg:h-full relative" role="region" aria-label="3D сцена с книгой">
-            {mounted && !sceneError && (
+            {!sceneError && (
               <Scene
                 isRotating={isRotating}
                 onError={handleSceneError}
@@ -319,11 +317,10 @@ export default function Home() {
                 rotationSpeed={rotationSpeed}
               />
             )}
-            
+
             {/* Debug информация */}
             {process.env.NODE_ENV === 'development' && (
               <div className="absolute top-2 left-2 text-[10px] text-amber-500/30 bg-black/50 p-2 rounded">
-                <div>mounted: {mounted ? 'yes' : 'no'}</div>
                 <div>hasWebGL: {hasWebGL === true ? 'yes' : hasWebGL === false ? 'no' : 'checking'}</div>
                 <div>sceneError: {sceneError ? 'yes' : 'no'}</div>
                 <div>activeBook: {activeBook.id}</div>
