@@ -98,7 +98,7 @@ export default function Home() {
     ).catch(() => {
       // Игнорируем ошибки предзагрузки
     });
-  }, []); // Пустой массив - только при монтировании
+  }, [activeBook.coverImage, activeBook.spineImage, activeBook.backCoverImage]);
 
   // Обработчик ошибок сцены
   const handleSceneError = useCallback(() => {
