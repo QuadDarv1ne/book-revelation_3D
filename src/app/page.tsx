@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { QuotesPanel } from "@/components/quotes";
 import { ControlButton, WebGLError, useWebGLSupport, SettingsBar, PWAInstall, ToastProvider, BookSelector, MainMenu } from "@/components/ui";
-import { useRotationControl } from "@/hooks/use-rotation";
+import { useBookRotation } from "@/hooks/use-scene-controls";
 import { useMounted } from "@/hooks/use-mounted";
 import { LoadingFallback } from "@/components/ui/LoadingFallback";
 import { getBookById, getDefaultBook, books } from "@/data/books";
@@ -60,7 +60,7 @@ function getInitialTheme(): Theme {
 export default function Home() {
   const mounted = useMounted();
   const hasWebGL = useWebGLSupport();
-  const { isRotating, toggleRotation } = useRotationControl();
+  const { isRotating, toggleRotation } = useBookRotation();
   const { trackEvent } = useAnalytics();
   const { themeConfig: autoThemeConfig } = useAutoTheme();
   const { addThemeExplored, addBookViewed, trackTime } = useGamification();
