@@ -19,6 +19,7 @@
     "covers:parse": "node scripts/parse-book-covers.js",
     "covers:azbooka": "node scripts/parse-azbooka.js",
     "covers:google": "node scripts/parse-google-books.js",
+    "covers:openlibrary": "node scripts/open-library-covers.js",
     "covers:set": "node scripts/set-cover.js",
     "covers:create-spine": "node scripts/create-spine.js"
   },
