@@ -35,12 +35,6 @@ describe("useBookRotation", () => {
 
     expect(result.current.isRotating).toBe(true);
   });
-
-  it("должен предоставлять rotationSpeed по умолчанию 0.5", () => {
-    const { result } = wrapWithProvider(() => useBookRotation());
-
-    expect(result.current.rotationSpeed).toBe(0.5);
-  });
 });
 
 describe("useTheme", () => {
@@ -61,6 +55,7 @@ describe("useTheme", () => {
       "ambient",
       "relax",
       "auto",
+      "auto-time",
     ]);
   });
 

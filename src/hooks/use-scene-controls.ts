@@ -6,17 +6,14 @@ import { useBook3D, ThemeType } from "@/contexts/Book3DContext";
 interface UseBookRotation {
   isRotating: boolean;
   toggleRotation: () => void;
-  rotationSpeed: number;
 }
 
 export function useBookRotation(): UseBookRotation {
   const { isRotating, toggleRotation } = useBook3D();
-  const rotationSpeed = 0.5;
 
   return {
     isRotating,
     toggleRotation,
-    rotationSpeed,
   };
 }
 
