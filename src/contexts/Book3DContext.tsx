@@ -11,31 +11,19 @@ export type BookImages = {
 };
 
 interface Book3DContextType {
-  // Вращение
   isRotating: boolean;
   toggleRotation: () => void;
-  setRotation: (rotating: boolean) => void;
-
-  // Тема
   theme: ThemeType;
   setTheme: (theme: ThemeType | ((prev: ThemeType) => ThemeType)) => void;
-
-  // Изображения книги
   bookImages: BookImages;
   setBookImages: (images: BookImages | ((prev: BookImages) => BookImages)) => void;
-
-  // Масштаб камеры
   cameraZoom: number;
   zoomIn: () => void;
   zoomOut: () => void;
   resetZoom: () => void;
   setZoom: (zoom: number) => void;
-
-  // Загрузка
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
-
-  // Ошибки
   error: string | null;
   setError: (error: string | null) => void;
 }
@@ -73,10 +61,6 @@ export function Book3DProvider({
     setIsRotating(prev => !prev);
   }, []);
 
-  const setRotation = useCallback((rotating: boolean) => {
-    setIsRotating(rotating);
-  }, []);
-
   const zoomIn = useCallback(() => {
     setCameraZoom(prev => Math.min(prev + 0.2, 2));
   }, []);
@@ -96,7 +80,6 @@ export function Book3DProvider({
   const value = useMemo(() => ({
     isRotating,
     toggleRotation,
-    setRotation,
     theme,
     setTheme,
     bookImages,
@@ -113,7 +96,6 @@ export function Book3DProvider({
   }), [
     isRotating,
     toggleRotation,
-    setRotation,
     theme,
     setTheme,
     bookImages,

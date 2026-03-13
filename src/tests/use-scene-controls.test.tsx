@@ -117,22 +117,6 @@ describe("useBookRotation", () => {
     expect(result.current.isRotating).toBe(true);
   });
 
-  it("должен устанавливать вращение через setRotation", () => {
-    const { result } = wrapWithProvider(() => useBookRotation());
-
-    act(() => {
-      result.current.setRotation(false);
-    });
-
-    expect(result.current.isRotating).toBe(false);
-
-    act(() => {
-      result.current.setRotation(true);
-    });
-
-    expect(result.current.isRotating).toBe(true);
-  });
-
   it("должен предоставлять rotationSpeed по умолчанию 0.5", () => {
     const { result } = wrapWithProvider(() => useBookRotation());
 
