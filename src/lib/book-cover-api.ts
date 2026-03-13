@@ -100,7 +100,7 @@ export async function searchOpenLibrary(query: BookSearchQuery): Promise<BookCov
 export async function searchGoogleBooks(query: BookSearchQuery): Promise<BookCoverResult> {
   try {
     let searchUrl = `${GOOGLE_BOOKS_BASE}/volumes?q=`;
-    
+
     if (query.isbn) {
       searchUrl += `isbn:${query.isbn}`;
     } else {
