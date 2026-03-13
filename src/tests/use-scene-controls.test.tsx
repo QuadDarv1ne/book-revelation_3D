@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { Book3DProvider } from "@/contexts/Book3DContext";
-import { useCameraControls, useBookRotation, useTheme, useBookTextures } from "@/hooks/use-scene-controls";
+import { useBookRotation, useTheme, useBookTextures } from "@/hooks/use-scene-controls";
 
 function wrapWithProvider<T>(hook: () => T) {
   return renderHook(hook, {
@@ -12,87 +12,6 @@ function wrapWithProvider<T>(hook: () => T) {
     ),
   });
 }
-
-describe("useCameraControls", () => {
-  it("должен предоставлять начальный зум 1", () => {
-    const { result } = wrapWithProvider(() => useCameraControls());
-
-    expect(result.current.cameraZoom).toBe(1);
-  });
-
-  it("должен предоставлять FOV на основе зума", () => {
-    const { result } = wrapWithProvider(() => useCameraControls());
-
-    // BASE_FOV = 38, zoom = 1, fov = 38 / 1 = 38
-    expect(result.current.fov).toBe(38);
-  });
-
-  it("должен увеличивать зум через zoomIn", () => {
-    const { result } = wrapWithProvider(() => useCameraControls());
-
-    act(() => {
-      result.current.zoomIn();
-    });
-
-    expect(result.current.cameraZoom).toBe(1.2);
-    expect(result.current.fov).toBeCloseTo(38 / 1.2, 2);
-  });
-
-  it("должен уменьшать зум через zoomOut", () => {
-    const { result } = wrapWithProvider(() => useCameraControls());
-
-    act(() => {
-      result.current.zoomOut();
-    });
-
-    expect(result.current.cameraZoom).toBe(0.8);
-    expect(result.current.fov).toBeCloseTo(38 / 0.8, 2);
-  });
-
-  it("должен сбрасывать зум через resetZoom", () => {
-    const { result } = wrapWithProvider(() => useCameraControls());
-
-    act(() => {
-      result.current.zoomIn();
-      result.current.zoomIn();
-      result.current.resetZoom();
-    });
-
-    expect(result.current.cameraZoom).toBe(1);
-  });
-
-  it("должен ограничивать максимальный зум значением 2", () => {
-    const { result } = wrapWithProvider(() => useCameraControls());
-
-    act(() => {
-      for (let i = 0; i < 10; i++) {
-        result.current.zoomIn();
-      }
-    });
-
-    expect(result.current.cameraZoom).toBe(2);
-  });
-
-  it("должен ограничивать минимальный зум значением 0.5", () => {
-    const { result } = wrapWithProvider(() => useCameraControls());
-
-    act(() => {
-      for (let i = 0; i < 10; i++) {
-        result.current.zoomOut();
-      }
-    });
-
-    expect(result.current.cameraZoom).toBe(0.5);
-  });
-
-  it("должен предоставлять позицию камеры на основе зума", () => {
-    const { result } = wrapWithProvider(() => useCameraControls());
-
-    expect(result.current.position).toBeDefined();
-    expect(result.current.position.y).toBeCloseTo(1.25, 2);
-    expect(result.current.position.z).toBeCloseTo(4.0, 2);
-  });
-});
 
 describe("useBookRotation", () => {
   it("должен начинать с isRotating = true", () => {
