@@ -2,7 +2,7 @@
 
 import {useState, useCallback, useEffect} from 'react';
 
-export type Locale = 'en' | 'ru' | 'zh' | 'he' | 'de';
+export type Locale = 'en' | 'ru' | 'zh' | 'he' | 'de' | 'fr';
 
 const translations: Record<Locale, Record<string, string>> = {
   en: {
@@ -425,6 +425,90 @@ const translations: Record<Locale, Record<string, string>> = {
     'settings.open': 'Einstellungen öffnen',
     'app.title': 'Buch Offenbarung 3D',
   },
+  fr: {
+    'quotes.search': 'Rechercher des citations...',
+    'quotes.all': 'Toutes',
+    'quotes.favorites': 'Favoris',
+    'quotes.shuffle': 'Mélanger',
+    'quotes.export': 'Exporter',
+    'quotes.import': 'Importer',
+    'quotes.copy': 'Copier',
+    'quotes.share': 'Partager',
+    'quotes.filters': 'Filtres de citations',
+    'quotes.noFavorites': 'Pas encore de citations favorites. Cliquez sur le cœur pour en ajouter une.',
+    'quotes.loading': 'Chargement des citations de "{book}"...',
+    'quotes.ariaLabel': 'Panneau de citations. Utilisez les flèches Haut/Bas ou balayez sur les écrans tactiles.',
+    'quotes.categories': 'Catégories',
+    'category.all': 'Toutes',
+    'category.thinking': 'Pensée',
+    'category.life': 'Vie',
+    'category.selfControl': 'Maîtrise de soi',
+    'category.wisdom': 'Sagesse',
+    'category.freedom': 'Liberté',
+    'category.knowledge': 'Connaissance',
+    'category.resilience': 'Résilience',
+    'category.goal': 'Objectif',
+    'category.calmness': 'Calme',
+    'category.strategy': 'Stratégie',
+    'category.patience': 'Patience',
+    'category.action': 'Action',
+    'category.inspiration': 'Inspiration',
+    'theme.dark': 'Sombre',
+    'theme.light': 'Clair',
+    'theme.blue': 'Bleu',
+    'theme.purple': 'Violet',
+    'theme.ambient': 'Ambiant',
+    'theme.relax': 'Détendu',
+    'theme.auto': 'Auto',
+    'theme.autoTime': 'Auto Temps',
+    'time.morning': 'Matin',
+    'time.day': 'Jour',
+    'time.evening': 'Soir',
+    'time.night': 'Nuit',
+    'toast.noFavoritesToExport': 'Aucun favori à exporter',
+    'toast.favoritesExported': 'Favoris exportés',
+    'toast.exportError': 'Erreur d\'exportation',
+    'toast.favoritesImported': '{count} citations importées',
+    'toast.importError': 'Erreur d\'importation',
+    'toast.readFileError': 'Erreur de lecture du fichier',
+    'menu.favorites': 'Favoris',
+    'menu.rotation': 'Rotation',
+    'menu.pause': 'Pause',
+    'menu.play': 'Lecture',
+    'menu.zenMode': 'Mode Zen',
+    'menu.about': 'À propos',
+    'menu.aboutText': 'Module 3D interactif avec un livre tournant de philosophie stoïcienne. Comprend la sagesse de Marc Aurèle, Épictète et d\'autres grands penseurs.',
+    'menu.controls': 'Contrôles',
+    'menu.pauseRotation': 'Pause/rotation',
+    'menu.quoteNav': 'Navigation des citations',
+    'control.rotation': 'Rotation',
+    'control.pause': 'Pause de la rotation',
+    'control.play': 'Démarrer la rotation',
+    'control.space': 'Espace',
+    'book.select': 'Sélectionner un livre',
+    'book.cover': 'Couverture du livre',
+    'book.changed': 'Livre changé pour',
+    'settings.theme': 'Thème',
+    'settings.rotation': 'Rotation du livre',
+    'settings.notifications': 'Notifications',
+    'settings.speed': 'Vitesse',
+    'settings.rotationSpeed': 'Vitesse de rotation du livre',
+    'settings.app': 'Paramètres de l\'application',
+    'settings.general': 'Général',
+    'settings.account': 'Compte',
+    'settings.appearance': 'Apparence',
+    'menu.main': 'Menu principal',
+    'swipe': 'BALAYER',
+    'stoicPhilosophy': 'Philosophie stoïcienne',
+    'stoicWisdom': 'Sagesse stoïcienne',
+    'pwa.install': 'Installer l\'application',
+    'pwa.add': 'Ajouter',
+    'common.close': 'Fermer',
+    'settings.expand': 'Développer les paramètres',
+    'settings.collapse': 'Réduire les paramètres',
+    'settings.open': 'Ouvrir les paramètres',
+    'app.title': 'Révélation du Livre 3D',
+  },
 };
 
 export function useI18n() {
@@ -432,7 +516,7 @@ export function useI18n() {
 
   useEffect(() => {
     const saved = localStorage.getItem('locale') as Locale;
-    if (saved && ['en', 'ru', 'zh', 'he', 'de'].includes(saved)) {
+    if (saved && ['en', 'ru', 'zh', 'he', 'de', 'fr'].includes(saved)) {
       setLocaleState(saved);
     }
   }, []);
