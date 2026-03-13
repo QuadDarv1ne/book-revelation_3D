@@ -31,19 +31,12 @@ describe('useZenMode', () => {
 
   it('должен загружать настройки из localStorage', () => {
     localStorage.setItem('stoic-book-zen-mode', JSON.stringify({
-      isZenMode: true,
-      settings: {
-        hideUI: false,
-        hideParticles: true,
-        reduceMotion: true
-      }
+      isZenMode: true
     }));
 
     const { result } = renderHook(() => useZenMode({ autoSave: true }));
 
     expect(result.current.isZenMode).toBe(true);
-    expect(result.current.settings.hideUI).toBe(false);
-    expect(result.current.settings.hideParticles).toBe(true);
   });
 
   it('должен сохранять настройки в localStorage', () => {
@@ -69,17 +62,6 @@ describe('useZenMode', () => {
       result.current.disableZenMode();
     });
     expect(result.current.isZenMode).toBe(false);
-  });
-
-  it('должен обновлять настройки', () => {
-    const { result } = renderHook(() => useZenMode({ autoSave: false }));
-
-    act(() => {
-      result.current.updateSettings({ hideParticles: true });
-    });
-
-    expect(result.current.settings.hideParticles).toBe(true);
-    expect(result.current.settings.hideUI).toBe(true); // значение по умолчанию
   });
 
   it('должен обрабатывать невалидные данные из localStorage', () => {

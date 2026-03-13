@@ -6,90 +6,40 @@ const STORAGE_KEY = 'stoic-book-zen-mode';
 
 export interface UseZenModeOptions {
   autoSave?: boolean;
-  hideUI?: boolean;
-  hideParticles?: boolean;
-  reduceMotion?: boolean;
 }
 
-/**
- * Хук для режима фокусировки (Zen mode)
- * Скрывает UI элементы, оставляет только книгу и цитату
- */
 export function useZenMode(options: UseZenModeOptions = {}) {
-  const {
-    autoSave = true,
-    hideUI = true,
-    hideParticles = false,
-    reduceMotion = false
-  } = options;
-
+  const { autoSave = true } = options;
   const [isZenMode, setIsZenMode] = useState(false);
-  const [settings, setSettings] = useState({
-    hideUI,
-    hideParticles,
-    reduceMotion
-  });
 
-  // Загрузка настроек из localStorage
   useEffect(() => {
-    if (autoSave) {
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          setIsZenMode(parsed.isZenMode || false);
-          setSettings(parsed.settings || settings);
-        }
-      } catch (error) {
-        console.warn('Failed to load zen mode settings:', error);
+    if (!autoSave) return;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setIsZenMode(!!parsed.isZenMode);
       }
+    } catch {
+      // Ignore parse errors
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [autoSave]);
 
-  // Сохранение настроек
   useEffect(() => {
-    if (autoSave) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          isZenMode,
-          settings
-        }));
-      } catch (error) {
-        console.warn('Failed to save zen mode settings:', error);
-      }
+    if (!autoSave) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ isZenMode }));
+    } catch {
+      // Ignore storage errors
     }
-  }, [isZenMode, settings, autoSave]);
+  }, [isZenMode, autoSave]);
 
   const toggleZenMode = useCallback(() => {
     setIsZenMode(prev => !prev);
   }, []);
 
-  const enableZenMode = useCallback(() => {
-    setIsZenMode(true);
-  }, []);
+  const enableZenMode = useCallback(() => setIsZenMode(true), []);
+  const disableZenMode = useCallback(() => setIsZenMode(false), []);
 
-  const disableZenMode = useCallback(() => {
-    setIsZenMode(false);
-  }, []);
-
-  const updateSettings = useCallback((newSettings: Partial<typeof settings>) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
-  }, []);
-
-  return {
-    isZenMode,
-    settings,
-    toggleZenMode,
-    enableZenMode,
-    disableZenMode,
-    updateSettings
-  };
-}
-
-/**
- * Получить классы для скрытия UI в zen mode
- */
-export function getZenModeClasses(isZenMode: boolean): string {
-  if (!isZenMode) return '';
-  return 'zen-mode-active';
+  return { isZenMode, toggleZenMode, enableZenMode, disableZenMode };
 }

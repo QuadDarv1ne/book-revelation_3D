@@ -10,12 +10,7 @@ interface ZenModeButtonProps {
 export const ZenModeButton = memo(function ZenModeButton({
   onZenModeChange
 }: ZenModeButtonProps) {
-  const { isZenMode, toggleZenMode } = useZenMode({
-    autoSave: true,
-    hideUI: true,
-    hideParticles: false,
-    reduceMotion: false
-  });
+  const { isZenMode, toggleZenMode } = useZenMode({ autoSave: true });
 
   const handleClick = useCallback(() => {
     toggleZenMode();
