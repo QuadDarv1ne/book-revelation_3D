@@ -16,6 +16,8 @@ import { useOfflineQuotes } from "@/hooks/use-offline-quotes";
 import { useAnalytics, trackBookChange, trackThemeChange } from "@/hooks/use-analytics";
 import { useAutoTheme } from "@/hooks/use-auto-theme";
 import { useGamification } from "@/hooks/use-gamification";
+import { useZenMode } from "@/hooks/use-zen-mode";
+import { KeyboardShortcutsHelp } from "@/components/ui/KeyboardShortcutsHelp";
 import type { Quote } from "@/types/quote";
 
 const Scene = dynamic(() => import("@/components/book").then(mod => ({ default: mod.Scene })), {
@@ -62,12 +64,13 @@ export default function Home() {
   const { trackEvent } = useAnalytics();
   const { themeConfig: autoThemeConfig } = useAutoTheme();
   const { addThemeExplored, addBookViewed, trackTime } = useGamification();
+  const { isZenMode, toggleZenMode } = useZenMode({ autoSave: true });
   const [activeQuote, setActiveQuote] = useState(0);
   const [webGLError, setWebGLError] = useState(false);
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
-  const [zenMode, setZenMode] = useState(false);
   const [activeBookId, setActiveBookId] = useState<string>(getInitialBook);
   const [sceneError, setSceneError] = useState(false);
+  const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
   const rotationSpeed = getInitialRotationSpeed();
   
   // Получаем системную цветовую схему для режима "auto"
@@ -117,22 +120,27 @@ export default function Home() {
     return () => window.removeEventListener('message', handleMessage);
   }, [toggleRotation]);
 
-  // Zen-режим - скрытие UI при нажатии Z
+  // Zen-режим и горячие клавиши
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'z' || e.key === 'Z') {
         if (!e.ctrlKey && !e.metaKey && !e.altKey) {
-          setZenMode(prev => !prev);
+          toggleZenMode();
         }
       }
-      if (e.key === 'Escape' && zenMode) {
-        setZenMode(false);
+      if (e.key === 'Escape' && isZenMode) {
+        toggleZenMode();
+      }
+      if (e.key === 'h' || e.key === 'H') {
+        if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+          setShowShortcutsHelp(prev => !prev);
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [zenMode]);
+  }, [isZenMode, toggleZenMode]);
 
   // Смена темы оформления - оптимизировано
   useEffect(() => {
@@ -346,17 +354,17 @@ export default function Home() {
             )}
 
           <div id="controls">
-            {!zenMode && <ControlButton isRotating={isRotating} onClick={toggleRotation} />}
+            {!isZenMode && <ControlButton isRotating={isRotating} onClick={toggleRotation} />}
           </div>
 
           {/* Переключатель книг - вверху справа */}
-          {!zenMode && (
+          {!isZenMode && (
             <div className="absolute top-3 right-3 z-40">
               <BookSelector activeBookId={activeBookId} onBookChange={handleBookChange} />
             </div>
           )}
 
-          {!zenMode && (
+          {!isZenMode && (
             <div className="absolute bottom-3 md:bottom-6 left-0 right-0 text-center pointer-events-none px-4">
               <div className="inline-block px-5 md:px-8 py-3 md:py-4 rounded-2xl backdrop-blur-lg bg-[rgba(8,8,16,0.72)] border border-[rgba(212,175,55,0.18)] shadow-[0_10px_35px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(212,175,55,0.12)]">
                 <h1 className="text-base md:text-lg lg:text-xl text-amber-100 font-light tracking-wider">{activeBook.title}</h1>
@@ -377,7 +385,7 @@ export default function Home() {
           </div>
         </div>
 
-        {!zenMode ? (
+        {!isZenMode ? (
           <>
             <div className="absolute top-3 left-3 flex items-center gap-1.5 pointer-events-none">
               <div className="w-6 h-px bg-gradient-to-r from-amber-500/20 to-transparent" />
@@ -395,8 +403,8 @@ export default function Home() {
                 onThemeChange={(t: string) => setTheme(t as Theme)}
                 isRotating={isRotating}
                 onToggleRotation={toggleRotation}
-                zenMode={zenMode}
-                onToggleZenMode={() => setZenMode(!zenMode)}
+                zenMode={isZenMode}
+                onToggleZenMode={toggleZenMode}
                 onExportFavorites={handleExportFavorites}
                 onImportFavorites={handleImportFavorites}
               />
@@ -406,7 +414,7 @@ export default function Home() {
           <div className="absolute top-3 left-3 z-50 flex items-center gap-2">
             <p className="text-amber-500/40 text-[10px] tracking-[0.2em] uppercase hidden sm:block">Zen Mode — нажми Z или Esc для выхода</p>
             <button
-              onClick={() => setZenMode(false)}
+              onClick={toggleZenMode}
               className="sm:hidden px-3 py-1.5 text-xs rounded-lg backdrop-blur-md bg-[rgba(10,10,20,0.85)] border border-amber-500/30 text-amber-300 hover:bg-amber-500/10 transition-all focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[44px] min-w-[44px] flex items-center gap-1.5"
               aria-label="Выйти из Zen-режима"
               type="button"
@@ -419,9 +427,9 @@ export default function Home() {
           </div>
         )}
 
-        {!zenMode && <SettingsBar theme={theme} onThemeChange={setTheme} />}
+        {!isZenMode && <SettingsBar theme={theme} onThemeChange={setTheme} />}
 
-        {!zenMode && <PWAInstall />}
+        {!isZenMode && <PWAInstall />}
 
         {/* JSON-LD Structured Data */}
         <script
@@ -451,6 +459,8 @@ export default function Home() {
             })
           }}
         />
+
+        <KeyboardShortcutsHelp isOpen={showShortcutsHelp} onClose={() => setShowShortcutsHelp(false)} />
 
         <style jsx global>{`
           .custom-scrollbar::-webkit-scrollbar { width: 2.5px; }
