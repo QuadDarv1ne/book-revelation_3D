@@ -1,14 +1,14 @@
-# robots.txt для Stoic Book 3D
-# https://stoic-book-3d.vercel.app
+# robots.txt для Book Revelation 3D
+# https://book-revelation-3d.vercel.app
 
 User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://stoic-book-3d.vercel.app/sitemap.xml
+Sitemap: https://book-revelation-3d.vercel.app/sitemap.xml
 
 # Хост
-Host: https://stoic-book-3d.vercel.app
+Host: https://book-revelation-3d.vercel.app
 
 # Запрет на сканирование служебных путей
 Disallow: /_next/

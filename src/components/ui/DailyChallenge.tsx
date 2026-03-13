@@ -53,7 +53,7 @@ export function DailyChallenge() {
 
   const handleShare = useCallback(async () => {
     const shareData = {
-      title: "Цитата дня — Stoic Book 3D",
+      title: "Цитата дня — Book Revelation 3D",
       text: `"${quoteOfDay.quote}" — ${quoteOfDay.author}`,
       url: window.location.href,
     };
