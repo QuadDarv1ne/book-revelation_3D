@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useBook3D, ThemeType } from "@/contexts/Book3DContext";
 
 interface UseBookRotation {
@@ -20,18 +20,15 @@ export function useBookRotation(): UseBookRotation {
   };
 }
 
-/**
- * Хук для управления темой сцены
- */
 interface UseTheme {
   theme: ThemeType;
   setTheme: (theme: ThemeType | ((prev: ThemeType) => ThemeType)) => void;
-  availableThemes: string[];
+  availableThemes: readonly string[];
   nextTheme: () => void;
   previousTheme: () => void;
 }
 
-const AVAILABLE_THEMES = ["dark", "light", "blue", "purple", "ambient", "relax", "auto"];
+const AVAILABLE_THEMES = ["dark", "light", "blue", "purple", "ambient", "relax", "auto", "auto-time"] as const;
 
 export function useTheme(): UseTheme {
   const { theme, setTheme } = useBook3D();
@@ -61,9 +58,6 @@ export function useTheme(): UseTheme {
   };
 }
 
-/**
- * Хук для управления текстурами книги
- */
 interface UseBookTextures {
   coverImage: string | undefined;
   spineImage: string | undefined;
