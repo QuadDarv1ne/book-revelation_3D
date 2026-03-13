@@ -1,8 +1,18 @@
-const CACHE_NAME = 'stoic-book-v1';
+const CACHE_NAME = 'book-revelation-v1';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
   '/offline.html',
+  '/book-covers/christensen-innovators-solution.svg',
+  '/book-covers/epictetus-our-good.svg',
+  '/book-covers/hawking-theory-of-everything.svg',
+  '/book-covers/marcus-aurelius-meditations.svg',
+  '/book-covers/sun-tzu-art-of-war.svg',
+  '/book-spines/christensen-innovators-solution.svg',
+  '/book-spines/epictetus-our-good.svg',
+  '/book-spines/hawking-theory-of-everything.svg',
+  '/book-spines/marcus-aurelius-meditations.svg',
+  '/book-spines/sun-tzu-art-of-war.svg',
 ];
 
 // Install event - cache static assets

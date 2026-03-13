@@ -82,12 +82,21 @@ export const metadata: Metadata = {
     locale: "ru_RU",
     siteName: "Book Revelation 3D",
     url: "https://book-revelation-3d.vercel.app",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Book Revelation 3D — интерактивная 3D книга с цитатами философов",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Book Revelation 3D — Откровение Книги",
     description: "Интерактивный 3D модуль с цитатами стоических философов",
     creator: "@bookrevelation3d",
+    images: ["/og-image.png"],
   },
   metadataBase: new URL("https://book-revelation-3d.vercel.app"),
   alternates: {
