@@ -286,10 +286,10 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
 
       {/* Header */}
       <div className="mb-3 sm:mb-4 md:mb-5">
-        <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light text-amber-100 mb-1.5 tracking-wide">
+        <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-light text-amber-100 dark:text-amber-100 light:text-amber-900 relax:text-amber-900 mb-1.5 tracking-wide">
           {bookTitle}
         </h2>
-        <p className="text-[10px] sm:text-xs md:text-sm text-amber-500/65 tracking-[0.18em] uppercase font-light">
+        <p className="text-[10px] sm:text-xs md:text-sm text-amber-500/65 dark:text-amber-500/65 light:text-amber-700/65 relax:text-amber-700/65 tracking-[0.18em] uppercase font-light">
           {t('stoicWisdom')}
         </p>
 
@@ -302,13 +302,13 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
             placeholder="Поиск цитат..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-3 py-2.5 text-sm bg-white/5 border border-amber-500/20 rounded-lg text-amber-100 placeholder-gray-500 focus:outline-none focus:border-amber-500/40 transition-colors focus:ring-2 focus:ring-amber-400 min-h-[44px]"
+            className="w-full px-3 py-2.5 text-sm bg-white/5 dark:bg-white/5 light:bg-amber-50/40 relax:bg-amber-50/30 border border-amber-500/20 light:border-amber-500/30 relax:border-amber-500/25 rounded-lg text-amber-100 dark:text-amber-100 light:text-amber-900 relax:text-amber-900 placeholder-gray-500 dark:placeholder-gray-500 light:placeholder-gray-600 relax:placeholder-gray-600 focus:outline-none focus:border-amber-500/40 transition-colors focus:ring-2 focus:ring-amber-400 min-h-[44px]"
             aria-label="Поиск по цитатам"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 rounded-full p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-400 light:text-gray-600 relax:text-gray-600 hover:text-amber-300 light:hover:text-amber-600 relax:hover:text-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-400 rounded-full p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
               aria-label="Очистить поиск"
               type="button"
             >
@@ -325,8 +325,8 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
             onClick={() => setFilter('all')}
             className={`px-3 py-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[44px] ${
               filter === 'all'
-                ? 'bg-amber-600/30 text-amber-200 font-medium'
-                : 'text-gray-400 hover:text-amber-300 hover:bg-amber-500/10'
+                ? 'bg-amber-600/30 dark:bg-amber-600/30 light:bg-amber-300/40 relax:bg-amber-200/30 text-amber-200 dark:text-amber-200 light:text-amber-900 relax:text-amber-900 font-medium'
+                : 'text-gray-400 dark:text-gray-400 light:text-gray-600 relax:text-gray-600 hover:text-amber-300 light:hover:text-amber-700 relax:hover:text-amber-700 hover:bg-amber-500/10 light:hover:bg-amber-500/8 relax:hover:bg-amber-500/8'
             }`}
             aria-pressed={filter === 'all'}
             type="button"
@@ -337,8 +337,8 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
             onClick={() => setFilter('favorites')}
             className={`px-3 py-2 sm:px-3 sm:py-1.5 text-xs sm:text-sm rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[44px] ${
               filter === 'favorites'
-                ? 'bg-amber-600/30 text-amber-200 font-medium'
-                : 'text-gray-400 hover:text-amber-300 hover:bg-amber-500/10'
+                ? 'bg-amber-600/30 dark:bg-amber-600/30 light:bg-amber-300/40 relax:bg-amber-200/30 text-amber-200 dark:text-amber-200 light:text-amber-900 relax:text-amber-900 font-medium'
+                : 'text-gray-400 dark:text-gray-400 light:text-gray-600 relax:text-gray-600 hover:text-amber-300 light:hover:text-amber-700 relax:hover:text-amber-700 hover:bg-amber-500/10 light:hover:bg-amber-500/8 relax:hover:bg-amber-500/8'
             }`}
             aria-pressed={filter === 'favorites'}
             type="button"
@@ -354,8 +354,8 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
                 onClick={() => setCategoryFilter(cat)}
                 className={`px-2.5 py-1.5 text-xs rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[36px] ${
                   categoryFilter === cat
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                    : 'text-gray-500 hover:text-amber-300 hover:bg-amber-500/10 border border-transparent'
+                    ? 'bg-amber-500/20 dark:bg-amber-500/20 light:bg-amber-300/35 relax:bg-amber-200/25 text-amber-300 dark:text-amber-300 light:text-amber-800 relax:text-amber-800 border border-amber-500/30 light:border-amber-500/40 relax:border-amber-500/35'
+                    : 'text-gray-500 dark:text-gray-500 light:text-gray-600 relax:text-gray-600 hover:text-amber-300 light:hover:text-amber-700 relax:hover:text-amber-700 hover:bg-amber-500/10 light:hover:bg-amber-500/8 relax:hover:bg-amber-500/8 border border-transparent'
                 }`}
                 aria-pressed={categoryFilter === cat}
                 type="button"

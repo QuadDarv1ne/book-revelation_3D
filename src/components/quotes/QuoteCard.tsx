@@ -74,7 +74,7 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
       className={`
         transition-all duration-700 ease-out cursor-pointer
         transform ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'}
-        focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(25,25,40,0.95)] focus-visible:ring-4
+        focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(25,25,40,0.95)] dark:focus:ring-offset-[rgba(25,25,40,0.95)] light:focus:ring-offset-[rgba(255,255,255,0.92)] relax:focus:ring-offset-[rgba(255,255,255,0.9)] focus-visible:ring-4
       `}
       style={{
         transitionDelay: `${index * 50}ms`
@@ -85,8 +85,8 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
           relative p-3.5 md:p-4 rounded-xl overflow-hidden
           transition-all duration-400
           ${isActive
-            ? 'bg-gradient-to-r from-amber-900/55 via-amber-900/30 to-transparent border-l-[3px] border-amber-400'
-            : 'bg-white/[0.08] border-l-[3px] border-transparent hover:bg-white/[0.12] hover:border-amber-600/30'
+            ? 'bg-gradient-to-r from-amber-900/55 via-amber-900/30 to-transparent dark:from-amber-900/55 dark:via-amber-900/30 dark:to-transparent light:from-amber-200/60 light:via-amber-100/40 light:to-transparent relax:from-amber-100/50 relax:via-amber-50/30 relax:to-transparent border-l-[3px] border-amber-400'
+            : 'bg-white/[0.08] dark:bg-white/[0.08] light:bg-amber-50/[0.06] relax:bg-amber-50/[0.05] border-l-[3px] border-transparent hover:bg-white/[0.12] dark:hover:bg-white/[0.12] light:hover:bg-amber-100/[0.1] relax:hover:bg-amber-50/[0.08] hover:border-amber-600/30'
           }
         `}
       >
@@ -121,11 +121,11 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
               }}
               onKeyDown={handleShareKeyDown}
               tabIndex={0}
-              className="p-1.5 rounded-full hover:bg-amber-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus-visible:ring-4"
+              className="p-1.5 rounded-full hover:bg-amber-500/20 dark:hover:bg-amber-500/20 light:hover:bg-amber-500/15 relax:hover:bg-amber-500/15 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus-visible:ring-4"
               aria-label={`Поделиться цитатой: "${quote.text.substring(0, 30)}${quote.text.length > 30 ? '...' : ''}"`}
               type="button"
             >
-              <svg className="w-4 h-4 text-gray-400 hover:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="w-4 h-4 text-gray-400 dark:text-gray-400 light:text-gray-600 relax:text-gray-600 hover:text-amber-300 light:hover:text-amber-600 relax:hover:text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
               </svg>
             </button>
@@ -139,13 +139,13 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
             }}
             onKeyDown={handleFavoriteKeyDown}
             tabIndex={0}
-            className="p-1.5 rounded-full hover:bg-amber-500/20 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus-visible:ring-4"
+            className="p-1.5 rounded-full hover:bg-amber-500/20 dark:hover:bg-amber-500/20 light:hover:bg-amber-500/15 relax:hover:bg-amber-500/15 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus-visible:ring-4"
             aria-label={isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
             aria-pressed={isFavorite}
             type="button"
           >
             <svg
-              className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-400 hover:text-amber-300'}`}
+              className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-amber-400 text-amber-400' : 'text-gray-400 dark:text-gray-400 light:text-gray-600 relax:text-gray-600 hover:text-amber-300 light:hover:text-amber-600 relax:hover:text-amber-600'}`}
               fill={isFavorite ? "currentColor" : "none"}
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -163,7 +163,7 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
 
         <p className={`
           text-sm md:text-[15px] leading-relaxed mb-2 pr-8 relative z-10
-          ${isActive ? 'text-amber-50' : 'text-gray-200'}
+          ${isActive ? 'text-amber-50 dark:text-amber-50 light:text-amber-950 relax:text-amber-950' : 'text-gray-200 dark:text-gray-200 light:text-gray-700 relax:text-gray-700'}
           transition-colors duration-400
         `}>
           &ldquo;{safeText}&rdquo;
@@ -171,14 +171,14 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
         <div className="flex items-center gap-2 relative z-10">
           <p className={`
             text-xs md:text-sm
-            ${isActive ? 'text-amber-300' : 'text-gray-400'}
+            ${isActive ? 'text-amber-300 dark:text-amber-300 light:text-amber-800 relax:text-amber-800' : 'text-gray-400 dark:text-gray-400 light:text-gray-500 relax:text-gray-500'}
             transition-colors duration-400 font-light tracking-wide
           `}>
             — {safeAuthor}
           </p>
           <span className={`
             text-[10px] px-1.5 py-0.5 rounded
-            ${isActive ? 'bg-amber-600/30 text-amber-200' : 'bg-white/5 text-gray-500'}
+            ${isActive ? 'bg-amber-600/30 dark:bg-amber-600/30 light:bg-amber-300/40 relax:bg-amber-200/30 text-amber-200 dark:text-amber-200 light:text-amber-900 relax:text-amber-900' : 'bg-white/5 dark:bg-white/5 light:bg-amber-100/30 relax:bg-amber-50/20 text-gray-500 dark:text-gray-500 light:text-gray-600 relax:text-gray-600'}
             transition-colors duration-400
           `}>
             {safeEra}

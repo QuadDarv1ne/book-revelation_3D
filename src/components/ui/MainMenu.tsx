@@ -96,16 +96,16 @@ export function MainMenu({
   const menuContent = (
     <>
       {/* Заголовок */}
-      <div className="px-5 py-4 border-b border-[rgba(212,175,55,0.15)] bg-gradient-to-r from-amber-900/20 to-transparent">
-        <h2 className="text-lg font-light text-amber-100 tracking-wide">{t('app.title')}</h2>
-        <p className="text-xs text-amber-500/60 mt-0.5 tracking-[0.12em] uppercase">{t('stoicPhilosophy')}</p>
+      <div className="px-5 py-4 border-b border-[rgba(212,175,55,0.15)] bg-gradient-to-r from-amber-900/20 to-transparent dark:from-amber-900/20 light:from-amber-100/30 relax:from-amber-100/30">
+        <h2 className="text-lg font-light text-amber-100 dark:text-amber-100 light:text-amber-900 relax:text-amber-900 tracking-wide">{t('app.title')}</h2>
+        <p className="text-xs text-amber-500/60 light:text-amber-700/60 relax:text-amber-700/60 mt-0.5 tracking-[0.12em] uppercase">{t('stoicPhilosophy')}</p>
       </div>
 
       {/* Кнопка прогресс */}
       <div className="px-5 py-3 border-b border-[rgba(212,175,55,0.1)]">
         <button
           onClick={() => setShowGamification(true)}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-600/20 to-yellow-600/20 border border-amber-500/30 text-amber-100 hover:from-amber-600/30 hover:to-yellow-600/30 transition-all focus:outline-none focus:ring-2 focus:ring-amber-400"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-600/20 to-yellow-600/20 border border-amber-500/30 text-amber-100 dark:text-amber-100 light:text-amber-900 relax:text-amber-900 hover:from-amber-600/30 hover:to-yellow-600/30 transition-all focus:outline-none focus:ring-2 focus:ring-amber-400"
           type="button"
         >
           <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -113,7 +113,7 @@ export function MainMenu({
           </svg>
           <div className="flex-1 text-left">
             <div className="text-sm font-medium">Прогресс и достижения</div>
-            <div className="text-xs text-amber-400/60">Отслеживайте свой путь</div>
+            <div className="text-xs text-amber-400/60 light:text-amber-700/60 relax:text-amber-700/60">Отслеживайте свой путь</div>
           </div>
           <svg className="w-5 h-5 text-amber-400/60" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -137,7 +137,7 @@ export function MainMenu({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span className="text-sm text-amber-100 font-medium">{t('settings.theme')}</span>
+                <span className="text-sm text-amber-100 dark:text-amber-100 light:text-amber-900 relax:text-amber-900 font-medium">{t('settings.theme')}</span>
               </div>
               <svg
                 className={`w-4 h-4 text-amber-400/60 transition-transform duration-200 ${activeSection === "settings" ? "rotate-180" : ""}`}
@@ -155,7 +155,7 @@ export function MainMenu({
               <div className="px-5 pb-4 space-y-4">
                 {/* Тема оформления */}
                 <div>
-                  <h4 className="text-xs uppercase tracking-[0.12em] text-amber-500/70 mb-2">Тема оформления</h4>
+                  <h4 className="text-xs uppercase tracking-[0.12em] text-amber-500/70 dark:text-amber-500/70 light:text-amber-700/70 relax:text-amber-700/70 mb-2">Тема оформления</h4>
                   <div className="grid grid-cols-3 gap-2">
                     {THEMES.map((t) => (
                       <button
@@ -168,8 +168,8 @@ export function MainMenu({
                         }`}
                         type="button"
                       >
-                        <div className={`w-8 h-8 rounded-full ${t.color} border-2 ${theme === t.value ? "border-amber-400" : "border-white/20"}`} />
-                        <span className={`text-[10px] ${theme === t.value ? "text-amber-100" : "text-gray-400"}`}>{t.label}</span>
+                        <div className={`w-8 h-8 rounded-full ${t.color} border-2 ${theme === t.value ? "border-amber-400" : "border-white/20 dark:border-white/20 light:border-amber-900/20 relax:border-amber-900/20"}`} />
+                        <span className={`text-[10px] ${theme === t.value ? "text-amber-100 dark:text-amber-100 light:text-amber-900 relax:text-amber-900" : "text-gray-400 dark:text-gray-400 light:text-gray-600 relax:text-gray-600"}`}>{t.label}</span>
                       </button>
                     ))}
                   </div>
@@ -331,7 +331,7 @@ export function MainMenu({
       {/* Кнопка открытия меню (видима только на desktop) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl backdrop-blur-xl bg-[rgba(15,15,25,0.9)] border border-[rgba(212,175,55,0.25)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-amber-100 hover:text-amber-50 hover:bg-[rgba(15,15,25,0.95)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(15,15,25,0.9)]"
+        className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl backdrop-blur-xl bg-[rgba(15,15,25,0.9)] dark:bg-[rgba(15,15,25,0.9)] light:bg-[rgba(255,255,255,0.85)] relax:bg-[rgba(255,255,255,0.85)] border border-[rgba(212,175,55,0.25)] light:border-[rgba(212,175,55,0.4)] relax:border-[rgba(212,175,55,0.4)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] light:shadow-[0_8px_32px_rgba(0,0,0,0.15)] relax:shadow-[0_8px_32px_rgba(0,0,0,0.15)] text-amber-900 light:text-amber-900 relax:text-amber-900 hover:text-amber-600 hover:bg-[rgba(255,255,255,0.9)] light:hover:bg-[rgba(255,255,255,0.95)] relax:hover:bg-[rgba(255,255,255,0.95)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(15,15,25,0.9)] light:focus:ring-offset-[rgba(255,255,255,0.85)] relax:focus:ring-offset-[rgba(255,255,255,0.85)]"
         aria-label="Открыть меню настроек"
         aria-expanded={isOpen}
         type="button"
@@ -346,7 +346,7 @@ export function MainMenu({
       {/* Мобильная кнопка (видима только на mobile) */}
       <button
         onClick={() => setIsOpen(true)}
-        className="sm:hidden flex items-center justify-center p-3 rounded-xl backdrop-blur-xl bg-[rgba(15,15,25,0.9)] border border-[rgba(212,175,55,0.25)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] text-amber-100 hover:text-amber-50 hover:bg-[rgba(15,15,25,0.95)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[48px] min-w-[48px]"
+        className="sm:hidden flex items-center justify-center p-3 rounded-xl backdrop-blur-xl bg-[rgba(15,15,25,0.9)] dark:bg-[rgba(15,15,25,0.9)] light:bg-[rgba(255,255,255,0.85)] relax:bg-[rgba(255,255,255,0.85)] border border-[rgba(212,175,55,0.25)] light:border-[rgba(212,175,55,0.4)] relax:border-[rgba(212,175,55,0.4)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] light:shadow-[0_8px_32px_rgba(0,0,0,0.15)] relax:shadow-[0_8px_32px_rgba(0,0,0,0.15)] text-amber-900 light:text-amber-900 relax:text-amber-900 hover:text-amber-600 hover:bg-[rgba(255,255,255,0.9)] light:hover:bg-[rgba(255,255,255,0.95)] relax:hover:bg-[rgba(255,255,255,0.95)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[48px] min-w-[48px]"
         aria-label="Открыть меню настроек"
         aria-expanded={isOpen}
         type="button"
@@ -359,7 +359,7 @@ export function MainMenu({
 
       {/* Desktop dropdown меню */}
       <div
-        className={`hidden sm:block absolute top-full right-0 mt-2 w-80 md:w-96 rounded-2xl overflow-hidden backdrop-blur-xl bg-[rgba(15,15,25,0.98)] border border-[rgba(212,175,55,0.3)] shadow-[0_16px_48px_rgba(0,0,0,0.6)] transition-all duration-300 transform origin-top-right ${
+        className={`hidden sm:block absolute top-full right-0 mt-2 w-80 md:w-96 rounded-2xl overflow-hidden backdrop-blur-xl bg-[rgba(15,15,25,0.98)] dark:bg-[rgba(15,15,25,0.98)] light:bg-[rgba(255,255,255,0.95)] relax:bg-[rgba(255,255,255,0.95)] border border-[rgba(212,175,55,0.3)] light:border-[rgba(212,175,55,0.4)] relax:border-[rgba(212,175,55,0.4)] shadow-[0_16px_48px_rgba(0,0,0,0.6)] light:shadow-[0_16px_48px_rgba(0,0,0,0.2)] relax:shadow-[0_16px_48px_rgba(0,0,0,0.2)] transition-all duration-300 transform origin-top-right ${
           isOpen ? "opacity-100 visible scale-100" : "opacity-0 invisible scale-95"
         }`}
         role="menu"

@@ -98,7 +98,7 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
 
   return (
     <div className="absolute top-3 right-3 z-40" ref={dropdownRef}>
-      <div className="flex items-center gap-2 px-3 py-2 rounded-xl backdrop-blur-xl bg-[rgba(15,15,25,0.9)] border border-[rgba(212,175,55,0.25)] shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+      <div className="flex items-center gap-2 px-3 py-2 rounded-xl backdrop-blur-xl bg-[rgba(15,15,25,0.9)] dark:bg-[rgba(15,15,25,0.9)] light:bg-[rgba(255,255,255,0.92)] relax:bg-[rgba(255,255,255,0.9)] border border-[rgba(212,175,55,0.25)] light:border-[rgba(180,160,80,0.3)] relax:border-[rgba(160,140,70,0.25)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] light:shadow-[0_8px_32px_rgba(0,0,0,0.1)] relax:shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
         {/* Иконка книги */}
         <svg className="w-4 h-4 text-amber-400/70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -110,7 +110,7 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
             ref={buttonRef}
             onClick={() => setIsOpen(!isOpen)}
             onKeyDown={handleKeyDown}
-            className="flex items-center gap-2 text-sm text-amber-100 hover:text-amber-50 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(15,15,25,0.9)] rounded-lg px-2 py-1"
+            className="flex items-center gap-2 text-sm text-amber-100 dark:text-amber-100 light:text-amber-900 relax:text-amber-900 hover:text-amber-50 hover:light:text-amber-700 hover:relax:text-amber-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(15,15,25,0.9)] light:focus:ring-offset-[rgba(255,255,255,0.92)] relax:focus:ring-offset-[rgba(255,255,255,0.9)] rounded-lg px-2 py-1"
             aria-label="Выбрать книгу"
             aria-haspopup="listbox"
             aria-expanded={isOpen}
@@ -118,9 +118,9 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
             type="button"
           >
             <span className="font-medium">{activeBook.title}</span>
-            <span className="text-amber-400/50">—</span>
-            <span className="text-amber-300/80 text-xs">{activeBook.author}</span>
-            <svg className="w-3 h-3 text-amber-400/60 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+            <span className="text-amber-400/50 light:text-amber-700/50 relax:text-amber-700/50">—</span>
+            <span className="text-amber-300/80 light:text-amber-800/70 relax:text-amber-800/70 text-xs">{activeBook.author}</span>
+            <svg className="w-3 h-3 text-amber-400/60 light:text-amber-700/60 relax:text-amber-700/60 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
@@ -128,9 +128,9 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
           {/* Выпадающее меню */}
           <div
             id="book-listbox"
-            className={`absolute right-0 top-full mt-2 min-w-[280px] rounded-xl overflow-hidden backdrop-blur-xl bg-[rgba(15,15,25,0.98)] border border-[rgba(212,175,55,0.3)] shadow-[0_16px_48px_rgba(0,0,0,0.6)] transition-all duration-200 transform origin-top-right ${
-              isOpen 
-                ? "opacity-100 visible scale-100" 
+            className={`absolute right-0 top-full mt-2 min-w-[280px] rounded-xl overflow-hidden backdrop-blur-xl bg-[rgba(15,15,25,0.98)] dark:bg-[rgba(15,15,25,0.98)] light:bg-[rgba(255,255,255,0.96)] relax:bg-[rgba(255,255,255,0.94)] border border-[rgba(212,175,55,0.3)] light:border-[rgba(180,160,80,0.35)] relax:border-[rgba(160,140,70,0.3)] shadow-[0_16px_48px_rgba(0,0,0,0.6)] light:shadow-[0_16px_48px_rgba(0,0,0,0.12)] relax:shadow-[0_16px_48px_rgba(0,0,0,0.1)] transition-all duration-200 transform origin-top-right ${
+              isOpen
+                ? "opacity-100 visible scale-100"
                 : "opacity-0 invisible scale-95"
             }`}
             role="listbox"
@@ -148,10 +148,10 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
                     onMouseEnter={() => setFocusedIndex(index)}
                     className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors focus:outline-none ${
                       isActive
-                        ? "bg-[rgba(212,175,55,0.2)] border-l-4 border-amber-400"
+                        ? "bg-[rgba(212,175,55,0.2)] dark:bg-[rgba(212,175,55,0.2)] light:bg-[rgba(212,175,55,0.15)] relax:bg-[rgba(212,175,55,0.12)] border-l-4 border-amber-400"
                         : isFocused
-                          ? "bg-[rgba(212,175,55,0.1)] border-l-4 border-amber-400/50"
-                          : "border-l-4 border-transparent hover:bg-[rgba(212,175,55,0.08)]"
+                          ? "bg-[rgba(212,175,55,0.1)] dark:bg-[rgba(212,175,55,0.1)] light:bg-[rgba(212,175,55,0.08)] relax:bg-[rgba(212,175,55,0.06)] border-l-4 border-amber-400/50"
+                          : "border-l-4 border-transparent hover:bg-[rgba(212,175,55,0.08)] dark:hover:bg-[rgba(212,175,55,0.08)] light:hover:bg-[rgba(212,175,55,0.05)] relax:hover:bg-[rgba(212,175,55,0.04)]"
                     }`}
                     role="option"
                     aria-selected={isActive}
@@ -165,11 +165,11 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
                       aria-hidden="true"
                     />
                     <div className="flex-1">
-                      <p className={`text-sm font-medium ${isActive ? "text-amber-100" : "text-gray-200"}`}>
+                      <p className={`text-sm font-medium ${isActive ? "text-amber-100 dark:text-amber-100 light:text-amber-900 relax:text-amber-900" : "text-gray-200 dark:text-gray-200 light:text-gray-700 relax:text-gray-700"}`}>
                         {book.title}
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5">{book.author}</p>
-                      <p className="text-[10px] text-gray-500 mt-1">{book.description}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-400 light:text-gray-500 relax:text-gray-500 mt-0.5">{book.author}</p>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-500 light:text-gray-400 relax:text-gray-400 mt-1">{book.description}</p>
                     </div>
                     {isActive && (
                       <svg className="w-4 h-4 text-amber-400 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">

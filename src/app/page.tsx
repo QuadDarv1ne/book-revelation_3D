@@ -24,7 +24,8 @@ const Scene = dynamic(() => import("@/components/book").then(mod => ({ default: 
   loading: () => <LoadingFallback />,
 });
 
-const BACKGROUND_GRADIENT = 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.08)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.06)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(30,30,50,0.7)_0%,transparent_50%)';
+const BACKGROUND_GRADIENT_DARK = 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.08)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.06)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(30,30,50,0.7)_0%,transparent_50%)';
+const BACKGROUND_GRADIENT_LIGHT = 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(180,160,80,0.12)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(160,140,70,0.08)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(255,255,255,0.9)_0%,transparent_50%)';
 const GRID_PATTERN = 'linear-gradient(rgba(212,175,55,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.5)_1px,transparent_1px)';
 const QUOTE_ROTATION_INTERVAL = 5000;
 const DEFAULT_BOOK_ID = "marcus-aurelius-meditations"; // Книга по умолчанию
@@ -50,10 +51,10 @@ const THEMES = ["dark", "light", "blue", "purple", "ambient", "relax", "auto", "
 type Theme = (typeof THEMES)[number];
 
 function getInitialTheme(): Theme {
-  if (typeof window === "undefined") return "dark";
+  if (typeof window === "undefined") return "relax";
   const saved = localStorage.getItem("theme");
   if (saved && THEMES.includes(saved as Theme)) return saved as Theme;
-  return "dark";
+  return "relax";
 }
 
 export default function Home() {
@@ -278,13 +279,13 @@ export default function Home() {
     return <WebGLError onRetry={handleRetry} />;
   }
 
-  const backgroundGradient = BACKGROUND_GRADIENT;
+  const backgroundGradient = theme === "light" || theme === "relax" ? BACKGROUND_GRADIENT_LIGHT : BACKGROUND_GRADIENT_DARK;
   const gridPattern = GRID_PATTERN;
 
   return (
     <ToastProvider>
       <main
-        className="relative w-full h-screen overflow-hidden select-none bg-[#07070d]"
+        className="relative w-full h-screen overflow-hidden select-none bg-[#f5f5f0] dark:bg-[#07070d] light:bg-[#f5f5f0] relax:bg-[#f0f0eb]"
         role="main"
         style={{
           paddingTop: 'var(--safe-area-inset-top)',
@@ -348,14 +349,14 @@ export default function Home() {
           )}
           </div>
 
-          <div id="quotes" className="w-full lg:w-[42%] h-[50%] lg:h-full relative bg-gradient-to-b from-[rgba(25,25,40,0.95)] to-[rgba(20,20,35,0.97)] border-l border-[rgba(212,175,55,0.12)]" role="region" aria-label="Цитаты стоических философов">
-            <div className="absolute top-0 left-0 right-0 h-20 pointer-events-none bg-gradient-to-b from-[rgba(10,10,18,1)] to-transparent" />
+          <div id="quotes" className="w-full lg:w-[42%] h-[50%] lg:h-full relative bg-gradient-to-b from-[rgba(25,25,40,0.95)] to-[rgba(20,20,35,0.97)] dark:from-[rgba(25,25,40,0.95)] dark:to-[rgba(20,20,35,0.97)] light:from-[rgba(255,255,255,0.92)] light:to-[rgba(250,250,245,0.94)] relax:from-[rgba(255,255,255,0.9)] relax:to-[rgba(248,248,243,0.92)] border-l border-[rgba(212,175,55,0.12)] light:border-[rgba(180,160,80,0.2)] relax:border-[rgba(160,140,70,0.18)]" role="region" aria-label="Цитаты стоических философов">
+            <div className="absolute top-0 left-0 right-0 h-20 pointer-events-none bg-gradient-to-b from-[rgba(10,10,18,1)] to-transparent dark:from-[rgba(10,10,18,1)] light:from-[rgba(255,255,255,0)] relax:from-[rgba(255,255,255,0)]" />
             {/* Live region для объявления о смене цитаты */}
             <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
               {`Цитата ${activeQuote + 1} из ${activeBook.quotes.length}: ${activeBook.quotes[activeQuote]?.text.substring(0, 100)}${activeBook.quotes[activeQuote]?.text.length > 100 ? '...' : ''}. Автор: ${activeBook.quotes[activeQuote]?.author}`}
             </div>
             <QuotesPanel quotes={activeBook.quotes} activeQuote={activeQuote} setActiveQuote={setActiveQuote} bookTitle={activeBook.title} />
-            <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none bg-gradient-to-t from-[rgba(5,5,10,1)] to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 h-20 pointer-events-none bg-gradient-to-t from-[rgba(5,5,10,1)] to-transparent dark:from-[rgba(5,5,10,1)] light:from-[rgba(255,255,255,0)] relax:from-[rgba(255,255,255,0)]" />
           </div>
         </div>
 
@@ -370,8 +371,8 @@ export default function Home() {
               <p className="text-amber-600/15 text-[9px] tracking-[0.2em] uppercase font-light">Stoic Philosophy</p>
             </div>
 
-            {/* Кнопка меню настроек - внизу слева */}
-            <div className="absolute bottom-20 left-3 z-40">
+            {/* Кнопка меню настроек - внизу справа */}
+            <div className="absolute bottom-3 right-3 z-40">
               <MainMenu
                 theme={theme}
                 onThemeChange={(t: string) => setTheme(t as Theme)}
