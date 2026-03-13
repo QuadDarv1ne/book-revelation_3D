@@ -2,7 +2,7 @@
 
 import {useState, useCallback, useEffect} from 'react';
 
-export type Locale = 'en' | 'ru' | 'zh' | 'he';
+export type Locale = 'en' | 'ru' | 'zh' | 'he' | 'de';
 
 const translations: Record<Locale, Record<string, string>> = {
   en: {
@@ -341,6 +341,90 @@ const translations: Record<Locale, Record<string, string>> = {
     'settings.open': 'פתח הגדרות',
     'app.title': 'גילוי הספר 3D',
   },
+  de: {
+    'quotes.search': 'Zitate suchen...',
+    'quotes.all': 'Alle',
+    'quotes.favorites': 'Favoriten',
+    'quotes.shuffle': 'Mischen',
+    'quotes.export': 'Exportieren',
+    'quotes.import': 'Importieren',
+    'quotes.copy': 'Kopieren',
+    'quotes.share': 'Teilen',
+    'quotes.filters': 'Zitat-Filter',
+    'quotes.noFavorites': 'Noch keine Lieblingszitate. Klicken Sie auf das Herz, um eines hinzuzufügen.',
+    'quotes.loading': 'Zitate aus "{book}" werden geladen...',
+    'quotes.ariaLabel': 'Zitate-Panel. Verwenden Sie die Pfeiltasten Auf/Ab oder Wischen auf Touchscreens.',
+    'quotes.categories': 'Kategorien',
+    'category.all': 'Alle',
+    'category.thinking': 'Denken',
+    'category.life': 'Leben',
+    'category.selfControl': 'Selbstkontrolle',
+    'category.wisdom': 'Weisheit',
+    'category.freedom': 'Freiheit',
+    'category.knowledge': 'Wissen',
+    'category.resilience': 'Widerstandsfähigkeit',
+    'category.goal': 'Ziel',
+    'category.calmness': 'Ruhe',
+    'category.strategy': 'Strategie',
+    'category.patience': 'Geduld',
+    'category.action': 'Handlung',
+    'category.inspiration': 'Inspiration',
+    'theme.dark': 'Dunkel',
+    'theme.light': 'Hell',
+    'theme.blue': 'Blau',
+    'theme.purple': 'Lila',
+    'theme.ambient': 'Ambient',
+    'theme.relax': 'Entspannt',
+    'theme.auto': 'Auto',
+    'theme.autoTime': 'Auto Zeit',
+    'time.morning': 'Morgen',
+    'time.day': 'Tag',
+    'time.evening': 'Abend',
+    'time.night': 'Nacht',
+    'toast.noFavoritesToExport': 'Keine Favoriten zum Exportieren',
+    'toast.favoritesExported': 'Favoriten exportiert',
+    'toast.exportError': 'Exportfehler',
+    'toast.favoritesImported': '{count} Zitate importiert',
+    'toast.importError': 'Importfehler',
+    'toast.readFileError': 'Dateilesenfehler',
+    'menu.favorites': 'Favoriten',
+    'menu.rotation': 'Rotation',
+    'menu.pause': 'Pause',
+    'menu.play': 'Abspielen',
+    'menu.zenMode': 'Zen-Modus',
+    'menu.about': 'Über',
+    'menu.aboutText': 'Interaktives 3D-Modul mit einem rotierenden Buch der stoischen Philosophie. Enthält Weisheiten von Marc Aurel, Epiktet und anderen großen Denkern.',
+    'menu.controls': 'Steuerung',
+    'menu.pauseRotation': 'Pause/Rotation',
+    'menu.quoteNav': 'Zitat-Navigation',
+    'control.rotation': 'Rotation',
+    'control.pause': 'Rotation pausieren',
+    'control.play': 'Rotation starten',
+    'control.space': 'Leertaste',
+    'book.select': 'Buch auswählen',
+    'book.cover': 'Buchcover',
+    'book.changed': 'Buch geändert zu',
+    'settings.theme': 'Thema',
+    'settings.rotation': 'Buchrotation',
+    'settings.notifications': 'Benachrichtigungen',
+    'settings.speed': 'Geschwindigkeit',
+    'settings.rotationSpeed': 'Rotationsgeschwindigkeit',
+    'settings.app': 'Anwendungseinstellungen',
+    'settings.general': 'Allgemein',
+    'settings.account': 'Konto',
+    'settings.appearance': 'Erscheinungsbild',
+    'menu.main': 'Hauptmenü',
+    'swipe': 'WISCHEN',
+    'stoicPhilosophy': 'Stoische Philosophie',
+    'stoicWisdom': 'Stoische Weisheit',
+    'pwa.install': 'App installieren',
+    'pwa.add': 'Hinzufügen',
+    'common.close': 'Schließen',
+    'settings.expand': 'Einstellungen erweitern',
+    'settings.collapse': 'Einstellungen einklappen',
+    'settings.open': 'Einstellungen öffnen',
+    'app.title': 'Buch Offenbarung 3D',
+  },
 };
 
 export function useI18n() {
@@ -348,7 +432,7 @@ export function useI18n() {
 
   useEffect(() => {
     const saved = localStorage.getItem('locale') as Locale;
-    if (saved && ['en', 'ru', 'zh', 'he'].includes(saved)) {
+    if (saved && ['en', 'ru', 'zh', 'he', 'de'].includes(saved)) {
       setLocaleState(saved);
     }
   }, []);

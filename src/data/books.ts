@@ -10,6 +10,8 @@ export interface Book {
   backCoverImage: string;
   quotes: Quote[];
   color: string;
+  isbn?: string; // ISBN для интеграции с Open Library API
+  openLibraryKey?: string; // Open Library ID (OLID)
 }
 
 const marcusAureliusQuotes: Quote[] = [
@@ -89,6 +91,7 @@ export const books: Book[] = [
     backCoverImage: "/book-covers/marcus-aurelius-meditations-back.jpg",
     quotes: marcusAureliusQuotes,
     color: "#d4af37",
+    isbn: "9780140449334", // ISBN-13 для Penguin Classics edition
   },
   {
     id: "epictetus-our-good",
@@ -100,6 +103,7 @@ export const books: Book[] = [
     backCoverImage: "/book-covers/epictetus-our-good-back.jpg",
     quotes: epictetusQuotes,
     color: "#c9a961",
+    isbn: "9780195041583", // ISBN-13 для Oxford University Press
   },
   {
     id: "seneca-letters",
@@ -111,6 +115,7 @@ export const books: Book[] = [
     backCoverImage: "/book-covers/seneca-letters-back.jpg",
     quotes: senecaQuotes,
     color: "#b89f5e",
+    isbn: "9780140442106", // ISBN-13 для Penguin Classics
   },
   {
     id: "sun-tzu-art-of-war",
@@ -122,6 +127,7 @@ export const books: Book[] = [
     backCoverImage: "/book-covers/sun-tzu-art-of-war-back.jpg",
     quotes: sunTzuQuotes,
     color: "#a67c52",
+    isbn: "9781599869773", // ISBN-13 для Filiquarian Publishing
   },
   {
     id: "hawking-theory-of-everything",
@@ -133,6 +139,7 @@ export const books: Book[] = [
     backCoverImage: "/book-covers/hawking-theory-of-everything-back.jpg",
     quotes: hawkingQuotes,
     color: "#8b7355",
+    isbn: "9780762476282", // ISBN-13 для Running Press
   },
   {
     id: "christensen-innovators-solution",
@@ -144,6 +151,7 @@ export const books: Book[] = [
     backCoverImage: "/book-covers/christensen-innovators-solution-back.jpg",
     quotes: christensenQuotes,
     color: "#9a7b4f",
+    isbn: "9781422185889", // ISBN-13 для Harvard Business Review Press
   },
 ];
 
