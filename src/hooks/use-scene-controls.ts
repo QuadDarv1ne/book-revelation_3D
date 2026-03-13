@@ -12,29 +12,19 @@ interface UseCameraControls {
   setZoom: (zoom: number) => void;
   fov: number;
   position: THREE.Vector3;
-  updatePosition: (pos: Partial<THREE.Vector3>) => void;
 }
 
 const DEFAULT_CAMERA_POSITION = new THREE.Vector3(0, 1.25, 4.0);
 const BASE_FOV = 38;
 
-/**
- * Хук для управления камерой в 3D сцене
- */
 export function useCameraControls(): UseCameraControls {
   const { cameraZoom, zoomIn, zoomOut, resetZoom, setZoom } = useBook3D();
 
-  const fov = useMemo(() => {
-    return BASE_FOV / cameraZoom;
-  }, [cameraZoom]);
+  const fov = useMemo(() => BASE_FOV / cameraZoom, [cameraZoom]);
 
   const position = useMemo(() => {
     return DEFAULT_CAMERA_POSITION.clone().multiplyScalar(cameraZoom);
   }, [cameraZoom]);
-
-  const updatePosition = useCallback((_pos: Partial<THREE.Vector3>) => {
-    // Будет реализовано через контекст при необходимости
-  }, []);
 
   return {
     cameraZoom,
@@ -44,33 +34,23 @@ export function useCameraControls(): UseCameraControls {
     setZoom,
     fov,
     position,
-    updatePosition,
   };
 }
 
-/**
- * Хук для управления вращением книги
- */
 interface UseBookRotation {
   isRotating: boolean;
   toggleRotation: () => void;
   rotationSpeed: number;
-  setRotationSpeed: (speed: number) => void;
 }
 
 export function useBookRotation(): UseBookRotation {
   const { isRotating, toggleRotation } = useBook3D();
   const rotationSpeed = 0.5;
 
-  const setRotationSpeed = useCallback((_speed: number) => {
-    // Будет реализовано через контекст при необходимости
-  }, []);
-
   return {
     isRotating,
     toggleRotation,
     rotationSpeed,
-    setRotationSpeed,
   };
 }
 
