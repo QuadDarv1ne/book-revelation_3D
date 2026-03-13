@@ -7,8 +7,6 @@ export { ServiceWorkerRegistration } from "./ServiceWorkerRegistration";
 export { ToastProvider, useToast } from "./Toast";
 export { BookSelector } from "./BookSelector";
 export { MainMenu } from "./MainMenu";
-export { CoverUpload } from "./CoverUpload";
-export { ThemeSelector } from "./ThemeSelector";
 export { ErrorBoundary } from "./ErrorBoundary";
 export { BottomSheet } from "./BottomSheet";
 export { GamificationDashboard } from "./GamificationDashboard";

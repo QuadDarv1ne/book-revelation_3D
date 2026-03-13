@@ -4,7 +4,7 @@ export type { ThemeType, BookImages } from "./Book3DContext";
 
 // Hooks
 export { usePrefersReducedMotion, useMotionPreference } from "@/hooks/use-prefers-reduced-motion";
-export { useBookRotation, useTheme, useBookTextures } from "@/hooks/use-scene-controls";
+export { useBookRotation } from "@/hooks/use-scene-controls";
 export { useAccessibility, useFocusTrap, useScreenReaderAnnouncement } from "@/hooks/use-accessibility";
 export { useSwipe } from "@/hooks/use-swipe";
 export { useMounted } from "@/hooks/use-mounted";
