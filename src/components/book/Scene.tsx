@@ -9,6 +9,7 @@ import { ParticleRingOptimized } from "./ParticleRingOptimized";
 import { Lighting } from "./Lighting";
 import { ThemeParticleEffect } from "./ThemeParticleEffect";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { useCameraPersistence } from "@/hooks/use-camera-persistence";
 import * as THREE from "three";
 
 interface SceneProps {
@@ -37,14 +38,25 @@ const SceneContent = memo(function SceneContent({ isRotating, coverImage, spineI
 });
 
 // Компонент для обработки клавиатурных событий в Canvas
-function KeyboardHandler({ onRotate, onZoomIn, onZoomOut, onReset }: {
+function KeyboardHandler({ onRotate, onZoomIn, onZoomOut, onReset, updatePosition }: {
   onRotate: () => void;
   onZoomIn: () => void;
   onZoomOut: () => void;
   onReset: () => void;
+  updatePosition: (pos: THREE.Vector3) => void;
 }) {
   const { camera, gl } = useThree();
   const targetPosition = useRef(new THREE.Vector3(0, 1.25, 4.0));
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const savePosition = useCallback((pos: THREE.Vector3) => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    saveTimeoutRef.current = setTimeout(() => {
+      updatePosition(pos.clone());
+    }, 1000);
+  }, [updatePosition]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
@@ -102,9 +114,18 @@ function KeyboardHandler({ onRotate, onZoomIn, onZoomOut, onReset }: {
     const animate = () => {
       camera.position.lerp(targetPosition.current, 0.1);
       camera.lookAt(0, 0.6, 0);
+      savePosition(camera.position);
     };
     animate();
-  }, [camera]);
+  }, [camera, savePosition]);
+
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return null;
 }
@@ -119,23 +140,44 @@ export const Scene = memo(function Scene({
   onKeyboardRotate
 }: SceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { cameraState, isLoaded, updateZoom, resetCamera, updatePosition } = useCameraPersistence();
   const [cameraZoom, setCameraZoom] = useState(1);
   const prefersReducedMotion = usePrefersReducedMotion();
+
+  // Initialize camera position from saved state
+  const initialCameraPosition = isLoaded ? cameraState.position : { x: 0, y: 1.25, z: 4.0 };
+  const initialZoom = isLoaded ? cameraState.zoom : 1;
 
   // Если включено prefers-reduced-motion, отключаем вращение
   const effectiveIsRotating = prefersReducedMotion ? false : isRotating;
 
   const handleZoomIn = useCallback(() => {
-    setCameraZoom(prev => Math.min(prev + 0.2, 2));
-  }, []);
+    setCameraZoom(prev => {
+      const newZoom = Math.min(prev + 0.2, 2);
+      updateZoom(newZoom);
+      return newZoom;
+    });
+  }, [updateZoom]);
 
   const handleZoomOut = useCallback(() => {
-    setCameraZoom(prev => Math.max(prev - 0.2, 0.5));
-  }, []);
+    setCameraZoom(prev => {
+      const newZoom = Math.max(prev - 0.2, 0.5);
+      updateZoom(newZoom);
+      return newZoom;
+    });
+  }, [updateZoom]);
 
   const handleReset = useCallback(() => {
     setCameraZoom(1);
-  }, []);
+    resetCamera();
+  }, [resetCamera]);
+
+  // Sync with saved zoom on load
+  useEffect(() => {
+    if (isLoaded && initialZoom !== 1) {
+      setCameraZoom(initialZoom);
+    }
+  }, [isLoaded, initialZoom]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -176,7 +218,7 @@ export const Scene = memo(function Scene({
       </div>
       <Canvas
         ref={canvasRef}
-        camera={{ position: [0, 1.25, 4.0], fov }}
+        camera={{ position: [initialCameraPosition.x, initialCameraPosition.y, initialCameraPosition.z], fov }}
         shadows
         dpr={[1, 1.5]}
         gl={{
@@ -201,6 +243,7 @@ export const Scene = memo(function Scene({
           onZoomIn={handleZoomIn}
           onZoomOut={handleZoomOut}
           onReset={handleReset}
+          updatePosition={updatePosition}
         />
       </Canvas>
     </div>
