@@ -2,6 +2,12 @@
 
 Интерактивный 3D модуль с вращающейся книгой стоической философии для интеграции на сайт (Tilda, WordPress и др.)
 
+**Название на языках:**
+- 🇬🇧 English: **Book Revelation 3D**
+- 🇷🇺 Русский: **Откровение Книги 3D**
+- 🇮🇱 עברית: **גילוי הספר 3D**
+- 🇨🇳 中文：书籍启示 3D
+
 ![Book Revelation 3D](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)
 ![Three.js](https://img.shields.io/badge/Three.js-r148-orange?style=flat-square&logo=three.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)

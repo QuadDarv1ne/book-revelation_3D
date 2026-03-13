@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: stoic-book-3d
+    name: book-revelation-3d
     env: node
     buildCommand: npm install && npm run build
     startCommand: npm run start
