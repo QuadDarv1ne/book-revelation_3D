@@ -11,31 +11,19 @@ export type BookImages = {
 };
 
 interface Book3DContextType {
-  // Вращение
   isRotating: boolean;
   toggleRotation: () => void;
-  setRotation: (rotating: boolean) => void;
-
-  // Тема
   theme: ThemeType;
   setTheme: (theme: ThemeType | ((prev: ThemeType) => ThemeType)) => void;
-
-  // Изображения книги
   bookImages: BookImages;
   setBookImages: (images: BookImages | ((prev: BookImages) => BookImages)) => void;
-
-  // Масштаб камеры
   cameraZoom: number;
   zoomIn: () => void;
   zoomOut: () => void;
   resetZoom: () => void;
   setZoom: (zoom: number) => void;
-
-  // Загрузка
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
-
-  // Ошибки
   error: string | null;
   setError: (error: string | null) => void;
 }
