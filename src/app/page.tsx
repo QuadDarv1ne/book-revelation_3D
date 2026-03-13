@@ -89,6 +89,17 @@ export default function Home() {
     localStorage.setItem("activeBook", activeBookId);
   }, [activeBookId]);
 
+  // Предзагрузка текстур активной книги при монтировании
+  useEffect(() => {
+    textureManager.preloadBookTextures(
+      activeBook.coverImage,
+      activeBook.spineImage,
+      activeBook.backCoverImage
+    ).catch(() => {
+      // Игнорируем ошибки предзагрузки
+    });
+  }, []); // Пустой массив - только при монтировании
+
   // Обработчик ошибок сцены
   const handleSceneError = useCallback(() => {
     setSceneError(true);
@@ -165,6 +176,19 @@ export default function Home() {
     trackBookChange(activeBookId, bookId);
     trackEvent("navigation", "book_change", bookId);
     addBookViewed(bookId);
+    
+    // Предзагрузка текстур новой книги
+    const newBook = getBookById(bookId);
+    if (newBook) {
+      textureManager.preloadBookTextures(
+        newBook.coverImage,
+        newBook.spineImage,
+        newBook.backCoverImage
+      ).catch(() => {
+        // Игнорируем ошибки предзагрузки
+      });
+    }
+    
     setActiveBookId(bookId);
     setActiveQuote(0); // Сбрасываем на первую цитату новой книги
   }, [activeBookId, trackEvent, addBookViewed]);
@@ -398,6 +422,35 @@ export default function Home() {
         {!zenMode && <SettingsBar theme={theme} onThemeChange={setTheme} />}
 
         {!zenMode && <PWAInstall />}
+
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": "Book Revelation 3D",
+              "alternateName": ["Откровение Книги 3D", "Stoic Book 3D"],
+              "url": "https://book-revelation-3d.vercel.app",
+              "description": "Интерактивный 3D модуль с вращающейся книгой философии и цитатами великих мыслителей",
+              "applicationCategory": "EducationalApplication",
+              "operatingSystem": "Any",
+              "browserRequirements": "Requires JavaScript",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Book Revelation 3D Team"
+              },
+              "keywords": "стоицизм, 3D книга, Марк Аврелий, Эпиктет, Стивен Хокинг, философия, цитаты",
+              "inLanguage": ["ru", "en", "he", "zh"]
+            })
+          }}
+        />
 
         <style jsx global>{`
           .custom-scrollbar::-webkit-scrollbar { width: 2.5px; }
