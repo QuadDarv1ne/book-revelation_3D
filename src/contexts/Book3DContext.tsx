@@ -61,10 +61,6 @@ export function Book3DProvider({
     setIsRotating(prev => !prev);
   }, []);
 
-  const setRotation = useCallback((rotating: boolean) => {
-    setIsRotating(rotating);
-  }, []);
-
   const zoomIn = useCallback(() => {
     setCameraZoom(prev => Math.min(prev + 0.2, 2));
   }, []);
@@ -84,7 +80,6 @@ export function Book3DProvider({
   const value = useMemo(() => ({
     isRotating,
     toggleRotation,
-    setRotation,
     theme,
     setTheme,
     bookImages,
@@ -101,7 +96,6 @@ export function Book3DProvider({
   }), [
     isRotating,
     toggleRotation,
-    setRotation,
     theme,
     setTheme,
     bookImages,

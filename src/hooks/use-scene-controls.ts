@@ -54,13 +54,12 @@ export function useCameraControls(): UseCameraControls {
 interface UseBookRotation {
   isRotating: boolean;
   toggleRotation: () => void;
-  setRotation: (rotating: boolean) => void;
   rotationSpeed: number;
   setRotationSpeed: (speed: number) => void;
 }
 
 export function useBookRotation(): UseBookRotation {
-  const { isRotating, toggleRotation, setRotation } = useBook3D();
+  const { isRotating, toggleRotation } = useBook3D();
   const rotationSpeed = 0.5;
 
   const setRotationSpeed = useCallback((_speed: number) => {
@@ -70,7 +69,6 @@ export function useBookRotation(): UseBookRotation {
   return {
     isRotating,
     toggleRotation,
-    setRotation,
     rotationSpeed,
     setRotationSpeed,
   };
