@@ -49,7 +49,7 @@
 - [x] DEPLOY.md документация
 
 ### Code Quality
-- [x] 92 теста проходят (unit + integration)
+- [x] 110 тестов проходят (unit + integration)
 - [x] ESLint: 0 errors, 0 warnings ✅
 - [x] Build успешен
 - [x] TypeScript строгий режим (noImplicitAny: true)
@@ -59,6 +59,13 @@
 - [x] Удалён неиспользуемый CanvasErrorBoundary
 - [x] Реализован setZoom в Book3DContext
 - [x] Удалены console.warn заглушки
+- [x] Удалён useBookRotation прокси (используется useBook3D напрямую)
+- [x] Удалены неиспользуемые хуки: useCameraControls, useTheme, useBookTextures
+- [x] Удалены неиспользуемые компоненты: CoverUpload, ThemeSelector, BookCoverFinder
+- [x] Удалены файлы: use-scene-controls.ts, contexts/index.ts, use-mounted.ts, use-swipe.ts, use-book-cover.ts
+- [x] Упрощён use-keyboard-shortcuts (удалены useKeyboardShortcuts, useKeyboardShortcutsHelp)
+- [x] Удалены тесты: use-scene-controls.test.tsx, use-mounted.test.tsx, use-swipe.test.tsx, use-book-cover.test.tsx
+- [x] Итого удалено ~900+ строк неиспользуемого кода
 
 ### SEO
 - [x] Расширенные мета-теги (Open Graph, Twitter Cards)
@@ -158,7 +165,7 @@
 
 | Метрика | Значение | Цель |
 |---------|----------|------|
-| Тесты | 112 passed ✅ | 95+ |
+| Тесты | 110 passed ✅ | 95+ |
 | ESLint errors | 0 ✅ | 0 |
 | ESLint warnings | 0 ✅ | 0 |
 | Языки | 4 | 6+ |
@@ -166,6 +173,7 @@
 | Категории | 13 | - |
 | Lighthouse Performance | TBD | 90+ |
 | Lighthouse Accessibility | TBD | 95+ |
+| Удалено кода | ~900+ строк | - |
 
 ---
 
@@ -189,7 +197,8 @@
 - ✅ Категоризация цитат (13 категорий)
 - ✅ Авто-тема по времени суток
 - ✅ Улучшенные частицы (200 частиц, реакция на вращение)
-- ✅ 112 тестов
+- ✅ 110 тестов
+- ✅ Рефакторинг (удалено ~900+ строк неиспользуемого кода)
 
 ### v0.3.0 (план)
 - [ ] Интеграция с Open Library API для обложек
