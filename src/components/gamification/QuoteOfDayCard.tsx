@@ -12,9 +12,9 @@ export function QuoteOfDayCard({ onLike }: QuoteOfDayCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleLike = useCallback(() => {
-    toggleQuoteLike(quoteOfDay.quote);
+    toggleQuoteLike();
     onLike?.(!quoteOfDay.liked);
-  }, [quoteOfDay.quote, quoteOfDay.liked, toggleQuoteLike, onLike]);
+  }, [quoteOfDay.liked, toggleQuoteLike, onLike]);
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
     if (event.key === "Enter" || event.key === " ") {
@@ -120,12 +120,12 @@ export function QuoteOfDayCard({ onLike }: QuoteOfDayCardProps) {
         <div className="mt-3 pt-3 border-t border-amber-500/10">
           <div className="flex items-center justify-between text-xs text-white/50 mb-1">
             <span>Прогресс изучения</span>
-            <span>Цитата #{getDayOfYear()}</span>
+            <span>День {getDayOfYear()}</span>
           </div>
           <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-            <div 
+            <div
               className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-500"
-              style={{ width: `${((getDayOfYear() % 365) / 365) * 100}%` }}
+              style={{ width: `${(getDayOfYear() / 365) * 100}%` }}
             />
           </div>
         </div>

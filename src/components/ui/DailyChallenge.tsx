@@ -47,9 +47,9 @@ export function DailyChallenge() {
 
   const handleLike = useCallback(() => {
     setIsLiked(prev => !prev);
-    toggleQuoteLike(quoteOfDay.quote);
+    toggleQuoteLike();
     showToast(isLiked ? "Удалено из избранного" : "Добавлено в избранное", isLiked ? "info" : "success");
-  }, [isLiked, quoteOfDay.quote, toggleQuoteLike, showToast]);
+  }, [isLiked, toggleQuoteLike, showToast]);
 
   const handleShare = useCallback(async () => {
     const shareData = {
