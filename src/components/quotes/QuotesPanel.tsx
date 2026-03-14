@@ -92,7 +92,8 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
     let result = quotes.map((q, i) => ({ quote: q, originalIndex: i }));
 
     if (filter === 'favorites') {
-      result = result.filter(({ originalIndex }) => favorites.includes(originalIndex));
+      const favoriteTexts = new Set(favorites.map(q => q.text));
+      result = result.filter(({ quote }) => favoriteTexts.has(quote.text));
     }
 
     if (categoryFilter !== 'all') {
@@ -122,8 +123,9 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
 
   const handleToggleFavorite = useCallback((e: React.MouseEvent | React.KeyboardEvent, index: number) => {
     e.stopPropagation();
-    toggleFavorite(index);
-  }, [toggleFavorite]);
+    const quote = quotes[index];
+    toggleFavorite(quote);
+  }, [toggleFavorite, quotes]);
 
   // Функция копирования цитаты
   const handleCopyQuote = useCallback((text: string) => {
@@ -252,7 +254,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
         index={originalIndex}
         isVisible={visibleQuotes.includes(originalIndex)}
         isActive={activeQuote === originalIndex}
-        isFavorite={isFavorite(originalIndex)}
+        isFavorite={isFavorite(quote)}
         onClick={() => setActiveQuote(originalIndex)}
         onToggleFavorite={(e) => handleToggleFavorite(e, originalIndex)}
         onCopy={handleCopyQuote}

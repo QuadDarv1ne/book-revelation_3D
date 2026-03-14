@@ -1,90 +1,71 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useUserSettings } from "./use-user-settings";
+import type { Quote } from "@/types/quote";
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<number[]>([]);
+  const { settings, updateSettings } = useUserSettings();
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Экспорт избранных цитат в JSON
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
+  const favorites = useMemo(() => settings.favorites, [settings.favorites]);
+
   const exportFavorites = useCallback(() => {
     if (favorites.length === 0) {
       return null;
     }
-    
+
     const exportData = {
       version: "1.0",
       timestamp: new Date().toISOString(),
       favorites: favorites,
       total: favorites.length
     };
-    
+
     return JSON.stringify(exportData, null, 2);
   }, [favorites]);
 
-  // Импорт избранных цитат из JSON
   const importFavorites = useCallback((jsonString: string) => {
     try {
       const importData = JSON.parse(jsonString);
-      
-      // Валидация структуры данных
+
       if (!importData.favorites || !Array.isArray(importData.favorites)) {
         throw new Error("Неверный формат данных");
       }
-      
-      // Проверка, что все элементы массива - числа
-      if (!importData.favorites.every((index: unknown) => typeof index === 'number' && index >= 0)) {
-        throw new Error("Неверный формат индексов цитат");
+
+      if (!importData.favorites.every((q: Quote) => typeof q.text === 'string' && typeof q.author === 'string')) {
+        throw new Error("Неверный формат цитат");
       }
-      
-      setFavorites(importData.favorites);
+
+      updateSettings('favorites', importData.favorites);
       return { success: true, count: importData.favorites.length };
     } catch (error) {
       return { success: false, error: error instanceof Error ? error.message : "Неизвестная ошибка" };
     }
-  }, []);
+  }, [updateSettings]);
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("stoic-favorites");
-      if (stored) {
-        setFavorites(JSON.parse(stored));
-      }
-    } catch {
-      // Ignore parse errors
-    } finally {
-      setIsLoaded(true);
+  const toggleFavorite = useCallback((quote: Quote) => {
+    const exists = favorites.some(q => q.text === quote.text);
+    if (exists) {
+      updateSettings('favorites', favorites.filter(q => q.text !== quote.text));
+    } else {
+      updateSettings('favorites', [...favorites, quote]);
     }
-  }, []);
+  }, [favorites, updateSettings]);
 
-  useEffect(() => {
-    if (isLoaded) {
-      try {
-        localStorage.setItem("stoic-favorites", JSON.stringify(favorites));
-      } catch {
-        // Ignore storage errors
-      }
-    }
-  }, [favorites, isLoaded]);
-
-  const toggleFavorite = useCallback((index: number) => {
-    setFavorites((prev) =>
-      prev.includes(index)
-        ? prev.filter((i) => i !== index)
-        : [...prev, index]
-    );
-  }, []);
-
-  const favoritesSet = useMemo(() => new Set(favorites), [favorites]);
-
-  const isFavorite = useCallback(
-    (index: number) => favoritesSet.has(index),
-    [favoritesSet]
-  );
+  const isFavorite = useCallback((quote: Quote) => {
+    return favorites.some(q => q.text === quote.text);
+  }, [favorites]);
 
   const clearFavorites = useCallback(() => {
-    setFavorites([]);
-  }, []);
+    updateSettings('favorites', []);
+  }, [updateSettings]);
+
+  const favoritesSet = useMemo(() => new Set(favorites.map(q => q.text)), [favorites]);
 
   return {
     favorites,

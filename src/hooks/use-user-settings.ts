@@ -20,6 +20,11 @@ interface Achievement {
   progress: number;
 }
 
+interface CameraState {
+  position: { x: number; y: number; z: number };
+  zoom: number;
+}
+
 interface UserSettings {
   theme: Theme;
   locale: Locale;
@@ -35,6 +40,7 @@ interface UserSettings {
     rotations: number;
   };
   activeBookId: string;
+  cameraState: CameraState;
 }
 
 const defaultSettings: UserSettings = {
@@ -52,6 +58,10 @@ const defaultSettings: UserSettings = {
     rotations: 0,
   },
   activeBookId: 'marcus-aurelius-meditations',
+  cameraState: {
+    position: { x: 0, y: 1.25, z: 4.0 },
+    zoom: 1,
+  },
 };
 
 const STORAGE_KEY = 'user-settings';

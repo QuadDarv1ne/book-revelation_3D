@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import * as THREE from 'three';
+import { useUserSettings } from './use-user-settings';
 
 export interface CameraState {
   position: { x: number; y: number; z: number };
@@ -13,42 +14,28 @@ const DEFAULT_CAMERA_STATE: CameraState = {
   zoom: 1
 };
 
-const STORAGE_KEY = 'stoic-book-camera-state';
-const SAVE_DELAY = 1000;
-
 export function useCameraPersistence() {
-  const [cameraState, setCameraState] = useState<CameraState>(DEFAULT_CAMERA_STATE);
+  const { settings, updateSettings } = useUserSettings();
   const [isLoaded, setIsLoaded] = useState(false);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const [cameraState, setCameraState] = useState<CameraState>(DEFAULT_CAMERA_STATE);
+
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as CameraState;
-        if (parsed.position && typeof parsed.zoom === 'number') {
-          setCameraState(parsed);
-        }
-      }
-    } catch {
-      // Ignore parse errors
-    } finally {
-      setIsLoaded(true);
+    if (settings.cameraState) {
+      setCameraState(settings.cameraState);
     }
-  }, []);
+    setIsLoaded(true);
+  }, [settings.cameraState]);
 
   const saveCameraState = useCallback((state: CameraState) => {
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
     saveTimeoutRef.current = setTimeout(() => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch {
-        // Ignore storage errors
-      }
-    }, SAVE_DELAY);
-  }, []);
+      updateSettings('cameraState', state);
+    }, 1000);
+  }, [updateSettings]);
 
   const updatePosition = useCallback((position: THREE.Vector3) => {
     setCameraState(prev => {
@@ -68,12 +55,8 @@ export function useCameraPersistence() {
 
   const resetCamera = useCallback(() => {
     setCameraState(DEFAULT_CAMERA_STATE);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_CAMERA_STATE));
-    } catch {
-      // Ignore storage errors
-    }
-  }, []);
+    updateSettings('cameraState', DEFAULT_CAMERA_STATE);
+  }, [updateSettings]);
 
   useEffect(() => {
     return () => {
