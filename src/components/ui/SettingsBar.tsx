@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
+import type { ComponentType } from "react";
 import { useToast } from "./Toast";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useI18n } from "@/hooks/use-i18n";
@@ -86,30 +87,60 @@ interface SettingsBarProps {
   onThemeChange: (theme: "dark" | "light" | "blue" | "purple" | "ambient" | "relax" | "auto" | "auto-time") => void;
 }
 
+const THEMES_DATA = [
+  { value: "dark" as const, labelKey: "theme.dark", preview: "bg-[#1a1a1a]" },
+  { value: "light" as const, labelKey: "theme.light", preview: "bg-[#f5f5f5]" },
+  { value: "blue" as const, labelKey: "theme.blue", preview: "bg-[#1e3a5f]" },
+  { value: "purple" as const, labelKey: "theme.purple", preview: "bg-[#3f2a5f]" },
+  { value: "ambient" as const, labelKey: "theme.ambient", preview: "bg-[#1a3f2f]" },
+  { value: "relax" as const, labelKey: "theme.relax", preview: "bg-[#d4dcc4]" },
+  { value: "auto" as const, labelKey: "theme.auto", preview: "bg-gradient-to-br from-[#1a1a1a] to-[#f5f5f5]" },
+  { value: "auto-time" as const, labelKey: "theme.autoTime", preview: "bg-gradient-to-br from-[#1a1a2e] to-[#f5f5dc]" },
+] as const;
+
+const ICON_MAP: Record<string, ComponentType<IconProps>> = {
+  moon: Moon,
+  sun: Sun,
+  palette: Palette,
+  monitor: Monitor,
+  clock: Clock,
+  user: User,
+  settings: Settings,
+  chevronUp: ChevronUp,
+  chevronDown: ChevronDown,
+};
+
+const THEME_ICONS: Record<string, string> = {
+  dark: "moon",
+  light: "sun",
+  blue: "palette",
+  purple: "palette",
+  ambient: "palette",
+  relax: "palette",
+  auto: "monitor",
+  "auto-time": "clock",
+};
+
 export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { showToast } = useToast();
   const { exportFavorites, importFavorites } = useFavorites();
   const { t } = useI18n();
 
-  const THEMES = useMemo(() => [
-    { value: "dark" as const, label: t('theme.dark'), icon: Moon, preview: "bg-[#1a1a1a]" },
-    { value: "light" as const, label: t('theme.light'), icon: Sun, preview: "bg-[#f5f5f5]" },
-    { value: "blue" as const, label: t('theme.blue'), icon: Palette, preview: "bg-[#1e3a5f]" },
-    { value: "purple" as const, label: t('theme.purple'), icon: Palette, preview: "bg-[#3f2a5f]" },
-    { value: "ambient" as const, label: t('theme.ambient'), icon: Palette, preview: "bg-[#1a3f2f]" },
-    { value: "relax" as const, label: t('theme.relax'), icon: Palette, preview: "bg-[#d4dcc4]" },
-    { value: "auto" as const, label: t('theme.auto'), icon: Monitor, preview: "bg-gradient-to-br from-[#1a1a1a] to-[#f5f5f5]" },
-    { value: "auto-time" as const, label: t('theme.autoTime'), icon: Clock, preview: "bg-gradient-to-br from-[#1a1a2e] to-[#f5f5dc]" },
-  ], [t]);
+  const THEMES = useMemo(() => THEMES_DATA.map(themeData => ({
+    value: themeData.value,
+    label: t(themeData.labelKey),
+    icon: ICON_MAP[THEME_ICONS[themeData.value]],
+    preview: themeData.preview
+  })), [t]);
 
-  const cycleTheme = () => {
+  const cycleTheme = useCallback(() => {
     const currentIndex = THEMES.findIndex(t => t.value === theme);
     const nextIndex = (currentIndex + 1) % THEMES.length;
     onThemeChange(THEMES[nextIndex].value as "dark" | "light" | "blue" | "purple" | "ambient" | "relax");
-  };
+  }, [theme, THEMES, onThemeChange]);
 
-  const currentTheme = THEMES.find(t => t.value === theme) || THEMES[0];
+  const currentTheme = useMemo(() => THEMES.find(t => t.value === theme) || THEMES[0], [theme, THEMES]);
   const CurrentIcon = currentTheme.icon;
 
   // Обработчик экспорта избранных цитат
