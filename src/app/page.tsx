@@ -241,7 +241,6 @@ export default function Home() {
             {!sceneError && (
               <SceneContainer
                 book={activeBook}
-                isZenMode={isZenMode}
                 rotationSpeed={settings.rotationSpeed}
                 onError={handleSceneError}
               />

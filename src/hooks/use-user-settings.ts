@@ -65,6 +65,38 @@ const defaultSettings: UserSettings = {
 };
 
 const STORAGE_KEY = 'user-settings';
+const VALID_LOCALES = ['en', 'ru', 'zh', 'he'] as const;
+const VALID_THEMES = ['dark', 'light', 'blue', 'purple', 'ambient', 'relax', 'auto', 'auto-time'] as const;
+
+function isValidLocale(value: unknown): value is Locale {
+  return typeof value === 'string' && VALID_LOCALES.includes(value as Locale);
+}
+
+function isValidTheme(value: unknown): value is Theme {
+  return typeof value === 'string' && VALID_THEMES.includes(value as Theme);
+}
+
+function isValidQuote(value: unknown): value is Quote {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'text' in value &&
+    typeof (value as Quote).text === 'string' &&
+    'author' in value &&
+    typeof (value as Quote).author === 'string'
+  );
+}
+
+function isValidCameraState(value: unknown): value is CameraState {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'position' in value &&
+    typeof (value as CameraState).position === 'object' &&
+    'zoom' in value &&
+    typeof (value as CameraState).zoom === 'number'
+  );
+}
 
 export function useUserSettings() {
   const [settings, setSettings] = useState<UserSettings>(defaultSettings);
@@ -75,7 +107,20 @@ export function useUserSettings() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        setSettings({ ...defaultSettings, ...parsed });
+        
+        // Валидация и санитизация данных
+        const validated: Partial<UserSettings> = {};
+        
+        if (isValidTheme(parsed.theme)) validated.theme = parsed.theme;
+        if (isValidLocale(parsed.locale)) validated.locale = parsed.locale;
+        if (typeof parsed.rotationSpeed === 'number') validated.rotationSpeed = Math.max(0.1, Math.min(2, parsed.rotationSpeed));
+        if (typeof parsed.zenMode === 'boolean') validated.zenMode = parsed.zenMode;
+        if (Array.isArray(parsed.favorites)) validated.favorites = parsed.favorites.filter(isValidQuote).slice(0, 1000);
+        if (Array.isArray(parsed.achievements)) validated.achievements = parsed.achievements.filter((a: unknown) => typeof a === 'object' && a !== null && 'id' in a).slice(0, 100);
+        if (isValidCameraState(parsed.cameraState)) validated.cameraState = parsed.cameraState;
+        if (typeof parsed.activeBookId === 'string') validated.activeBookId = parsed.activeBookId;
+        
+        setSettings({ ...defaultSettings, ...validated });
       }
     } catch (error) {
       console.error('Failed to load user settings:', error);
@@ -149,6 +194,11 @@ export function useUserSettings() {
 
   const importSettings = useCallback((json: string) => {
     try {
+      // Проверка размера данных (максимум 1MB)
+      if (json.length > 1024 * 1024) {
+        return { success: false, error: 'Превышен максимальный размер данных' };
+      }
+
       const data = JSON.parse(json);
       if (!data || typeof data !== 'object') {
         return { success: false, error: 'Неверный формат данных' };
@@ -157,21 +207,27 @@ export function useUserSettings() {
       const validatedData: Partial<UserSettings> = {};
 
       if (Array.isArray(data.favorites)) {
-        validatedData.favorites = data.favorites.filter(
-          (q: Quote) => typeof q.text === 'string' && typeof q.author === 'string'
-        );
+        validatedData.favorites = data.favorites
+          .filter(isValidQuote)
+          .slice(0, 1000); // Максимум 1000 цитат
       }
 
       if (Array.isArray(data.achievements)) {
-        validatedData.achievements = data.achievements.filter(
-          (a: Achievement) => typeof a.id === 'string' && typeof a.unlockedAt === 'string'
-        );
+        validatedData.achievements = data.achievements
+          .filter((a: unknown): a is Achievement => 
+            typeof a === 'object' && a !== null && 'id' in a && typeof (a as Achievement).id === 'string'
+          )
+          .slice(0, 100); // Максимум 100 достижений
       }
 
       if (data.statistics && typeof data.statistics === 'object') {
         validatedData.statistics = {
           ...settings.statistics,
-          ...data.statistics,
+          timeSpent: typeof data.statistics.timeSpent === 'number' ? data.statistics.timeSpent : settings.statistics.timeSpent,
+          quotesRead: typeof data.statistics.quotesRead === 'number' ? data.statistics.quotesRead : settings.statistics.quotesRead,
+          rotations: typeof data.statistics.rotations === 'number' ? data.statistics.rotations : settings.statistics.rotations,
+          booksViewed: Array.isArray(data.statistics.booksViewed) ? data.statistics.booksViewed.slice(0, 50) : settings.statistics.booksViewed,
+          themesExplored: Array.isArray(data.statistics.themesExplored) ? data.statistics.themesExplored.slice(0, 50) : settings.statistics.themesExplored,
         };
       }
 

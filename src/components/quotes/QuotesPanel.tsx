@@ -6,6 +6,7 @@ import { QuoteCard } from "./QuoteCard";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useToast } from "@/components/ui/Toast";
 import { useI18n } from "@/hooks/use-i18n";
+import { triggerHaptic } from "@/lib/haptic";
 
 interface QuotesPanelProps {
   quotes: Quote[];
@@ -13,13 +14,6 @@ interface QuotesPanelProps {
   setActiveQuote: (n: number | ((prev: number) => number)) => void;
   bookTitle: string;
 }
-
-// Haptic feedback для мобильных
-const triggerHaptic = (pattern: number | number[]) => {
-  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-    navigator.vibrate(pattern);
-  }
-};
 
 export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: QuotesPanelProps) {
   const [visibleQuotes, setVisibleQuotes] = useState<number[]>([]);
@@ -72,19 +66,24 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
   }, [quotes.length, setActiveQuote]);
 
   useEffect(() => {
+    const timers: NodeJS.Timeout[] = [];
+    
     const showQuote = (index: number) => {
       if (index < quotes.length) {
         const timer = setTimeout(() => {
           setVisibleQuotes(prev => [...prev, index]);
           showQuote(index + 1);
         }, 50);
-        return timer;
+        timers.push(timer);
       }
-      return undefined;
     };
 
     const initialTimer = setTimeout(() => showQuote(0), 300);
-    return () => clearTimeout(initialTimer);
+    timers.push(initialTimer);
+    
+    return () => {
+      timers.forEach(timer => clearTimeout(timer));
+    };
   }, [quotes.length]);
 
   // Фильтруем с сохранением оригинального индекса
@@ -121,11 +120,10 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
     return ['all', ...Array.from(cats)];
   }, [quotes]);
 
-  const handleToggleFavorite = useCallback((e: React.MouseEvent | React.KeyboardEvent, index: number) => {
+  const handleToggleFavorite = useCallback((e: React.MouseEvent | React.KeyboardEvent, quote: Quote) => {
     e.stopPropagation();
-    const quote = quotes[index];
     toggleFavorite(quote);
-  }, [toggleFavorite, quotes]);
+  }, [toggleFavorite]);
 
   // Функция копирования цитаты
   const handleCopyQuote = useCallback((text: string) => {
@@ -256,7 +254,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
         isActive={activeQuote === originalIndex}
         isFavorite={isFavorite(quote)}
         onClick={() => setActiveQuote(originalIndex)}
-        onToggleFavorite={(e) => handleToggleFavorite(e, originalIndex)}
+        onToggleFavorite={(e) => handleToggleFavorite(e, quote)}
         onCopy={handleCopyQuote}
         onShare={handleShareQuote}
       />
