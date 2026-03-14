@@ -8,7 +8,6 @@ import { useBook3D } from "@/contexts/Book3DContext";
 import { LoadingFallback } from "@/components/ui/LoadingFallback";
 import { getBookById, getDefaultBook, books } from "@/data/books";
 import { textureManager } from "@/lib/textures/texture-manager";
-import { useFavorites } from "@/hooks/use-favorites";
 import { useToast } from "@/components/ui/Toast";
 import { usePrefersColorScheme } from "@/hooks/use-prefers-color-scheme";
 import { useOfflineQuotes } from "@/hooks/use-offline-quotes";
@@ -16,6 +15,9 @@ import { useAnalytics, trackBookChange, trackThemeChange } from "@/hooks/use-ana
 import { useAutoTheme } from "@/hooks/use-auto-theme";
 import { useGamification } from "@/hooks/use-gamification";
 import { useZenMode } from "@/hooks/use-zen-mode";
+import { useUserSettings } from "@/hooks/use-user-settings";
+import { useFPSMonitor } from "@/hooks/use-fps-monitor";
+import { useErrorHandler } from "@/hooks/use-error-handler";
 import { KeyboardShortcutsHelp } from "@/components/ui/KeyboardShortcutsHelp";
 import type { Quote } from "@/types/quote";
 
@@ -28,34 +30,10 @@ const BACKGROUND_GRADIENT_DARK = 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgb
 const BACKGROUND_GRADIENT_LIGHT = 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(180,160,80,0.12)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(160,140,70,0.08)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(255,255,255,0.9)_0%,transparent_50%)';
 const GRID_PATTERN = 'linear-gradient(rgba(212,175,55,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.5)_1px,transparent_1px)';
 const QUOTE_ROTATION_INTERVAL = 5000;
-const DEFAULT_BOOK_ID = "marcus-aurelius-meditations"; // Книга по умолчанию
-
-function getInitialBook(): string {
-  if (typeof window === "undefined") return DEFAULT_BOOK_ID;
-  const saved = localStorage.getItem("activeBook");
-  if (saved && getBookById(saved)) return saved;
-  return DEFAULT_BOOK_ID;
-}
-
-function getInitialRotationSpeed(): number {
-  if (typeof window === "undefined") return 0.5;
-  const saved = localStorage.getItem("rotationSpeed");
-  if (saved) {
-    const speed = parseFloat(saved);
-    if (!isNaN(speed) && speed >= 0.1 && speed <= 2) return speed;
-  }
-  return 0.5;
-}
+const DEFAULT_BOOK_ID = "marcus-aurelius-meditations";
 
 const THEMES = ["dark", "light", "blue", "purple", "ambient", "relax", "auto", "auto-time"] as const;
 type Theme = (typeof THEMES)[number];
-
-function getInitialTheme(): Theme {
-  if (typeof window === "undefined") return "relax";
-  const saved = localStorage.getItem("theme");
-  if (saved && THEMES.includes(saved as Theme)) return saved as Theme;
-  return "relax";
-}
 
 export default function Home() {
   const hasWebGL = useWebGLSupport();
@@ -64,32 +42,36 @@ export default function Home() {
   const { themeConfig: autoThemeConfig } = useAutoTheme();
   const { addThemeExplored, addBookViewed, trackTime } = useGamification();
   const { isZenMode, toggleZenMode } = useZenMode({ autoSave: true });
+  const {
+    settings,
+    isLoaded: settingsLoaded,
+    updateSettings,
+    exportSettings,
+    importSettings,
+  } = useUserSettings();
+  const { captureException, captureMessage } = useErrorHandler({ enabled: true });
+  const fpsStats = useFPSMonitor(!isZenMode);
+  
   const [activeQuote, setActiveQuote] = useState(0);
   const [webGLError, setWebGLError] = useState(false);
-  const [theme, setTheme] = useState<Theme>(getInitialTheme);
-  const [activeBookId, setActiveBookId] = useState<string>(getInitialBook);
   const [sceneError, setSceneError] = useState(false);
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
-  const rotationSpeed = getInitialRotationSpeed();
-  
-  // Получаем системную цветовую схему для режима "auto"
+  const rotationSpeed = settings.rotationSpeed;
+
+  // Синхронизация темы с централизованными настройками
   const systemColorScheme = usePrefersColorScheme();
   
-  // Определяем эффективную тему (с учётом "auto")
   const effectiveTheme = useMemo(() => {
-    if (theme === "auto") {
+    if (settings.theme === "auto") {
       return systemColorScheme;
     }
-    return theme;
-  }, [theme, systemColorScheme]);
+    if (settings.theme === "auto-time") {
+      return autoThemeConfig.colorClass.replace('-theme', '') as typeof systemColorScheme;
+    }
+    return settings.theme;
+  }, [settings.theme, systemColorScheme, autoThemeConfig]);
 
-  // Получаем активную книгу - оптимизировано с useMemo
-  const activeBook = useMemo(() => getBookById(activeBookId) || getDefaultBook(), [activeBookId]);
-
-  // Сохраняем выбор книги в localStorage
-  useEffect(() => {
-    localStorage.setItem("activeBook", activeBookId);
-  }, [activeBookId]);
+  const activeBook = useMemo(() => getBookById(settings.activeBookId) || getDefaultBook(), [settings.activeBookId]);
 
   // Предзагрузка текстур активной книги при монтировании
   useEffect(() => {
@@ -143,25 +125,23 @@ export default function Home() {
 
   // Смена темы оформления - оптимизировано
   useEffect(() => {
-    // Анимация при смене теме
+    if (!settingsLoaded) return;
+    
     document.body.classList.add('theme-transitioning');
 
-    // Применяем тему с учётом auto-time
-    const bodyTheme = theme === "auto-time" ? autoThemeConfig.colorClass : `${effectiveTheme}-theme`;
+    const bodyTheme = settings.theme === "auto-time" ? autoThemeConfig.colorClass : `${effectiveTheme}-theme`;
     document.body.className = bodyTheme;
-    localStorage.setItem("theme", theme);
 
-    // Track theme change
-    trackThemeChange(theme);
-    trackEvent("settings", "theme_change", theme);
-    addThemeExplored(theme);
+    trackThemeChange(settings.theme);
+    trackEvent("settings", "theme_change", settings.theme);
+    addThemeExplored(settings.theme);
 
     const timer = setTimeout(() => {
       document.body.classList.remove('theme-transitioning');
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [effectiveTheme, theme, trackEvent, autoThemeConfig, addThemeExplored]);
+  }, [effectiveTheme, settings.theme, settingsLoaded, trackEvent, autoThemeConfig, addThemeExplored]);
 
   // Отслеживание времени в приложении
   useEffect(() => {
@@ -180,11 +160,11 @@ export default function Home() {
   }, [activeBook.quotes.length]);
 
   const handleBookChange = useCallback((bookId: string) => {
-    trackBookChange(activeBookId, bookId);
+    trackBookChange(settings.activeBookId, bookId);
     trackEvent("navigation", "book_change", bookId);
     addBookViewed(bookId);
-    
-    // Предзагрузка текстур новой книги
+    updateSettings('activeBookId', bookId);
+
     const newBook = getBookById(bookId);
     if (newBook) {
       textureManager.preloadBookTextures(
@@ -192,21 +172,18 @@ export default function Home() {
         newBook.spineImage,
         newBook.backCoverImage
       ).catch(() => {
-        // Игнорируем ошибки предзагрузки
+        captureException(new Error(`Failed to preload textures for ${bookId}`));
       });
     }
-    
-    setActiveBookId(bookId);
-    setActiveQuote(0); // Сбрасываем на первую цитату новой книги
-  }, [activeBookId, trackEvent, addBookViewed]);
+
+    setActiveQuote(0);
+  }, [settings.activeBookId, trackEvent, addBookViewed, updateSettings, captureException]);
 
   const handleRetry = useCallback(() => {
     setWebGLError(false);
     window.location.reload();
   }, []);
 
-  // Экспорт/импорт избранных цитат
-  const { exportFavorites, importFavorites } = useFavorites();
   const { showToast } = useToast();
   const { cacheQuotes } = useOfflineQuotes();
 
@@ -220,7 +197,7 @@ export default function Home() {
   }, [cacheQuotes]);
 
   const handleExportFavorites = useCallback(() => {
-    const exportData = exportFavorites();
+    const exportData = exportSettings();
 
     if (!exportData) {
       showToast("Нет избранных цитат для экспорта", "info");
@@ -239,10 +216,12 @@ export default function Home() {
       URL.revokeObjectURL(url);
 
       showToast("Избранные цитаты экспортированы", "success");
-    } catch {
+      captureMessage("Favorites exported", "info");
+    } catch (error) {
+      captureException(error as Error);
       showToast("Ошибка при экспорте", "error");
     }
-  }, [exportFavorites, showToast]);
+  }, [exportSettings, showToast, captureException, captureMessage]);
 
   const handleImportFavorites = useCallback(() => {
     const input = document.createElement('input');
@@ -256,11 +235,13 @@ export default function Home() {
       const reader = new FileReader();
       reader.onload = (e) => {
         const content = e.target?.result as string;
-        const result = importFavorites(content);
+        const result = importSettings(content);
 
         if (result.success) {
           showToast(`Успешно импортировано ${result.count} цитат`, "success");
+          captureMessage(`Favorites imported: ${result.count}`, "info");
         } else {
+          captureException(new Error(result.error));
           showToast(`Ошибка импорта: ${result.error}`, "error");
         }
       };
@@ -273,13 +254,13 @@ export default function Home() {
     };
 
     input.click();
-  }, [importFavorites, showToast]);
+  }, [importSettings, showToast, captureException, captureMessage]);
 
   if (hasWebGL === false || webGLError) {
     return <WebGLError onRetry={handleRetry} />;
   }
 
-  const backgroundGradient = theme === "light" || theme === "relax" ? BACKGROUND_GRADIENT_LIGHT : BACKGROUND_GRADIENT_DARK;
+  const backgroundGradient = settings.theme === "light" || settings.theme === "relax" ? BACKGROUND_GRADIENT_LIGHT : BACKGROUND_GRADIENT_DARK;
   const gridPattern = GRID_PATTERN;
 
   return (
@@ -325,6 +306,8 @@ export default function Home() {
                 <div>hasWebGL: {hasWebGL === true ? 'yes' : hasWebGL === false ? 'no' : 'checking'}</div>
                 <div>sceneError: {sceneError ? 'yes' : 'no'}</div>
                 <div>activeBook: {activeBook.id}</div>
+                <div>FPS: {fpsStats.fps} (min: {fpsStats.min}, max: {fpsStats.max})</div>
+                <div>theme: {settings.theme}</div>
               </div>
             )}
 
@@ -335,7 +318,7 @@ export default function Home() {
           {/* Переключатель книг - вверху справа */}
           {!isZenMode && (
             <div className="absolute top-3 right-3 z-40">
-              <BookSelector activeBookId={activeBookId} onBookChange={handleBookChange} />
+              <BookSelector activeBookId={settings.activeBookId} onBookChange={handleBookChange} />
             </div>
           )}
 
@@ -374,8 +357,8 @@ export default function Home() {
             {/* Кнопка меню настроек - внизу справа */}
             <div className="absolute bottom-3 right-3 z-40">
               <MainMenu
-                theme={theme}
-                onThemeChange={(t: string) => setTheme(t as Theme)}
+                theme={settings.theme}
+                onThemeChange={(t: string) => updateSettings('theme', t as Theme)}
                 isRotating={isRotating}
                 onToggleRotation={toggleRotation}
                 zenMode={isZenMode}
@@ -402,7 +385,7 @@ export default function Home() {
           </div>
         )}
 
-        {!isZenMode && <SettingsBar theme={theme} onThemeChange={setTheme} />}
+        {!isZenMode && <SettingsBar theme={settings.theme} onThemeChange={(t) => updateSettings('theme', t as Theme)} />}
 
         {!isZenMode && <PWAInstall />}
 
