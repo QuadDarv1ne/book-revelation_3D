@@ -20,6 +20,15 @@ interface MainMenuProps {
 
 type MenuSection = "settings" | "about" | null;
 
+const THEMES_DATA = [
+  { value: "dark", labelKey: "theme.dark", color: "bg-[#1a1a1a]" },
+  { value: "light", labelKey: "theme.light", color: "bg-[#f5f5f5]" },
+  { value: "blue", labelKey: "theme.blue", color: "bg-[#1e3a5f]" },
+  { value: "purple", labelKey: "theme.purple", color: "bg-[#3f2a5f]" },
+  { value: "ambient", labelKey: "theme.ambient", color: "bg-[#1a3f2f]" },
+  { value: "relax", labelKey: "theme.relax", color: "bg-[#d4dcc4]" },
+] as const;
+
 export function MainMenu({
   theme,
   onThemeChange,
@@ -37,14 +46,11 @@ export function MainMenu({
   const { showToast } = useToast();
   const { t } = useI18n();
 
-  const THEMES = useMemo(() => [
-    { value: "dark", label: t('theme.dark'), color: "bg-[#1a1a1a]" },
-    { value: "light", label: t('theme.light'), color: "bg-[#f5f5f5]" },
-    { value: "blue", label: t('theme.blue'), color: "bg-[#1e3a5f]" },
-    { value: "purple", label: t('theme.purple'), color: "bg-[#3f2a5f]" },
-    { value: "ambient", label: t('theme.ambient'), color: "bg-[#1a3f2f]" },
-    { value: "relax", label: t('theme.relax'), color: "bg-[#d4dcc4]" },
-  ], [t]);
+  const THEMES = useMemo(() => THEMES_DATA.map(theme => ({
+    value: theme.value,
+    label: t(theme.labelKey),
+    color: theme.color
+  })), [t]);
 
   const handleThemeSelect = useCallback((themeValue: string) => {
     onThemeChange(themeValue);
@@ -57,9 +63,21 @@ export function MainMenu({
     showToast(`Скорость: ${speed}`, "info");
   }, [showToast]);
 
-  const toggleSection = (section: MenuSection) => {
-    setActiveSection(activeSection === section ? null : section);
-  };
+  const toggleSection = useCallback((section: MenuSection) => {
+    setActiveSection(prev => prev === section ? null : section);
+  }, []);
+
+  const handleOpenGamification = useCallback(() => {
+    setShowGamification(true);
+  }, []);
+
+  const handleExport = useCallback(() => {
+    onExportFavorites();
+  }, [onExportFavorites]);
+
+  const handleImport = useCallback(() => {
+    onImportFavorites();
+  }, [onImportFavorites]);
 
   // Контент меню (переиспользуется для desktop и mobile)
   const menuContent = (
@@ -73,7 +91,7 @@ export function MainMenu({
       {/* Кнопка прогресс */}
       <div className="px-5 py-3 border-b border-[rgba(212,175,55,0.1)]">
         <button
-          onClick={() => setShowGamification(true)}
+          onClick={handleOpenGamification}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-600/20 to-yellow-600/20 border border-amber-500/30 text-amber-100 dark:text-amber-100 light:text-amber-900 relax:text-amber-900 hover:from-amber-600/30 hover:to-yellow-600/30 transition-all focus:outline-none focus:ring-2 focus:ring-amber-400"
           type="button"
         >
@@ -210,7 +228,7 @@ export function MainMenu({
                   <h4 className="text-xs uppercase tracking-[0.12em] text-amber-500/70 mb-2">{t('menu.favorites')}</h4>
                   <div className="flex gap-2">
                     <button
-                      onClick={onExportFavorites}
+                      onClick={handleExport}
                       className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 text-gray-400 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-xs focus:outline-none focus:ring-2 focus:ring-amber-400"
                       type="button"
                     >
@@ -220,7 +238,7 @@ export function MainMenu({
                       <span>{t('quotes.export')}</span>
                     </button>
                     <button
-                      onClick={onImportFavorites}
+                      onClick={handleImport}
                       className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/5 text-gray-400 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-xs focus:outline-none focus:ring-2 focus:ring-amber-400"
                       type="button"
                     >
