@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState, useMemo, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Float } from "@react-three/drei";
 import * as THREE from "three";
 import { textureManager } from "@/lib/textures/texture-manager";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
+import { useBookMaterials } from "@/hooks/use-book-materials";
 
 interface BookProps {
   isRotating: boolean;
@@ -24,7 +25,6 @@ const DEFAULT_SPINE = "/book-spine.jpg";
 const DEFAULT_BACK_COVER = "/book-cover.jpg";
 const DEFAULT_ROTATION_SPEED = 0.5;
 
-// Выносим геометрии за пределы компонента для оптимизации
 const COVER_GEOMETRY = new THREE.BoxGeometry(BOOK_WIDTH, BOOK_HEIGHT, COVER_THICKNESS);
 const PAGES_GEOMETRY = new THREE.BoxGeometry(BOOK_WIDTH - 0.06, BOOK_HEIGHT - 0.06, BOOK_DEPTH - 0.035);
 const SPINE_GEOMETRY = new THREE.BoxGeometry(0.035, BOOK_HEIGHT + 0.015, BOOK_DEPTH + 0.015);
@@ -43,100 +43,28 @@ export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFA
   const touchRotation = useRef({ x: 0, y: 0 });
   const targetRotation = useRef(0);
 
-  // Текстуры хранятся в state для ленивой загрузки
   const [coverTexture, setCoverTexture] = useState<THREE.Texture | null>(null);
   const [spineTexture, setSpineTexture] = useState<THREE.Texture | null>(null);
   const [backCoverTexture, setBackCoverTexture] = useState<THREE.Texture | null>(null);
 
-  // Ленивая загрузка текстур при смене книги
   useEffect(() => {
-    // Предзагрузка всех текстур книги
     textureManager.preloadBookTextures(coverImage, spineImage, backCoverImage);
-    
-    // Загружаем текстуры через менеджер
     setCoverTexture(textureManager.getTexture(coverImage, 'cover'));
     setSpineTexture(textureManager.getTexture(spineImage, 'spine'));
     setBackCoverTexture(textureManager.getTexture(backCoverImage, 'back'));
   }, [coverImage, spineImage, backCoverImage]);
 
-  // Фолбэк материалы если текстуры ещё не загружены
-  const fallbackCoverMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    color: "#1a0f0a",
-    roughness: 0.45,
-    metalness: 0.15
-  }), []);
-
-  const fallbackSpineMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    color: "#150c08",
-    roughness: 0.45,
-    metalness: 0.15
-  }), []);
-
-  // Материалы с текстурами (обновляются при загрузке)
-  const coverMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    map: coverTexture,
-    roughness: 0.45,
-    metalness: 0.15,
-    color: "#ffffff"
-  }), [coverTexture]);
-
-  const backCoverMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    map: backCoverTexture,
-    roughness: 0.45,
-    metalness: 0.15,
-    color: "#ffffff"
-  }), [backCoverTexture]);
-
-  const spineMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    map: spineTexture,
-    roughness: 0.45,
-    metalness: 0.15,
-    color: "#ffffff"
-  }), [spineTexture]);
-
-  const pagesMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    color: "#f8f4eb",
-    roughness: 0.95,
-    metalness: 0
-  }), []);
-
-  const pagesEdgeMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    color: "#f5f0e6",
-    roughness: 0.9,
-    metalness: 0
-  }), []);
-
-  const goldMaterial = useMemo(() => new THREE.MeshStandardMaterial({
-    color: "#d4af37",
-    roughness: 0.25,
-    metalness: 0.85,
-    emissive: "#d4af37",
-    emissiveIntensity: 0.1
-  }), []);
-
-  const glowMaterial = useMemo(() => new THREE.MeshBasicMaterial({
-    color: "#d4af37",
-    transparent: true,
-    opacity: 0.2,
-    blending: THREE.AdditiveBlending
-  }), []);
-
-  // Очистка материалов при размонтировании
-  useEffect(() => {
-    return () => {
-      coverMaterial.dispose();
-      backCoverMaterial.dispose();
-      spineMaterial.dispose();
-      fallbackCoverMaterial.dispose();
-      fallbackSpineMaterial.dispose();
-      pagesMaterial.dispose();
-      pagesEdgeMaterial.dispose();
-      goldMaterial.dispose();
-      glowMaterial.dispose();
-    };
-  }, [coverMaterial, backCoverMaterial, spineMaterial, fallbackCoverMaterial, fallbackSpineMaterial, pagesMaterial, pagesEdgeMaterial, goldMaterial, glowMaterial]);
-
-  // Geometries - используем константы
+  const {
+    fallbackCoverMaterial,
+    fallbackSpineMaterial,
+    coverMaterial,
+    backCoverMaterial,
+    spineMaterial,
+    pagesMaterial,
+    pagesEdgeMaterial,
+    goldMaterial,
+    glowMaterial
+  } = useBookMaterials({ coverTexture, backCoverTexture, spineTexture });
 
   const handleTouchStart = useCallback((e: TouchEvent) => {
     const touch = e.touches[0];

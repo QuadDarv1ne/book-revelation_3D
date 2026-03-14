@@ -10,9 +10,12 @@ let dracoLoader: unknown = null;
 
 export function getDRACOLoader(): unknown {
   if (!dracoLoader) {
-    // DRACOLoader загружается динамически чтобы избежать проблем с bundling
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    dracoLoader = new (THREE as any).DRACOLoader();
+    // DRACOLoader загружается динамически через THREE
+    const DRACOLoaderClass = (THREE as unknown as { DRACOLoader?: new () => unknown }).DRACOLoader;
+    if (!DRACOLoaderClass) {
+      throw new Error('DRACOLoader not available');
+    }
+    dracoLoader = new DRACOLoaderClass();
     const loader = dracoLoader as { setDecoderPath?: (path: string) => void; setDecoderConfig?: (config: unknown) => void };
     if (loader.setDecoderPath && loader.setDecoderConfig) {
       loader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
@@ -103,17 +106,17 @@ export function optimizeTexture(
 ): THREE.Texture {
   const {
     maxSize = 2048,
-    format = THREE.RGBAFormat as unknown as THREE.PixelFormat,
+    format = THREE.RGBAFormat,
     generateMipmaps = true,
     minFilter = THREE.LinearMipmapLinearFilter,
     anisotropy = 4
   } = options;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (texture as any).format = format;
+  // @ts-expect-error - формат текстуры
+  texture.format = format;
   texture.generateMipmaps = generateMipmaps;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (texture as any).minFilter = minFilter;
+  // @ts-expect-error - фильтр текстуры
+  texture.minFilter = minFilter;
   texture.magFilter = THREE.LinearFilter;
   texture.anisotropy = anisotropy;
 
@@ -122,11 +125,10 @@ export function optimizeTexture(
     const image = texture.image as HTMLImageElement | HTMLCanvasElement;
     const maxDim = Math.max(image.width, image.height);
     if (maxDim > maxSize) {
-      // В реальном приложении здесь нужно ресайзить изображение
       console.warn(`Texture ${texture.name || 'unnamed'} is larger than ${maxSize}px`);
     }
   }
-  
+
   texture.needsUpdate = true;
   return texture;
 }

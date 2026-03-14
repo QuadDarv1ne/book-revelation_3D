@@ -1,14 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import dynamic from "next/dynamic";
 import { QuotesPanel } from "@/components/quotes";
-import { ControlButton, WebGLError, useWebGLSupport, SettingsBar, PWAInstall, ToastProvider, BookSelector, MainMenu } from "@/components/ui";
-import { useBook3D } from "@/contexts/Book3DContext";
-import { LoadingFallback } from "@/components/ui/LoadingFallback";
-import { getBookById, getDefaultBook, books } from "@/data/books";
-import { textureManager } from "@/lib/textures/texture-manager";
-import { useToast } from "@/components/ui/Toast";
+import { WebGLError, useWebGLSupport, SettingsBar, PWAInstall, ToastProvider, BookSelector, MainMenu } from "@/components/ui";
+import { SceneContainer } from "@/components/book/SceneContainer";
 import { usePrefersColorScheme } from "@/hooks/use-prefers-color-scheme";
 import { useOfflineQuotes } from "@/hooks/use-offline-quotes";
 import { useAnalytics, trackBookChange, trackThemeChange } from "@/hooks/use-analytics";
@@ -19,25 +14,16 @@ import { useUserSettings } from "@/hooks/use-user-settings";
 import { useFPSMonitor } from "@/hooks/use-fps-monitor";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { KeyboardShortcutsHelp } from "@/components/ui/KeyboardShortcutsHelp";
+import { useFavorites } from "@/hooks/use-favorites";
+import { getBookById, getDefaultBook, books } from "@/data/books";
+import { textureManager } from "@/lib/textures/texture-manager";
+import { useToast } from "@/components/ui/Toast";
 import type { Quote } from "@/types/quote";
 
-const Scene = dynamic(() => import("@/components/book").then(mod => ({ default: mod.Scene })), {
-  ssr: false,
-  loading: () => <LoadingFallback />,
-});
-
-const BACKGROUND_GRADIENT_DARK = 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.08)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.06)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(30,30,50,0.7)_0%,transparent_50%)';
-const BACKGROUND_GRADIENT_LIGHT = 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(180,160,80,0.12)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(160,140,70,0.08)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(255,255,255,0.9)_0%,transparent_50%)';
-const GRID_PATTERN = 'linear-gradient(rgba(212,175,55,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.5)_1px,transparent_1px)';
 const QUOTE_ROTATION_INTERVAL = 5000;
-const DEFAULT_BOOK_ID = "marcus-aurelius-meditations";
-
-const THEMES = ["dark", "light", "blue", "purple", "ambient", "relax", "auto", "auto-time"] as const;
-type Theme = (typeof THEMES)[number];
 
 export default function Home() {
   const hasWebGL = useWebGLSupport();
-  const { isRotating, toggleRotation } = useBook3D();
   const { trackEvent } = useAnalytics();
   const { themeConfig: autoThemeConfig } = useAutoTheme();
   const { addThemeExplored, addBookViewed, trackTime } = useGamification();
@@ -47,20 +33,20 @@ export default function Home() {
     isLoaded: settingsLoaded,
     updateSettings,
     exportSettings,
-    importSettings,
   } = useUserSettings();
   const { captureException, captureMessage } = useErrorHandler({ enabled: true });
   const fpsStats = useFPSMonitor(!isZenMode);
-  
+  const { showToast } = useToast();
+  const { exportFavoritesToFile, importFavoritesFromFile } = useFavorites();
+
   const [activeQuote, setActiveQuote] = useState(0);
   const [webGLError, setWebGLError] = useState(false);
   const [sceneError, setSceneError] = useState(false);
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
-  const rotationSpeed = settings.rotationSpeed;
+  const [menuIsRotating, setMenuIsRotating] = useState(false);
 
-  // Синхронизация темы с централизованными настройками
   const systemColorScheme = usePrefersColorScheme();
-  
+
   const effectiveTheme = useMemo(() => {
     if (settings.theme === "auto") {
       return systemColorScheme;
@@ -73,35 +59,17 @@ export default function Home() {
 
   const activeBook = useMemo(() => getBookById(settings.activeBookId) || getDefaultBook(), [settings.activeBookId]);
 
-  // Предзагрузка текстур активной книги при монтировании
-  useEffect(() => {
-    textureManager.preloadBookTextures(
-      activeBook.coverImage,
-      activeBook.spineImage,
-      activeBook.backCoverImage
-    ).catch(() => {
-      // Игнорируем ошибки предзагрузки
-    });
-  }, [activeBook.coverImage, activeBook.spineImage, activeBook.backCoverImage]);
-
-  // Обработчик ошибок сцены
-  const handleSceneError = useCallback(() => {
-    setSceneError(true);
-    setWebGLError(true);
-  }, []);
-
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'TOGGLE_ROTATION') {
-        toggleRotation();
+        toggleZenMode();
       }
     };
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [toggleRotation]);
+  }, [toggleZenMode]);
 
-  // Zen-режим и горячие клавиши
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'z' || e.key === 'Z') {
@@ -123,10 +91,9 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isZenMode, toggleZenMode]);
 
-  // Смена темы оформления - оптимизировано
   useEffect(() => {
     if (!settingsLoaded) return;
-    
+
     document.body.classList.add('theme-transitioning');
 
     const bodyTheme = settings.theme === "auto-time" ? autoThemeConfig.colorClass : `${effectiveTheme}-theme`;
@@ -143,15 +110,13 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [effectiveTheme, settings.theme, settingsLoaded, trackEvent, autoThemeConfig, addThemeExplored]);
 
-  // Отслеживание времени в приложении
   useEffect(() => {
     const interval = setInterval(() => {
-      trackTime(10); // Каждые 10 секунд добавляем время
+      trackTime(10);
     }, 10000);
     return () => clearInterval(interval);
   }, [trackTime]);
 
-  // Автоматическое переключение цитат
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveQuote((prev) => (prev + 1) % activeBook.quotes.length);
@@ -184,10 +149,13 @@ export default function Home() {
     window.location.reload();
   }, []);
 
-  const { showToast } = useToast();
+  const handleSceneError = useCallback(() => {
+    setSceneError(true);
+    setWebGLError(true);
+  }, []);
+
   const { cacheQuotes } = useOfflineQuotes();
 
-  // Кэширование цитат для offline режима
   useEffect(() => {
     const quotesByBook: Record<string, Quote[]> = {};
     books.forEach(book => {
@@ -205,23 +173,11 @@ export default function Home() {
     }
 
     try {
-      const blob = new Blob([exportData], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `stoic-favorites-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      showToast("Избранные цитаты экспортированы", "success");
-      captureMessage("Favorites exported", "info");
+      exportFavoritesToFile(exportData, showToast, captureMessage);
     } catch (error) {
       captureException(error as Error);
-      showToast("Ошибка при экспорте", "error");
     }
-  }, [exportSettings, showToast, captureException, captureMessage]);
+  }, [exportSettings, showToast, captureMessage, exportFavoritesToFile, captureException]);
 
   const handleImportFavorites = useCallback(() => {
     const input = document.createElement('input');
@@ -235,15 +191,7 @@ export default function Home() {
       const reader = new FileReader();
       reader.onload = (e) => {
         const content = e.target?.result as string;
-        const result = importSettings(content);
-
-        if (result.success) {
-          showToast(`Успешно импортировано ${result.count} цитат`, "success");
-          captureMessage(`Favorites imported: ${result.count}`, "info");
-        } else {
-          captureException(new Error(result.error));
-          showToast(`Ошибка импорта: ${result.error}`, "error");
-        }
+        importFavoritesFromFile(content, showToast, captureMessage, captureException);
       };
 
       reader.onerror = () => {
@@ -254,14 +202,17 @@ export default function Home() {
     };
 
     input.click();
-  }, [importSettings, showToast, captureException, captureMessage]);
+  }, [showToast, captureMessage, captureException, importFavoritesFromFile]);
 
   if (hasWebGL === false || webGLError) {
     return <WebGLError onRetry={handleRetry} />;
   }
 
-  const backgroundGradient = settings.theme === "light" || settings.theme === "relax" ? BACKGROUND_GRADIENT_LIGHT : BACKGROUND_GRADIENT_DARK;
-  const gridPattern = GRID_PATTERN;
+  const backgroundGradient = settings.theme === "light" || settings.theme === "relax" 
+    ? 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(180,160,80,0.12)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(160,140,70,0.08)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(255,255,255,0.9)_0%,transparent_50%)'
+    : 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.08)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.06)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(30,30,50,0.7)_0%,transparent_50%)';
+  
+  const gridPattern = 'linear-gradient(rgba(212,175,55,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.5)_1px,transparent_1px)';
 
   return (
     <ToastProvider>
@@ -288,19 +239,14 @@ export default function Home() {
         <div className="relative z-10 h-full flex flex-col lg:flex-row">
           <div className="w-full lg:w-[58%] h-[50%] lg:h-full relative" role="region" aria-label="3D сцена с книгой">
             {!sceneError && (
-              <Scene
-                isRotating={isRotating}
+              <SceneContainer
+                book={activeBook}
+                isZenMode={isZenMode}
+                rotationSpeed={settings.rotationSpeed}
                 onError={handleSceneError}
-                coverImage={activeBook.coverImage}
-                spineImage={activeBook.spineImage}
-                backCoverImage={activeBook.backCoverImage}
-                theme={effectiveTheme}
-                onKeyboardRotate={toggleRotation}
-                rotationSpeed={rotationSpeed}
               />
             )}
 
-            {/* Debug информация */}
             {process.env.NODE_ENV === 'development' && (
               <div className="absolute top-2 left-2 text-[10px] text-amber-500/30 bg-black/50 p-2 rounded">
                 <div>hasWebGL: {hasWebGL === true ? 'yes' : hasWebGL === false ? 'no' : 'checking'}</div>
@@ -311,30 +257,26 @@ export default function Home() {
               </div>
             )}
 
-          <div id="controls">
-            {!isZenMode && <ControlButton isRotating={isRotating} onClick={toggleRotation} />}
-          </div>
-
-          {/* Переключатель книг - вверху справа */}
-          {!isZenMode && (
-            <div className="absolute top-3 right-3 z-40">
-              <BookSelector activeBookId={settings.activeBookId} onBookChange={handleBookChange} />
+            <div id="controls">
+              {!isZenMode && (
+                <div className="absolute top-3 right-3 z-40">
+                  <BookSelector activeBookId={settings.activeBookId} onBookChange={handleBookChange} />
+                </div>
+              )}
             </div>
-          )}
 
-          {!isZenMode && (
-            <div className="absolute bottom-3 md:bottom-6 left-0 right-0 text-center pointer-events-none px-4">
-              <div className="inline-block px-5 md:px-8 py-3 md:py-4 rounded-2xl backdrop-blur-lg bg-[rgba(8,8,16,0.72)] border border-[rgba(212,175,55,0.18)] shadow-[0_10px_35px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(212,175,55,0.12)]">
-                <h1 className="text-base md:text-lg lg:text-xl text-amber-100 font-light tracking-wider">{activeBook.title}</h1>
-                <p className="text-[9px] md:text-[11px] text-amber-400/55 mt-1 tracking-[0.12em] uppercase">{activeBook.author}</p>
+            {!isZenMode && (
+              <div className="absolute bottom-3 md:bottom-6 left-0 right-0 text-center pointer-events-none px-4">
+                <div className="inline-block px-5 md:px-8 py-3 md:py-4 rounded-2xl backdrop-blur-lg bg-[rgba(8,8,16,0.72)] border border-[rgba(212,175,55,0.18)] shadow-[0_10px_35px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(212,175,55,0.12)]">
+                  <h1 className="text-base md:text-lg lg:text-xl text-amber-100 font-light tracking-wider">{activeBook.title}</h1>
+                  <p className="text-[9px] md:text-[11px] text-amber-400/55 mt-1 tracking-[0.12em] uppercase">{activeBook.author}</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
           </div>
 
           <div id="quotes" className="w-full lg:w-[42%] h-[50%] lg:h-full relative bg-gradient-to-b from-[rgba(25,25,40,0.95)] to-[rgba(20,20,35,0.97)] dark:from-[rgba(25,25,40,0.95)] dark:to-[rgba(20,20,35,0.97)] light:from-[rgba(255,255,255,0.92)] light:to-[rgba(250,250,245,0.94)] relax:from-[rgba(255,255,255,0.9)] relax:to-[rgba(248,248,243,0.92)] border-l border-[rgba(212,175,55,0.12)] light:border-[rgba(180,160,80,0.2)] relax:border-[rgba(160,140,70,0.18)]" role="region" aria-label="Цитаты стоических философов">
             <div className="absolute top-0 left-0 right-0 h-20 pointer-events-none bg-gradient-to-b from-[rgba(10,10,18,1)] to-transparent dark:from-[rgba(10,10,18,1)] light:from-[rgba(255,255,255,0)] relax:from-[rgba(255,255,255,0)]" />
-            {/* Live region для объявления о смене цитаты */}
             <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
               {`Цитата ${activeQuote + 1} из ${activeBook.quotes.length}: ${activeBook.quotes[activeQuote]?.text.substring(0, 100)}${activeBook.quotes[activeQuote]?.text.length > 100 ? '...' : ''}. Автор: ${activeBook.quotes[activeQuote]?.author}`}
             </div>
@@ -354,13 +296,12 @@ export default function Home() {
               <p className="text-amber-600/15 text-[9px] tracking-[0.2em] uppercase font-light">Stoic Philosophy</p>
             </div>
 
-            {/* Кнопка меню настроек - внизу справа */}
             <div className="absolute bottom-3 right-3 z-40">
               <MainMenu
                 theme={settings.theme}
-                onThemeChange={(t: string) => updateSettings('theme', t as Theme)}
-                isRotating={isRotating}
-                onToggleRotation={toggleRotation}
+                onThemeChange={(t: string) => updateSettings('theme', t as typeof settings.theme)}
+                isRotating={menuIsRotating}
+                onToggleRotation={() => setMenuIsRotating(!menuIsRotating)}
                 zenMode={isZenMode}
                 onToggleZenMode={toggleZenMode}
                 onExportFavorites={handleExportFavorites}
@@ -385,11 +326,10 @@ export default function Home() {
           </div>
         )}
 
-        {!isZenMode && <SettingsBar theme={settings.theme} onThemeChange={(t) => updateSettings('theme', t as Theme)} />}
+        {!isZenMode && <SettingsBar theme={settings.theme} onThemeChange={(t) => updateSettings('theme', t as typeof settings.theme)} />}
 
         {!isZenMode && <PWAInstall />}
 
-        {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
