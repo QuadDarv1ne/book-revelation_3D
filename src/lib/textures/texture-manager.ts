@@ -4,11 +4,24 @@ interface TextureCacheEntry {
   texture: THREE.Texture;
   loadComplete: boolean;
   promise?: Promise<THREE.Texture>;
+  error?: Error;
+}
+
+interface TextureManagerOptions {
+  maxRetries?: number;
+  onTextureLoadError?: (path: string, error: Error) => void;
 }
 
 class TextureManager {
   private cache = new Map<string, TextureCacheEntry>();
   private placeholderCache = new Map<string, THREE.Texture>();
+  private readonly maxRetries: number;
+  private readonly onTextureLoadError?: (path: string, error: Error) => void;
+
+  constructor(options?: TextureManagerOptions) {
+    this.maxRetries = options?.maxRetries ?? 3;
+    this.onTextureLoadError = options?.onTextureLoadError;
+  }
 
   getTexture(imagePath: string, type: 'cover' | 'spine' | 'back'): THREE.Texture {
     const cacheKey = `${type}-${imagePath}`;
@@ -18,37 +31,82 @@ class TextureManager {
     if (cached?.promise) return this.getPlaceholder(type);
 
     const placeholder = this.getPlaceholder(type);
-    const promise = this.loadTexture(imagePath);
+    const promise = this.loadTextureWithRetry(imagePath, this.maxRetries);
 
     this.cache.set(cacheKey, { texture: placeholder, loadComplete: false, promise });
     return placeholder;
   }
 
   async preloadBookTextures(coverImage: string, spineImage: string, backCoverImage: string): Promise<void> {
-    await Promise.all([
-      this.loadTexture(coverImage).then(t => this.cache.set(`cover-${coverImage}`, { texture: t, loadComplete: true })).catch(() => {}),
-      this.loadTexture(spineImage).then(t => this.cache.set(`spine-${spineImage}`, { texture: t, loadComplete: true })).catch(() => {}),
-      this.loadTexture(backCoverImage).then(t => this.cache.set(`back-${backCoverImage}`, { texture: t, loadComplete: true })).catch(() => {})
+    const results = await Promise.allSettled([
+      this.loadTextureWithRetry(coverImage, this.maxRetries),
+      this.loadTextureWithRetry(spineImage, this.maxRetries),
+      this.loadTextureWithRetry(backCoverImage, this.maxRetries)
     ]);
+
+    const entries = [
+      { key: `cover-${coverImage}`, path: coverImage },
+      { key: `spine-${spineImage}`, path: spineImage },
+      { key: `back-${backCoverImage}`, path: backCoverImage }
+    ];
+
+    results.forEach((result, index) => {
+      const { key, path } = entries[index];
+      if (result.status === 'fulfilled') {
+        this.cache.set(key, { texture: result.value, loadComplete: true });
+      } else {
+        const error = result.reason as Error;
+        this.cache.set(key, { 
+          texture: this.getPlaceholder(index === 1 ? 'spine' : 'cover'), 
+          loadComplete: true, 
+          error 
+        });
+        this.onTextureLoadError?.(path, error);
+      }
+    });
+  }
+
+  private async loadTextureWithRetry(path: string, retries: number): Promise<THREE.Texture> {
+    let lastError: Error | undefined;
+    
+    for (let attempt = 0; attempt < retries; attempt++) {
+      try {
+        return await this.loadTexture(path);
+      } catch (error) {
+        lastError = error as Error;
+        if (attempt < retries - 1) {
+          await new Promise(resolve => setTimeout(resolve, 100 * (attempt + 1)));
+        }
+      }
+    }
+    
+    throw lastError ?? new Error(`Failed to load texture: ${path}`);
   }
 
   private loadTexture(imagePath: string): Promise<THREE.Texture> {
     return new Promise((resolve, reject) => {
-      new THREE.TextureLoader().load(imagePath,
+      const loader = new THREE.TextureLoader();
+      
+      loader.load(
+        imagePath,
         (texture) => {
-          texture.anisotropy = 4;
+          texture.anisotropy = Math.min(THREE.MathUtils.lerp(1, 16, 0.5), 8);
           texture.colorSpace = THREE.SRGBColorSpace;
           texture.generateMipmaps = true;
           texture.minFilter = THREE.LinearMipMapLinearFilter;
           texture.magFilter = THREE.LinearFilter;
+          texture.wrapS = THREE.ClampToEdgeWrapping;
+          texture.wrapT = THREE.ClampToEdgeWrapping;
           this.completeLoad(imagePath, texture);
           resolve(texture);
         },
-        undefined,
+        (_progress) => {
+          // Прогресс загрузки можно логировать при необходимости
+        },
         (error) => {
           const fallback = this.getPlaceholder('cover');
           this.completeLoad(imagePath, fallback);
-          reject(error);
+          reject(new Error(`Texture load error: ${imagePath}`, { cause: error }));
         }
       );
     });

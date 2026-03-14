@@ -99,19 +99,17 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
   return (
     <div className="absolute top-3 right-3 z-40" ref={dropdownRef}>
       <div className="flex items-center gap-2 px-3 py-2 rounded-xl backdrop-blur-xl bg-[rgba(15,15,25,0.9)] dark:bg-[rgba(15,15,25,0.9)] light:bg-[rgba(255,255,255,0.92)] relax:bg-[rgba(255,255,255,0.9)] border border-[rgba(212,175,55,0.25)] light:border-[rgba(180,160,80,0.3)] relax:border-[rgba(160,140,70,0.25)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] light:shadow-[0_8px_32px_rgba(0,0,0,0.1)] relax:shadow-[0_8px_32px_rgba(0,0,0,0.08)]">
-        {/* Иконка книги */}
         <svg className="w-4 h-4 text-amber-400/70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
         </svg>
 
-        {/* Выпадающий список книг */}
         <div className="relative group">
           <button
             ref={buttonRef}
             onClick={() => setIsOpen(!isOpen)}
             onKeyDown={handleKeyDown}
             className="flex items-center gap-2 text-sm text-amber-100 dark:text-amber-100 light:text-amber-900 relax:text-amber-900 hover:text-amber-50 hover:light:text-amber-700 hover:relax:text-amber-700 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(15,15,25,0.9)] light:focus:ring-offset-[rgba(255,255,255,0.92)] relax:focus:ring-offset-[rgba(255,255,255,0.9)] rounded-lg px-2 py-1"
-            aria-label="Выбрать книгу"
+            aria-label={t('book.select')}
             aria-haspopup="listbox"
             aria-expanded={isOpen}
             aria-controls="book-listbox"
@@ -125,7 +123,6 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
             </svg>
           </button>
 
-          {/* Выпадающее меню */}
           <div
             id="book-listbox"
             className={`absolute right-0 top-full mt-2 min-w-[280px] rounded-xl overflow-hidden backdrop-blur-xl bg-[rgba(15,15,25,0.98)] dark:bg-[rgba(15,15,25,0.98)] light:bg-[rgba(255,255,255,0.96)] relax:bg-[rgba(255,255,255,0.94)] border border-[rgba(212,175,55,0.3)] light:border-[rgba(180,160,80,0.35)] relax:border-[rgba(160,140,70,0.3)] shadow-[0_16px_48px_rgba(0,0,0,0.6)] light:shadow-[0_16px_48px_rgba(0,0,0,0.12)] relax:shadow-[0_16px_48px_rgba(0,0,0,0.1)] transition-all duration-200 transform origin-top-right ${
@@ -134,7 +131,7 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
                 : "opacity-0 invisible scale-95"
             }`}
             role="listbox"
-            aria-label="Список книг"
+            aria-label={t('book.list')}
             tabIndex={-1}
           >
             <div className="max-h-[400px] overflow-y-auto custom-scrollbar" role="list">
@@ -146,7 +143,12 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
                     key={book.id}
                     onClick={() => handleBookSelect(book.id, book.title)}
                     onMouseEnter={() => setFocusedIndex(index)}
-                    className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors focus:outline-none ${
+                    onKeyDown={(e) => {
+                      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                      }
+                    }}
+                    className={`w-full flex items-start gap-3 px-4 py-3 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-inset ${
                       isActive
                         ? "bg-[rgba(212,175,55,0.2)] dark:bg-[rgba(212,175,55,0.2)] light:bg-[rgba(212,175,55,0.15)] relax:bg-[rgba(212,175,55,0.12)] border-l-4 border-amber-400"
                         : isFocused
@@ -158,7 +160,6 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
                     tabIndex={-1}
                     type="button"
                   >
-                    {/* Цветной индикатор */}
                     <div
                       className="w-1 h-8 rounded-full mt-0.5 flex-shrink-0"
                       style={{ backgroundColor: book.color }}

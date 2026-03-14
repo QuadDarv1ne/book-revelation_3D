@@ -9,12 +9,21 @@ interface BottomSheetProps {
   children: React.ReactNode;
 }
 
+const FOCUSABLE_SELECTORS = [
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  'a[href]',
+  '[tabindex]:not([tabindex="-1"])'
+].join(', ');
+
 export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef<number>(0);
   const touchCurrentY = useRef<number>(0);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
-  // Закрытие по swipe вниз
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
   }, []);
@@ -25,14 +34,13 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
 
   const handleTouchEnd = useCallback(() => {
     const diff = touchCurrentY.current - touchStartY.current;
-    if (diff > 100) { // Swipe вниз на 100px+
+    if (diff > 100) {
       onClose();
     }
     touchStartY.current = 0;
     touchCurrentY.current = 0;
   }, [onClose]);
 
-  // Закрытие по Escape
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -44,18 +52,32 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
-  // Блокировка скролла body
   useEffect(() => {
     if (isOpen) {
+      previousFocusRef.current = document.activeElement as HTMLElement;
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
       document.body.style.width = '100%';
       document.body.style.inset = '0';
+      
+      // Фокус на первый фокусируемый элемент
+      setTimeout(() => {
+        const focusableElements = sheetRef.current?.querySelectorAll(FOCUSABLE_SELECTORS);
+        if (focusableElements && focusableElements.length > 0) {
+          (focusableElements[0] as HTMLElement).focus();
+        }
+      }, 0);
     } else {
       document.body.style.overflow = '';
       document.body.style.position = '';
       document.body.style.width = '';
       document.body.style.inset = '';
+      
+      // Возврат фокуса
+      if (previousFocusRef.current) {
+        previousFocusRef.current.focus();
+        previousFocusRef.current = null;
+      }
     }
 
     return () => {
@@ -66,12 +88,35 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
     };
   }, [isOpen]);
 
-  // Закрытие по клику на overlay
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
   }, [onClose]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (!isOpen) return;
+
+    if (e.key === 'Tab') {
+      const focusableElements = sheetRef.current?.querySelectorAll(FOCUSABLE_SELECTORS);
+      if (!focusableElements || focusableElements.length === 0) return;
+
+      const firstElement = focusableElements[0] as HTMLElement;
+      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -80,19 +125,18 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
       className="fixed inset-0 z-50 flex items-end sm:hidden"
       role="dialog"
       aria-modal="true"
-      aria-label={title}
+      aria-labelledby="bottom-sheet-title"
       onClick={handleOverlayClick}
+      onKeyDown={handleKeyDown}
       style={{
         paddingBottom: 'var(--safe-area-inset-bottom)'
       }}
     >
-      {/* Overlay */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
         aria-hidden="true"
       />
 
-      {/* Bottom Sheet */}
       <div
         ref={sheetRef}
         className="relative w-full max-h-[85vh] bg-[rgba(15,15,25,0.98)] rounded-t-3xl shadow-[0_-16px_48px_rgba(0,0,0,0.6)] overflow-hidden animate-slide-up"
@@ -104,15 +148,13 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
           paddingRight: 'var(--safe-area-inset-right)'
         }}
       >
-        {/* Handle bar */}
         <div className="flex items-center justify-center pt-3 pb-2">
           <div className="w-12 h-1.5 bg-amber-500/30 rounded-full" />
         </div>
 
-        {/* Header */}
         <div className="px-5 pb-3 border-b border-[rgba(212,175,55,0.15)] bg-gradient-to-r from-amber-900/20 to-transparent">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-light text-amber-100 tracking-wide">{title}</h2>
+            <h2 id="bottom-sheet-title" className="text-lg font-light text-amber-100 tracking-wide">{title}</h2>
             <button
               onClick={onClose}
               className="p-2 rounded-lg hover:bg-amber-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[44px] min-w-[44px] flex items-center justify-center"
@@ -127,7 +169,6 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
           <p className="text-xs text-amber-500/60 mt-0.5 tracking-[0.12em] uppercase">Свайпните вниз для закрытия</p>
         </div>
 
-        {/* Content */}
         <div className="overflow-y-auto custom-scrollbar max-h-[65vh]">
           {children}
         </div>

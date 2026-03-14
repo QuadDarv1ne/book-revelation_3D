@@ -48,6 +48,40 @@ export function useFavorites() {
     }
   }, [updateSettings]);
 
+  const exportFavoritesToFile = useCallback((exportData: string, showToast: (msg: string, type: "success" | "error" | "info") => void, captureMessage: (msg: string, level?: "info" | "warning" | "error") => void) => {
+    try {
+      const blob = new Blob([exportData], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `stoic-favorites-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      showToast("Избранные цитаты экспортированы", "success");
+      captureMessage("Favorites exported", "info");
+    } catch (error) {
+      showToast("Ошибка при экспорте", "error");
+      throw error;
+    }
+  }, []);
+
+  const importFavoritesFromFile = useCallback((jsonString: string, showToast: (msg: string, type: "success" | "error" | "info") => void, captureMessage: (msg: string, level?: "info" | "warning" | "error") => void, captureException: (error: Error) => void) => {
+    const result = importFavorites(jsonString);
+
+    if (result.success) {
+      showToast(`Успешно импортировано ${result.count} цитат`, "success");
+      captureMessage(`Favorites imported: ${result.count}`, "info");
+    } else {
+      captureException(new Error(result.error));
+      showToast(`Ошибка импорта: ${result.error}`, "error");
+    }
+
+    return result;
+  }, [importFavorites]);
+
   const toggleFavorite = useCallback((quote: Quote) => {
     const exists = favorites.some(q => q.text === quote.text);
     if (exists) {
@@ -76,5 +110,7 @@ export function useFavorites() {
     favoritesSet,
     exportFavorites,
     importFavorites,
+    exportFavoritesToFile,
+    importFavoritesFromFile,
   };
 }
