@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-
-const STORAGE_KEY = 'stoic-book-zen-mode';
+import { useUserSettings } from './use-user-settings';
 
 export interface UseZenModeOptions {
   autoSave?: boolean;
@@ -10,29 +9,20 @@ export interface UseZenModeOptions {
 
 export function useZenMode(options: UseZenModeOptions = {}) {
   const { autoSave = true } = options;
+  const { settings, updateSettings } = useUserSettings();
   const [isZenMode, setIsZenMode] = useState(false);
 
   useEffect(() => {
-    if (!autoSave) return;
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setIsZenMode(!!parsed.isZenMode);
-      }
-    } catch {
-      // Ignore parse errors
+    if (autoSave) {
+      setIsZenMode(settings.zenMode);
     }
-  }, [autoSave]);
+  }, [autoSave, settings.zenMode]);
 
   useEffect(() => {
-    if (!autoSave) return;
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ isZenMode }));
-    } catch {
-      // Ignore storage errors
+    if (autoSave) {
+      updateSettings('zenMode', isZenMode);
     }
-  }, [isZenMode, autoSave]);
+  }, [isZenMode, autoSave, updateSettings]);
 
   const toggleZenMode = useCallback(() => {
     setIsZenMode(prev => !prev);
