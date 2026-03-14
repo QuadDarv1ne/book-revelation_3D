@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useToast } from "./Toast";
 import { useI18n } from "@/hooks/use-i18n";
+import { useMenuState } from "@/hooks/use-menu-state";
 import { BottomSheet } from "./BottomSheet";
 import { GamificationDashboard } from "./GamificationDashboard";
 
@@ -29,11 +30,10 @@ export function MainMenu({
   onExportFavorites,
   onImportFavorites,
 }: MainMenuProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isOpen, setIsOpen, menuRef } = useMenuState();
   const [activeSection, setActiveSection] = useState<MenuSection>(null);
   const [showGamification, setShowGamification] = useState(false);
   const [rotationSpeed, setRotationSpeed] = useState(0.5);
-  const menuRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
   const { t } = useI18n();
 
@@ -45,37 +45,6 @@ export function MainMenu({
     { value: "ambient", label: t('theme.ambient'), color: "bg-[#1a3f2f]" },
     { value: "relax", label: t('theme.relax'), color: "bg-[#d4dcc4]" },
   ], [t]);
-
-  // Закрытие при клике вне
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(prev => {
-          if (prev) {
-            setActiveSection(null);
-            return false;
-          }
-          return prev;
-        });
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Закрытие по Escape
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        setIsOpen(false);
-        setActiveSection(null);
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen]);
 
   const handleThemeSelect = useCallback((themeValue: string) => {
     onThemeChange(themeValue);
