@@ -4,6 +4,8 @@ import {useState, useCallback, useEffect} from 'react';
 
 export type Locale = 'en' | 'ru' | 'zh' | 'he';
 
+const VALID_LOCALES: readonly Locale[] = ['en', 'ru', 'zh', 'he'] as const;
+
 const translations: Record<Locale, Record<string, string>> = {
   en: {
     'quotes.search': 'Search quotes...',
@@ -347,19 +349,27 @@ export function useI18n() {
   const [locale, setLocaleState] = useState<Locale>('ru');
 
   useEffect(() => {
-    const saved = localStorage.getItem('locale') as Locale;
-    if (saved && ['en', 'ru', 'zh', 'he'].includes(saved)) {
-      setLocaleState(saved);
+    try {
+      const saved = localStorage.getItem('locale') as Locale;
+      if (saved && VALID_LOCALES.includes(saved)) {
+        setLocaleState(saved);
+      }
+    } catch {
+      // Ignore localStorage errors
     }
   }, []);
 
   const setLocale = useCallback((newLocale: Locale) => {
-    localStorage.setItem('locale', newLocale);
+    try {
+      localStorage.setItem('locale', newLocale);
+    } catch {
+      // Ignore localStorage errors
+    }
     setLocaleState(newLocale);
   }, []);
 
   const t = useCallback((key: string) => {
-    return translations[locale]?.[key] || key;
+    return translations[locale]?.[key] ?? key;
   }, [locale]);
 
   const dir = locale === 'he' ? 'rtl' : 'ltr';
