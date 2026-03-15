@@ -5,10 +5,11 @@
 ## ✅ Выполнено (Март 2026)
 
 ### Геймификация
-- [x] Расширение системы достижений (11 достижений)
+- [x] Расширение системы достижений (22 достижения)
 - [x] Визуализация прогресса (GamificationDashboard)
 - [x] Daily challenges (цитата дня)
 - [x] Statistics dashboard (время, вращения, книги, цитаты, темы)
+- [x] Новые достижения: rotation_legend, stoic_sage, year_streak, book_library, favorites_master, daily_visitor, quote_sharer, category_explorer, night_owl, early_bird, zen_master
 
 ### PWA
 - [x] Install prompt улучшение (iOS инструкции)
@@ -49,10 +50,12 @@
 - [x] DEPLOY.md документация
 
 ### Code Quality
-- [x] 92 теста проходят (unit + integration)
+- [x] 104 теста проходят (unit + integration)
 - [x] ESLint: 0 errors, 0 warnings ✅
 - [x] Build успешен
 - [x] TypeScript строгий режим (noImplicitAny: true)
+- [x] 65+ цитат в stoic-quotes.ts
+- [x] Цитаты от 10+ философов
 
 ### Рефакторинг
 - [x] Удалён неиспользуемый BookLOD
@@ -77,6 +80,15 @@
 - [x] Fallback материалы при загрузке
 - [x] Очистка материалов при unmount
 - [x] Texture cache cleanup
+- [x] InstancedMesh для частиц (200 частиц)
+- [x] memo() для компонентов
+- [x] Оптимизированный ParticleRingOptimized
+
+### Обложки книг
+- [x] Улучшен скрипт open-library-covers.js v2.0
+- [x] Генерация SVG обложек с текстом при отсутствии cover ID
+- [x] Градиентные фоны для SVG обложек
+- [x] Улучшенное логирование и обработка ошибок
 
 ### Мобильная адаптация
 - [x] Bottom sheet для меню
@@ -97,8 +109,9 @@
 - [x] Трекинг смены книг/тем
 
 ### Контент
-- [x] 40 цитат (8 на книгу)
-- [x] 5 книг: Марк Аврелий, Эпиктет, Сенека, Сунь-цзы, Хокинг
+- [x] 48 цитат в books.ts (8 на книгу × 6 книг)
+- [x] 6 книг: Марк Аврелий, Эпиктет, Сенека, Сунь-цзы, Хокинг, Кристенсен
+- [x] 65+ цитат в stoic-quotes.ts для геймификации
 
 ### CI/CD
 - [x] Кэширование зависимостей
@@ -160,12 +173,14 @@
 
 | Метрика | Значение | Цель |
 |---------|----------|------|
-| Тесты | 112 passed ✅ | 95+ |
+| Тесты | 104 passed ✅ | 95+ |
 | ESLint errors | 0 ✅ | 0 |
 | ESLint warnings | 0 ✅ | 0 |
 | Языки | 4 | 6+ |
-| Цитат | 40 | 50+ |
+| Цитат | 65+ ✅ | 50+ |
+| Достижения | 22 ✅ | - |
 | Категории | 13 ✅ | - |
+| Книги | 6 ✅ | - |
 | Lighthouse Performance | TBD | 90+ |
 | Lighthouse Accessibility | TBD | 95+ |
 

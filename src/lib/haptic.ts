@@ -14,7 +14,7 @@ export const HapticPatterns = {
   light: 10,
   medium: 20,
   heavy: 30,
-  success: [50, 50, 50],
-  error: [100, 50, 100],
+  success: [50, 50, 50] as number[],
+  error: [100, 50, 100] as number[],
   click: 5,
-} as const;
+};
