@@ -43,9 +43,9 @@ function createParticleInstancedMesh() {
 
 export const ParticleRingOptimized = memo(function ParticleRingOptimized({ isRotating }: ParticleRingOptimizedProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
-  const dummyRef = useRef(new THREE.Object3D());
   const particleData = useMemo(() => createParticleInstancedMesh(), []);
   const colorRef = useRef(new THREE.Color());
+  const matrixRef = useRef(new THREE.Matrix4());
 
   // Освобождаем память при размонтировании
   useEffect(() => {
@@ -58,13 +58,14 @@ export const ParticleRingOptimized = memo(function ParticleRingOptimized({ isRot
   }, []);
 
   useFrame((state) => {
-    if (!meshRef.current || !isRotating) return;
+    const mesh = meshRef.current;
+    if (!mesh || !isRotating) return;
 
     const time = state.clock.elapsedTime;
     const { positions, colors, scales, phases, baseY } = particleData;
 
     // Вращение всего кольца
-    meshRef.current.rotation.y += 0.002;
+    mesh.rotation.y += 0.002;
 
     // Обновляем позиции и цвета частиц
     for (let i = 0; i < PARTICLE_COUNT; i++) {
@@ -75,11 +76,17 @@ export const ParticleRingOptimized = memo(function ParticleRingOptimized({ isRot
       // Пульсация размера
       const scale = scales[i] * (1 + Math.sin(time * 2 + phases[i]) * 0.1);
 
-      dummyRef.current.position.set(
+      // Позиция
+      matrixRef.current.setPosition(
         positions[i * 3],
         y,
         positions[i * 3 + 2]
       );
+
+      // Масштаб
+      matrixRef.current.scale(new THREE.Vector3(scale, scale, scale));
+
+      mesh.setMatrixAt(i, matrixRef.current);
 
       // Мерцание цвета
       const flicker = 0.95 + Math.sin(time * 3 + phases[i]) * 0.05;
@@ -88,18 +95,11 @@ export const ParticleRingOptimized = memo(function ParticleRingOptimized({ isRot
         colors[i * 3 + 1] * flicker,
         colors[i * 3 + 2] * flicker
       );
-
-      dummyRef.current.scale.set(scale, scale, scale);
-      dummyRef.current.updateMatrix();
-
-      meshRef.current.setMatrixAt(i, dummyRef.current.matrix);
-      meshRef.current.setColorAt(i, colorRef.current);
+      mesh.setColorAt(i, colorRef.current);
     }
 
-    meshRef.current.instanceMatrix.needsUpdate = true;
-    if (meshRef.current.instanceColor) {
-      meshRef.current.instanceColor.needsUpdate = true;
-    }
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.instanceColor!.needsUpdate = true;
   });
 
   return (
