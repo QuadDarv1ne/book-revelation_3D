@@ -267,6 +267,107 @@ const INITIAL_ACHIEVEMENTS: Achievement[] = [
     maxProgress: 1800,
     category: "special",
   },
+  // Новые достижения по категориям (v0.3.0)
+  {
+    id: "wisdom_seeker",
+    title: "Искатель мудрости",
+    description: "Прочитайте 10 цитат категории 'Мудрость'",
+    icon: "🎓",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 10,
+    category: "knowledge",
+  },
+  {
+    id: "wisdom_master",
+    title: "Мастер мудрости",
+    description: "Прочитайте 25 цитат категории 'Мудрость'",
+    icon: "🏆",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 25,
+    category: "knowledge",
+  },
+  {
+    id: "stoic_warrior",
+    title: "Стоический воин",
+    description: "Прочитайте 15 цитат категории 'Стойкость'",
+    icon: "⚔️",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 15,
+    category: "knowledge",
+  },
+  {
+    id: "peaceful_soul",
+    title: "Спокойная душа",
+    description: "Прочитайте 15 цитат категории 'Спокойствие'",
+    icon: "🕊️",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 15,
+    category: "knowledge",
+  },
+  {
+    id: "action_hero",
+    title: "Герой действий",
+    description: "Прочитайте 10 цитат категории 'Действие'",
+    icon: "🚀",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 10,
+    category: "knowledge",
+  },
+  {
+    id: "life_philosopher",
+    title: "Философ жизни",
+    description: "Прочитайте 20 цитат категории 'Жизнь'",
+    icon: "🌱",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 20,
+    category: "knowledge",
+  },
+  {
+    id: "knowledge_hunter",
+    title: "Охотник за знаниями",
+    description: "Прочитайте 20 цитат категории 'Знание'",
+    icon: "🔍",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 20,
+    category: "knowledge",
+  },
+  {
+    id: "freedom_lover",
+    title: "Любитель свободы",
+    description: "Прочитайте 10 цитат категории 'Свобода'",
+    icon: "🦅",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 10,
+    category: "knowledge",
+  },
+  {
+    id: "strategy_master",
+    title: "Мастер стратегии",
+    description: "Прочитайте 10 цитат категории 'Стратегия'",
+    icon: "♟️",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 10,
+    category: "knowledge",
+  },
+  {
+    id: "inspiration_seeker",
+    title: "Искатель вдохновения",
+    description: "Прочитайте 15 цитат категории 'Вдохновение'",
+    icon: "✨",
+    unlocked: false,
+    progress: 0,
+    maxProgress: 15,
+    category: "knowledge",
+  },
 ];
 
 function getDayOfYear(): number {
@@ -395,6 +496,41 @@ export function useGamification() {
       checkAchievement("stoic_sage", 1);
     }
   }, [checkAchievement, settings.statistics.quotesRead, updateStatistics]);
+
+  // Инкремент прочитанных цитат по категориям
+  const incrementCategoryRead = useCallback((category: string) => {
+    const categoryAchievements: Record<string, { id: string; thresholds: number[] }> = {
+      'мудрость': { id: 'wisdom_seeker', thresholds: [10, 25] },
+      'стойкость': { id: 'stoic_warrior', thresholds: [15] },
+      'спокойствие': { id: 'peaceful_soul', thresholds: [15] },
+      'действие': { id: 'action_hero', thresholds: [10] },
+      'жизнь': { id: 'life_philosopher', thresholds: [20] },
+      'знание': { id: 'knowledge_hunter', thresholds: [20] },
+      'свобода': { id: 'freedom_lover', thresholds: [10] },
+      'стратегия': { id: 'strategy_master', thresholds: [10] },
+      'вдохновение': { id: 'inspiration_seeker', thresholds: [15] },
+    };
+
+    const achievement = categoryAchievements[category.toLowerCase()];
+    if (achievement) {
+      // Проверяем прогресс через localStorage (упрощённо)
+      const key = `category_${category}`;
+      try {
+        const saved = localStorage.getItem(key);
+        const currentCount = saved ? parseInt(saved, 10) : 0;
+        const newCount = currentCount + 1;
+        localStorage.setItem(key, newCount.toString());
+
+        for (const threshold of achievement.thresholds) {
+          if (newCount >= threshold) {
+            checkAchievement(achievement.id, newCount);
+          }
+        }
+      } catch {
+        // Игнорируем ошибки localStorage
+      }
+    }
+  }, [checkAchievement]);
 
   // Лайк цитаты с проверкой достижения
   const toggleQuoteLike = useCallback(() => {
@@ -529,6 +665,7 @@ export function useGamification() {
     addBookViewed,
     toggleQuoteLike,
     incrementQuotesRead,
+    incrementCategoryRead,
     incrementQuoteShares,
     checkTimeBasedAchievements,
     unlockCustomCoverAchievement,

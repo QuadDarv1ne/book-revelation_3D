@@ -146,6 +146,7 @@
 - [x] Daily challenges (цитата дня)
 - [x] Statistics dashboard (время в приложении, прочитано цитат)
 - [x] Экспорт прогресса пользователя (JSON: статистика, достижения, избранное)
+- [x] Расширение системы достижений (10 новых по категориям: wisdom_seeker, wisdom_master, stoic_warrior, peaceful_soul, action_hero, life_philosopher, knowledge_hunter, freedom_lover, strategy_master, inspiration_seeker)
 
 ---
 
@@ -181,13 +182,13 @@
 
 | Метрика | Значение | Цель |
 |---------|----------|------|
-| Тесты | 104 passed ✅ | 95+ |
+| Тесты | 106 passed ✅ | 95+ |
 | ESLint errors | 0 ✅ | 0 |
 | ESLint warnings | 0 ✅ | 0 |
 | Языки | 6 ✅ (EN, RU, ZH, HE, ES, FR) | 6+ |
 | Цитат | 65+ ✅ (stoic-quotes.ts) | 50+ |
 | Цитат в книгах | 48 ✅ (books.ts: 6 книг × 8 цитат) | 40+ |
-| Достижения | 22 ✅ | - |
+| Достижения | 32 ✅ (22 + 10 новых) | - |
 | Категории | 13 ✅ | - |
 | Книги | 6 ✅ | - |
 | Lighthouse Performance | TBD | 90+ |
@@ -225,7 +226,7 @@
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
 - [x] Интеграция с Google Books API (скрипты готовы)
-- [ ] Расширение системы достижений (новые категории)
+- [x] Расширение системы достижений (новые категории: 10 достижений)
 - [ ] Темы дня (daily theme challenge)
 - [x] Экспорт прогресса пользователя
 - [ ] Проверка на Safari iOS
