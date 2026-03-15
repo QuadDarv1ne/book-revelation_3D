@@ -155,6 +155,13 @@
 - [ ] Интеграция с Google Books API
 - [x] Категоризация цитат по темам
 
+### Книги (QWEN Memory)
+- [x] Стивен Хокинг — Теория Всего (в books.ts)
+- [x] Сунь-Цзы — Искусство побеждать (в books.ts)
+- [x] Марк Аврелий — Наедине с собой (в books.ts как "Размышления")
+- [x] Эпиктет — В чём наше благо? (в books.ts как "Наше благо")
+- [x] Клейтон Кристенсен — Закон успешных инноваций (в books.ts)
+
 ### PWA
 - [x] Push уведомления (цитата дня)
 - [x] Install prompt улучшение
@@ -177,7 +184,8 @@
 | ESLint errors | 0 ✅ | 0 |
 | ESLint warnings | 0 ✅ | 0 |
 | Языки | 4 | 6+ |
-| Цитат | 65+ ✅ | 50+ |
+| Цитат | 65+ ✅ (stoic-quotes.ts) | 50+ |
+| Цитат в книгах | 48 ✅ (books.ts: 6 книг × 8 цитат) | 40+ |
 | Достижения | 22 ✅ | - |
 | Категории | 13 ✅ | - |
 | Книги | 6 ✅ | - |
@@ -189,33 +197,39 @@
 ## 🚀 Релизы
 
 ### v0.2.0 (текущая) ✅
-- ✅ i18n поддержка
-- ✅ Экспорт/импорт
-- ✅ Share цитат
-- ✅ Деплой конфигурации
-- ✅ SEO (meta, robots, sitemap)
-- ✅ A11y (aria-live, focus)
-- ✅ Производительность (lazy loading)
-- ✅ Мобильная адаптация (BottomSheet, haptic)
-- ✅ PWA Offline
-- ✅ Аналитика (Web Vitals)
-- ✅ 40 цитат
-- ✅ Геймификация (11 достижений, dashboard)
+- ✅ i18n поддержка (4 языка: EN, RU, ZH, HE)
+- ✅ Экспорт/импорт избранных цитат
+- ✅ Share цитат (Web Share API + fallback)
+- ✅ Деплой конфигурации (Netlify, Vercel, Cloudflare, Docker, etc.)
+- ✅ SEO (meta, robots, sitemap, Open Graph, Twitter Cards)
+- ✅ A11y (aria-live, focus indicators, skip-link, 44px touch targets)
+- ✅ Производительность (lazy loading, texture cache, InstancedMesh)
+- ✅ Мобильная адаптация (BottomSheet, haptic feedback, safe area)
+- ✅ PWA Offline (Service Worker, offline page)
+- ✅ Аналитика (Vercel Analytics, Web Vitals, custom events)
+- ✅ 48 цитат в books.ts (6 книг × 8 цитат)
+- ✅ 65+ цитат в stoic-quotes.ts для геймификации
+- ✅ Геймификация (22 достижения, dashboard, daily challenges)
 - ✅ Daily Challenge (цитата дня)
 - ✅ PWA Install prompt (iOS инструкции)
 - ✅ Категоризация цитат (13 категорий)
-- ✅ Авто-тема по времени суток
+- ✅ Авто-тема по времени суток (morning/day/evening/night)
 - ✅ Улучшенные частицы (200 частиц, реакция на вращение)
-- ✅ 104 теста
+- ✅ 104 теста (unit + integration + E2E)
+- ✅ ESLint: 0 errors, 0 warnings
+- ✅ TypeScript strict mode (noImplicitAny: true)
+- ✅ 6 книг: Марк Аврелий, Эпиктет, Сенека, Сунь-цзы, Хокинг, Кристенсен
 
-### v0.3.0 (план)
+### v0.3.0 (план) 🔄
 - [ ] Интеграция с Open Library API для обложек
 - [ ] Интеграция с Google Books API
 - [ ] Расширение системы достижений (новые категории)
 - [ ] Темы дня (daily theme challenge)
 - [ ] Экспорт прогресса пользователя
+- [ ] Проверка на Safari iOS
+- [ ] Проверка на Android Chrome
 
 ### v0.4.0 (план)
 - [ ] PWA push уведомления
 - [ ] Интеграция API обложек
-- [ ] Категоризация цитат
+- [ ] Расширение переводов (6+ языков)
