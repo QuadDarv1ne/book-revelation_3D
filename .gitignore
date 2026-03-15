@@ -45,3 +45,5 @@ coverage/
 *.png
 *.jpg
 !public/*.jpg
+!public/book-covers/*.jpg
+!public/book-spines/*.jpg
