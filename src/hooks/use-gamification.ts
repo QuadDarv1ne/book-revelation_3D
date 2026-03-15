@@ -481,6 +481,44 @@ export function useGamification() {
     // Упрощено для централизации
   }, []);
 
+  /**
+   * Экспорт прогресса пользователя в JSON
+   */
+  const exportProgress = useCallback(() => {
+    const progressData = {
+      version: "1.0",
+      exportedAt: new Date().toISOString(),
+      statistics: {
+        timeSpent: settings.statistics.timeSpent,
+        quotesRead: settings.statistics.quotesRead,
+        rotations: settings.statistics.rotations,
+        booksViewed: settings.statistics.booksViewed,
+        themesExplored: settings.statistics.themesExplored,
+      },
+      achievements: achievements
+        .filter(a => a.unlocked)
+        .map(a => ({
+          id: a.id,
+          title: a.title,
+          unlockedAt: a.unlockedAt?.toISOString(),
+        })),
+      favorites: {
+        count: settings.favorites.length,
+        quotes: settings.favorites.map(q => ({
+          text: q.text,
+          author: q.author,
+        })),
+      },
+      summary: {
+        totalAchievements: achievements.length,
+        unlockedAchievements: totalUnlocked,
+        completionPercentage: completionPercentage,
+      },
+    };
+
+    return JSON.stringify(progressData, null, 2);
+  }, [settings, achievements, totalUnlocked, completionPercentage]);
+
   return {
     achievements,
     quoteOfDay,
@@ -498,5 +536,6 @@ export function useGamification() {
     dismissAchievement,
     totalUnlocked,
     completionPercentage,
+    exportProgress,
   };
 }
