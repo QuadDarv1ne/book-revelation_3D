@@ -280,10 +280,28 @@ function getDayOfYear(): number {
 function getQuoteForToday(): QuoteOfDay {
   const dayIndex = getDayOfYear() % STOIC_QUOTES.length;
   const quote = STOIC_QUOTES[dayIndex];
+  const today = new Date().toISOString().split("T")[0];
+
+  // Проверяем сохранённый статус лайка для сегодня
+  try {
+    const saved = localStorage.getItem('quote-of-day');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.date === today) {
+        return {
+          ...quote,
+          date: today,
+          liked: parsed.liked || false,
+        };
+      }
+    }
+  } catch {
+    // Игнорируем ошибки localStorage
+  }
 
   return {
     ...quote,
-    date: new Date().toISOString().split("T")[0],
+    date: today,
     liked: false,
   };
 }
@@ -381,7 +399,19 @@ export function useGamification() {
   // Лайк цитаты с проверкой достижения
   const toggleQuoteLike = useCallback(() => {
     const newCount = settings.favorites.length + 1;
-    setQuoteOfDay(prev => ({ ...prev, liked: !prev.liked }));
+    setQuoteOfDay(prev => {
+      const newLiked = !prev.liked;
+      // Сохраняем в localStorage
+      try {
+        localStorage.setItem('quote-of-day', JSON.stringify({
+          date: prev.date,
+          liked: newLiked,
+        }));
+      } catch {
+        // Игнорируем ошибки localStorage
+      }
+      return { ...prev, liked: newLiked };
+    });
     
     if (newCount >= 10) {
       checkAchievement("favorites_curator", newCount);
