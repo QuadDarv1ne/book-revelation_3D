@@ -112,7 +112,9 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showThemeDropdown, setShowThemeDropdown] = useState(false);
   const [rotationSpeed, setRotationSpeed] = useState(0.5);
+  const [showSpeedPresets, setShowSpeedPresets] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const speedRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
   const { exportFavorites, importFavorites } = useFavorites();
   const { t } = useI18n();
@@ -128,10 +130,22 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
   const currentTheme = useMemo(() => THEMES.find(t => t.value === theme) || THEMES[0], [theme, THEMES]);
   const CurrentIcon = currentTheme.icon;
 
+  const SPEED_PRESETS = useMemo(() => [
+    { value: 0, label: '⏸️' },
+    { value: 0.25, label: '🐢' },
+    { value: 0.5, label: '🚶' },
+    { value: 1, label: '🏃' },
+    { value: 1.5, label: '🚀' },
+    { value: 2, label: '⚡' },
+  ], []);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowThemeDropdown(false);
+      }
+      if (speedRef.current && !speedRef.current.contains(event.target as Node)) {
+        setShowSpeedPresets(false);
       }
     };
 
@@ -146,7 +160,16 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
   const handleSpeedChange = useCallback((newSpeed: number) => {
     setRotationSpeed(newSpeed);
     updateSettings('rotationSpeed', newSpeed);
-  }, [updateSettings]);
+    showToast(`Скорость: ${newSpeed.toFixed(2)}x`, "info");
+  }, [updateSettings, showToast]);
+
+  const handleResetSettings = useCallback(() => {
+    updateSettings('rotationSpeed', 0.5);
+    updateSettings('theme', 'relax');
+    setRotationSpeed(0.5);
+    onThemeChange('relax');
+    showToast("Настройки сброшены", "success");
+  }, [updateSettings, onThemeChange, showToast]);
 
   const handleExportFavorites = useCallback(() => {
     const exportData = exportFavorites();
@@ -251,20 +274,44 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
 
             <div className="w-px h-6 bg-gradient-to-b from-transparent via-[rgba(212,175,55,0.2)] to-transparent mx-1" />
 
-            {/* Скорость вращения */}
-            <div className="flex items-center gap-2 px-2">
-              <Speed className="w-4 h-4 text-amber-400/60" aria-hidden="true" />
-              <input
-                type="range"
-                min="0"
-                max="2"
-                step="0.1"
-                value={rotationSpeed}
-                onChange={(e) => handleSpeedChange(parseFloat(e.target.value))}
-                className="w-20 sm:w-24 h-1 bg-[rgba(255,255,255,0.1)] rounded-lg appearance-none cursor-pointer accent-amber-500"
+            {/* Скорость вращения с пресетами */}
+            <div className="relative flex items-center gap-2 px-2" ref={speedRef}>
+              <button
+                onClick={() => setShowSpeedPresets(!showSpeedPresets)}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[rgba(212,175,55,0.1)] hover:bg-[rgba(212,175,55,0.15)] transition-all focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[44px]"
                 aria-label={t('settings.rotationSpeed')}
-              />
-              <span className="text-xs text-amber-400/60 w-8">{rotationSpeed.toFixed(1)}x</span>
+                aria-expanded={showSpeedPresets}
+                type="button"
+              >
+                <Speed className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                <span className="text-sm text-amber-100">{SPEED_PRESETS.find(p => Math.abs(p.value - rotationSpeed) < 0.01)?.label || `${rotationSpeed.toFixed(1)}x`}</span>
+                <ChevronDown className={`w-3 h-3 text-amber-400/60 transition-transform ${showSpeedPresets ? "rotate-180" : ""}`} aria-hidden="true" />
+              </button>
+
+              {showSpeedPresets && (
+                <div className="absolute bottom-full left-0 mb-2 w-40 rounded-xl overflow-hidden backdrop-blur-xl bg-[rgba(15,15,25,0.98)] border border-[rgba(212,175,55,0.2)] shadow-[0_8px_32px_rgba(0,0,0,0.5)] animate-in fade-in slide-in-from-bottom-2 duration-200">
+                  <div className="p-2 space-y-1">
+                    {SPEED_PRESETS.map((preset) => (
+                      <button
+                        key={preset.value}
+                        onClick={() => {
+                          handleSpeedChange(preset.value);
+                          setShowSpeedPresets(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all ${
+                          Math.abs(preset.value - rotationSpeed) < 0.01
+                            ? "bg-[rgba(212,175,55,0.2)] text-amber-100"
+                            : "text-amber-100/70 hover:bg-[rgba(212,175,55,0.1)] hover:text-amber-100"
+                        }`}
+                        type="button"
+                      >
+                        <span className="text-lg">{preset.label}</span>
+                        <span className="text-xs text-amber-400/60">{preset.value === 0 ? 'Пауза' : `${preset.value.toFixed(2)}x`}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="w-px h-6 bg-gradient-to-b from-transparent via-[rgba(212,175,55,0.2)] to-transparent mx-1" />
@@ -307,6 +354,25 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
                   </svg>
                   <span>{t('quotes.import')}</span>
                 </button>
+              </div>
+              
+              <div className="mt-3 pt-3 border-t border-[rgba(212,175,55,0.1)]">
+                <button
+                  onClick={handleResetSettings}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-red-400/70 hover:text-red-300 hover:bg-[rgba(239,68,68,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
+                  type="button"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span>Сброс настроек</span>
+                </button>
+              </div>
+              
+              <div className="mt-3 pt-3 border-t border-[rgba(212,175,55,0.1)]">
+                <p className="text-[10px] text-amber-500/40 text-center">
+                  Book Revelation 3D v0.2.1
+                </p>
               </div>
             </div>
           )}
