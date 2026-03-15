@@ -408,12 +408,65 @@ function getQuoteForToday(): QuoteOfDay {
 }
 
 /**
+ * Тема дня для daily theme challenge
+ */
+export interface ThemeOfDay {
+  theme: string;
+  themeName: string;
+  description: string;
+  date: string;
+  completed: boolean;
+}
+
+const THEMES_ROTATION = [
+  { theme: 'dark', name: 'Тёмная', description: 'Классическая тёмная тема для комфортного чтения' },
+  { theme: 'light', name: 'Светлая', description: 'Светлая тема для дневного использования' },
+  { theme: 'blue', name: 'Синяя', description: 'Спокойная синяя тема для концентрации' },
+  { theme: 'purple', name: 'Фиолетовая', description: 'Творческая фиолетовая тема' },
+  { theme: 'ambient', name: 'Амбиент', description: 'Природная зелёная тема для релаксации' },
+  { theme: 'relax', name: 'Релакс', description: 'Мягкая расслабляющая тема' },
+];
+
+function getThemeOfDay(): ThemeOfDay {
+  const dayIndex = getDayOfYear() % THEMES_ROTATION.length;
+  const themeData = THEMES_ROTATION[dayIndex];
+  const today = new Date().toISOString().split("T")[0];
+
+  try {
+    const saved = localStorage.getItem('theme-of-day');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.date === today) {
+        return {
+          theme: themeData.theme,
+          themeName: themeData.name,
+          description: themeData.description,
+          date: today,
+          completed: parsed.completed || false,
+        };
+      }
+    }
+  } catch {
+    // Игнорируем ошибки localStorage
+  }
+
+  return {
+    theme: themeData.theme,
+    themeName: themeData.name,
+    description: themeData.description,
+    date: today,
+    completed: false,
+  };
+}
+
+/**
  * Хук для управления геймификацией
  */
 export function useGamification() {
   const { settings, updateStatistics } = useUserSettings();
   const [achievements, setAchievements] = useState<Achievement[]>(INITIAL_ACHIEVEMENTS);
   const [quoteOfDay, setQuoteOfDay] = useState<QuoteOfDay>(getQuoteForToday);
+  const [themeOfDay, setThemeOfDay] = useState<ThemeOfDay>(getThemeOfDay);
   const [showAchievement, setShowAchievement] = useState<Achievement | null>(null);
 
   // Проверка достижения
@@ -655,9 +708,25 @@ export function useGamification() {
     return JSON.stringify(progressData, null, 2);
   }, [settings, achievements, totalUnlocked, completionPercentage]);
 
+  /**
+   * Завершение испытания темы дня
+   */
+  const completeThemeChallenge = useCallback(() => {
+    setThemeOfDay(prev => {
+      const updated = { ...prev, completed: true };
+      try {
+        localStorage.setItem('theme-of-day', JSON.stringify(updated));
+      } catch {
+        // Игнорируем ошибки localStorage
+      }
+      return updated;
+    });
+  }, []);
+
   return {
     achievements,
     quoteOfDay,
+    themeOfDay,
     showAchievement,
     stats,
     incrementRotations,
@@ -674,5 +743,6 @@ export function useGamification() {
     totalUnlocked,
     completionPercentage,
     exportProgress,
+    completeThemeChallenge,
   };
 }

@@ -26,7 +26,7 @@ export default function Home() {
   const hasWebGL = useWebGLSupport();
   const { trackEvent } = useAnalytics();
   const { themeConfig: autoThemeConfig } = useAutoTheme();
-  const { addThemeExplored, addBookViewed, trackTime, incrementCategoryRead } = useGamification();
+  const { addThemeExplored, addBookViewed, trackTime, incrementCategoryRead, themeOfDay, completeThemeChallenge } = useGamification();
   const { isZenMode, toggleZenMode } = useZenMode({ autoSave: true });
   const {
     settings,
@@ -130,6 +130,13 @@ export default function Home() {
     }, QUOTE_ROTATION_INTERVAL);
     return () => clearInterval(interval);
   }, [activeBook.quotes.length, activeBook.quotes, incrementCategoryRead]);
+
+  // Автоматическое завершение theme challenge при смене темы
+  useEffect(() => {
+    if (!themeOfDay.completed && settings.theme === themeOfDay.theme) {
+      completeThemeChallenge();
+    }
+  }, [settings.theme, themeOfDay, completeThemeChallenge]);
 
   const handleBookChange = useCallback((bookId: string) => {
     trackBookChange(settings.activeBookId, bookId);

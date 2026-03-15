@@ -136,6 +136,13 @@
 ### Контент
 - [x] Категоризация цитат по темам (13 категорий)
 
+### Theme of the Day Challenge
+- [x] ThemeOfDay интерфейс и данные (6 тем в ротации)
+- [x] getThemeOfDay функция с localStorage persistence
+- [x] completeThemeChallenge хук
+- [x] Интеграция в DailyChallenge компонент
+- [x] Авто-завершение при смене темы в page.tsx
+
 ---
 
 ## 📋 TODO — Приоритет 1
@@ -191,6 +198,7 @@
 | Достижения | 32 ✅ (22 + 10 новых) | - |
 | Категории | 13 ✅ | - |
 | Книги | 6 ✅ | - |
+| Theme of Day | 6 тем в ротации ✅ | - |
 | Lighthouse Performance | TBD | 90+ |
 | Lighthouse Accessibility | TBD | 95+ |
 
@@ -217,11 +225,12 @@
 - ✅ Категоризация цитат (13 категорий)
 - ✅ Авто-тема по времени суток (morning/day/evening/night)
 - ✅ Улучшенные частицы (200 частиц, реакция на вращение)
-- ✅ 104 теста (unit + integration + E2E)
+- ✅ 106 тестов (unit + integration + E2E)
 - ✅ ESLint: 0 errors, 0 warnings
 - ✅ TypeScript strict mode (noImplicitAny: true)
 - ✅ 6 книг: Марк Аврелий, Эпиктет, Сенека, Сунь-цзы, Хокинг, Кристенсен
 - ✅ Переключатель языков в MainMenu
+- ✅ Theme of the Day Challenge (6 тем в ротации, авто-завершение)
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
