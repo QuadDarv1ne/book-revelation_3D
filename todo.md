@@ -28,6 +28,27 @@
 - [x] Accessibility Tests: 12 тестов с @axe-core/playwright
 - [x] E2E Tests: playwright.config.ts обновлён для production сборки
 
+### Автоматическая тема по времени суток
+- [x] useAutoTheme хук создан
+- [x] 4 временные темы (morning/day/evening/night)
+- [x] CSS стили для тем
+- [x] Интеграция в UI (переключатель)
+
+### Улучшения частиц
+- [x] Плавный переход цветов при смене темы
+- [x] Реакция частиц на вращение книги
+- [x] Настройка плотности частиц (200 частиц)
+
+### Контент
+- [x] Категоризация цитат по темам (13 категорий)
+
+### Theme of the Day Challenge
+- [x] ThemeOfDay интерфейс и данные (6 тем в ротации)
+- [x] getThemeOfDay функция с localStorage persistence
+- [x] completeThemeChallenge хук
+- [x] Интеграция в DailyChallenge компонент
+- [x] Авто-завершение при смене темы в page.tsx
+
 ### Геймификация
 - [x] Расширение системы достижений (22 достижения)
 - [x] Визуализация прогресса (GamificationDashboard)
@@ -172,26 +193,9 @@
 
 ## 🔄 В процессе
 
-### Автоматическая тема по времени суток
-- [x] useAutoTheme хук создан
-- [x] 4 временные темы (morning/day/evening/night)
-- [x] CSS стили для тем
-- [x] Интеграция в UI (переключатель)
-
-### Улучшения частиц
-- [x] Плавный переход цветов при смене темы
-- [x] Реакция частиц на вращение книги
-- [x] Настройка плотности частиц (200 частиц)
-
 ### Контент
-- [x] Категоризация цитат по темам (13 категорий)
-
-### Theme of the Day Challenge
-- [x] ThemeOfDay интерфейс и данные (6 тем в ротации)
-- [x] getThemeOfDay функция с localStorage persistence
-- [x] completeThemeChallenge хук
-- [x] Интеграция в DailyChallenge компонент
-- [x] Авто-завершение при смене темы в page.tsx
+- [ ] Расширение цитат до 100+
+- [ ] Аудио-версии цитат (TTS)
 
 ---
 
@@ -301,15 +305,19 @@
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
 - [x] Интеграция с Google Books API (скрипты готовы)
 - [x] Расширение системы достижений (новые категории: 10 достижений)
-- [ ] Темы дня (daily theme challenge)
+- [x] Темы дня (daily theme challenge)
 - [x] Экспорт прогресса пользователя
+- [x] Автоматическая тема по времени суток (morning/day/evening/night)
+- [x] Улучшенные частицы (реакция на вращение, плавный переход цветов)
 - [ ] Проверка на Safari iOS
 - [ ] Проверка на Android Chrome
 
 ### v0.4.0 (план)
 - [ ] PWA push уведомления
 - [ ] Расширение системы достижений (новые категории)
-- [ ] Темы дня (daily theme challenge)
 - [ ] Проверка на Safari iOS / Android Chrome
 - [ ] Lighthouse Performance 90+
 - [ ] Lighthouse Accessibility 95+
+- [ ] WebP/AVIF конвертация текстур
+- [ ] Визуальные регрессионные тесты
+- [ ] Production Web Vitals дашборд
