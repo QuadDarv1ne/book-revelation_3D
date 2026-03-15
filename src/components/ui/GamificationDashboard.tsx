@@ -162,7 +162,7 @@ interface GamificationDashboardProps {
 }
 
 export function GamificationDashboard({ onClose }: GamificationDashboardProps) {
-  const { achievements, stats, showAchievement, dismissAchievement } = useGamification();
+  const { achievements, stats, showAchievement, dismissAchievement, exportProgress } = useGamification();
   const { t } = useI18n();
 
   const formatTime = (seconds: number) => {
@@ -199,16 +199,37 @@ export function GamificationDashboard({ onClose }: GamificationDashboardProps) {
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-amber-400/60 rounded-lg hover:text-amber-300 hover:bg-amber-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400"
-            aria-label="Закрыть"
-            type="button"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                const data = exportProgress();
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `progress-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+              }}
+              className="px-3 py-2 text-xs text-amber-100 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400"
+              type="button"
+              aria-label="Экспорт прогресса"
+            >
+              📥 Экспорт
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 text-amber-400/60 rounded-lg hover:text-amber-300 hover:bg-amber-500/10 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400"
+              aria-label="Закрыть"
+              type="button"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Notification о новом достижении */}
