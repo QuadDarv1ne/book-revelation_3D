@@ -152,8 +152,8 @@
 ## 📋 TODO — Приоритет 2
 
 ### Контент
-- [ ] Интеграция с Open Library API для обложек
-- [ ] Интеграция с Google Books API
+- [x] Интеграция с Open Library API для обложек (обложки сгенерированы в public/book-covers/)
+- [x] Интеграция с Google Books API (скрипт parse-google-books.js доступен)
 - [x] Категоризация цитат по темам
 
 ### Книги (QWEN Memory)
@@ -223,8 +223,8 @@
 - ✅ Переключатель языков в MainMenu
 
 ### v0.3.0 (план) 🔄
-- [ ] Интеграция с Open Library API для обложек
-- [ ] Интеграция с Google Books API
+- [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
+- [x] Интеграция с Google Books API (скрипты готовы)
 - [ ] Расширение системы достижений (новые категории)
 - [ ] Темы дня (daily theme challenge)
 - [x] Экспорт прогресса пользователя
@@ -233,6 +233,8 @@
 
 ### v0.4.0 (план)
 - [ ] PWA push уведомления
-- [ ] Интеграция API обложек
-- [ ] Интеграция с Open Library API
-- [ ] Интеграция с Google Books API
+- [ ] Расширение системы достижений (новые категории)
+- [ ] Темы дня (daily theme challenge)
+- [ ] Проверка на Safari iOS / Android Chrome
+- [ ] Lighthouse Performance 90+
+- [ ] Lighthouse Accessibility 95+
