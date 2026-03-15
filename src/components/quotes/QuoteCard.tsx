@@ -2,6 +2,7 @@
 
 import type { Quote } from "@/types/quote";
 import { sanitizeText } from "@/lib/security";
+import { triggerHaptic, HapticPatterns } from "@/lib/haptic";
 
 interface QuoteCardProps {
   quote: Quote;
@@ -21,17 +22,10 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
   const safeAuthor = sanitizeText(quote.author);
   const safeEra = sanitizeText(quote.era);
 
-  // Haptic feedback
-  const triggerHaptic = (pattern: number | number[]) => {
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-      navigator.vibrate(pattern);
-    }
-  };
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      triggerHaptic(10);
+      triggerHaptic(HapticPatterns.click);
       onClick();
     }
   };
@@ -39,7 +33,7 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
   const handleCopyKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      triggerHaptic(5);
+      triggerHaptic(HapticPatterns.click);
       onCopy?.(`"${quote.text}" — ${quote.author}`);
     }
   };
@@ -47,7 +41,7 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
   const handleFavoriteKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      triggerHaptic(isFavorite ? [5, 10, 5] : 10);
+      triggerHaptic(isFavorite ? HapticPatterns.success : HapticPatterns.click);
       onToggleFavorite(e);
     }
   };
@@ -55,7 +49,7 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
   const handleShareKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      triggerHaptic(10);
+      triggerHaptic(HapticPatterns.click);
       onShare?.(quote);
     }
   };
@@ -63,7 +57,7 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
   return (
     <div
       onClick={() => {
-        triggerHaptic(10);
+        triggerHaptic(HapticPatterns.click);
         onClick();
       }}
       onKeyDown={handleKeyDown}
@@ -97,7 +91,7 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                triggerHaptic(5);
+                triggerHaptic(HapticPatterns.click);
                 onCopy(`"${quote.text}" — ${quote.author}`);
               }}
               onKeyDown={handleCopyKeyDown}
@@ -116,7 +110,7 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                triggerHaptic(10);
+                triggerHaptic(HapticPatterns.click);
                 onShare(quote);
               }}
               onKeyDown={handleShareKeyDown}
@@ -134,7 +128,7 @@ export function QuoteCard({ quote, index, isVisible, isActive, isFavorite, onCli
           <button
             onClick={(e) => {
               e.stopPropagation();
-              triggerHaptic(isFavorite ? [5, 10, 5] : 10);
+              triggerHaptic(isFavorite ? HapticPatterns.success : HapticPatterns.click);
               onToggleFavorite(e);
             }}
             onKeyDown={handleFavoriteKeyDown}
