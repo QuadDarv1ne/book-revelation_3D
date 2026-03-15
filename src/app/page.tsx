@@ -258,7 +258,7 @@ export default function Home() {
 
             <div id="controls">
               {!isZenMode && (
-                <div className="absolute top-3 right-3 z-40">
+                <div className="absolute top-3 left-0 right-0 flex justify-center z-40">
                   <BookSelector activeBookId={settings.activeBookId} onBookChange={handleBookChange} />
                 </div>
               )}
@@ -295,7 +295,7 @@ export default function Home() {
               <p className="text-amber-600/15 text-[9px] tracking-[0.2em] uppercase font-light">Stoic Philosophy</p>
             </div>
 
-            <div className="absolute bottom-3 right-3 z-40">
+            <div className="absolute bottom-3 left-0 right-0 flex justify-center z-40">
               <MainMenu
                 theme={settings.theme}
                 onThemeChange={(t: string) => updateSettings('theme', t as typeof settings.theme)}
