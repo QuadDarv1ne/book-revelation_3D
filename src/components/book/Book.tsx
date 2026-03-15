@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Float } from "@react-three/drei";
 import * as THREE from "three";
@@ -20,19 +20,35 @@ const BOOK_WIDTH = 1.35;
 const BOOK_HEIGHT = 1.85;
 const BOOK_DEPTH = 0.22;
 const COVER_THICKNESS = 0.018;
-const DEFAULT_COVER = "/book-cover.jpg";
-const DEFAULT_SPINE = "/book-spine.jpg";
-const DEFAULT_BACK_COVER = "/book-cover.jpg";
 const DEFAULT_ROTATION_SPEED = 0.5;
 
-const COVER_GEOMETRY = new THREE.BoxGeometry(BOOK_WIDTH, BOOK_HEIGHT, COVER_THICKNESS);
-const PAGES_GEOMETRY = new THREE.BoxGeometry(BOOK_WIDTH - 0.06, BOOK_HEIGHT - 0.06, BOOK_DEPTH - 0.035);
-const SPINE_GEOMETRY = new THREE.BoxGeometry(0.035, BOOK_HEIGHT + 0.015, BOOK_DEPTH + 0.015);
-const PAGES_EDGE_GEOMETRY = new THREE.BoxGeometry(0.07, BOOK_HEIGHT - 0.08, BOOK_DEPTH - 0.04);
-const GOLD_TOP_GEOMETRY = new THREE.BoxGeometry(BOOK_WIDTH - 0.08, 0.012, BOOK_DEPTH - 0.015);
-const GLOW_GEOMETRY = new THREE.CircleGeometry(1.1, 32);
+const GEOMETRIES = {
+  cover: new THREE.BoxGeometry(BOOK_WIDTH, BOOK_HEIGHT, COVER_THICKNESS),
+  pages: new THREE.BoxGeometry(BOOK_WIDTH - 0.06, BOOK_HEIGHT - 0.06, BOOK_DEPTH - 0.035),
+  spine: new THREE.BoxGeometry(0.035, BOOK_HEIGHT + 0.015, BOOK_DEPTH + 0.015),
+  pagesEdge: new THREE.BoxGeometry(0.07, BOOK_HEIGHT - 0.08, BOOK_DEPTH - 0.04),
+  goldTop: new THREE.BoxGeometry(BOOK_WIDTH - 0.08, 0.012, BOOK_DEPTH - 0.015),
+  glow: new THREE.CircleGeometry(1.1, 32),
+} as const;
 
-export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFAULT_SPINE, backCoverImage = DEFAULT_BACK_COVER, rotationSpeed = DEFAULT_ROTATION_SPEED }: BookProps) {
+const POSITIONS = {
+  backCover: [0, 0, -BOOK_DEPTH / 2 + COVER_THICKNESS / 2],
+  pages: [0, 0, 0],
+  frontCover: [0, 0, BOOK_DEPTH / 2 - COVER_THICKNESS / 2],
+  spine: [-BOOK_WIDTH / 2 - 0.008, 0, 0],
+  pagesEdge: [BOOK_WIDTH / 2 - 0.035, 0, 0],
+  goldTop: [0, BOOK_HEIGHT / 2 - 0.008, 0],
+  goldBottom: [0, -BOOK_HEIGHT / 2 + 0.008, 0],
+  glow: [0, 0.04, 0],
+} as const;
+
+export function Book({ 
+  isRotating, 
+  coverImage = "/book-cover.jpg", 
+  spineImage = "/book-spine.jpg", 
+  backCoverImage = "/book-cover.jpg", 
+  rotationSpeed = DEFAULT_ROTATION_SPEED 
+}: BookProps) {
   const bookRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   const glowRef = useRef<THREE.Mesh>(null);
@@ -42,6 +58,8 @@ export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFA
   const touchState = useRef({ startX: 0, startY: 0, isDragging: false });
   const touchRotation = useRef({ x: 0, y: 0 });
   const targetRotation = useRef(0);
+  const lastHoveredRef = useRef(hovered);
+  lastHoveredRef.current = hovered;
 
   const [coverTexture, setCoverTexture] = useState<THREE.Texture | null>(null);
   const [spineTexture, setSpineTexture] = useState<THREE.Texture | null>(null);
@@ -96,57 +114,61 @@ export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFA
     };
   }, [gl.domElement, handleTouchStart, handleTouchMove, handleTouchEnd]);
 
+  const hoverStateRef = useRef(hovered);
+  hoverStateRef.current = hovered;
+
   useFrame((state, delta) => {
     const book = bookRef.current;
     if (!book) return;
 
-    // Ограничиваем delta time для стабильности (максимум 100ms)
     const clampedDelta = Math.min(delta, 0.1);
     const time = state.clock.elapsedTime;
 
-    // Вращение книги (отключаем при reduced-motion)
     if (isRotating && !touchState.current.isDragging && !prefersReducedMotion) {
       targetRotation.current += clampedDelta * rotationSpeed;
     }
 
-    // Обработка touch вращения
     if (touchState.current.isDragging) {
       book.rotation.y = THREE.MathUtils.lerp(book.rotation.y, touchRotation.current.y * 0.01, clampedDelta * 10);
       book.rotation.x = THREE.MathUtils.lerp(book.rotation.x, touchRotation.current.x * 0.01, clampedDelta * 10);
     } else {
-      // Плавное затухание вращения
       book.rotation.y += (targetRotation.current - book.rotation.y) * clampedDelta * 5;
-      touchRotation.current.x *= Math.pow(0.01, clampedDelta);
-      touchRotation.current.y *= Math.pow(0.01, clampedDelta);
+      const damping = Math.pow(0.01, clampedDelta);
+      touchRotation.current.x *= damping;
+      touchRotation.current.y *= damping;
     }
 
-    // Парение книги (float animation) - уменьшено при reduced-motion
     if (prefersReducedMotion) {
-      book.position.y = 0.6; // Статичная позиция
+      book.position.y = 0.6;
     } else {
       book.position.y = 0.6 + Math.sin(time * 0.5) * 0.04;
     }
 
-    // Микро-колебания (отключаем при reduced-motion)
     if (!prefersReducedMotion) {
       book.rotation.x += Math.sin(time * 0.3) * 0.015 * clampedDelta;
       book.rotation.z = Math.cos(time * 0.4) * 0.008;
     }
 
-    // Плавное изменение масштаба при наведении
-    const targetScale = hovered ? 1.12 : 1;
+    const targetScale = hoverStateRef.current ? 1.12 : 1;
     book.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), clampedDelta * 10);
 
-    // Анимация свечения (уменьшена при reduced-motion)
     if (glowRef.current) {
       const material = glowRef.current.material as THREE.MeshBasicMaterial;
-      if (prefersReducedMotion) {
-        material.opacity = 0.2; // Статичная прозрачность
-      } else {
-        material.opacity = 0.22 + Math.sin(time * 2.5) * 0.08;
-      }
+      material.opacity = prefersReducedMotion 
+        ? 0.2 
+        : 0.22 + Math.sin(time * 2.5) * 0.08;
     }
   });
+
+  const bookMaterials = useMemo(() => ({
+    front: coverTexture ? coverMaterial : fallbackCoverMaterial,
+    back: backCoverTexture ? backCoverMaterial : fallbackCoverMaterial,
+    spine: spineTexture ? spineMaterial : fallbackSpineMaterial,
+    pages: pagesMaterial,
+    pagesEdge: pagesEdgeMaterial,
+    gold: goldMaterial,
+    glow: glowMaterial,
+  }), [coverTexture, backCoverTexture, spineTexture, coverMaterial, backCoverMaterial, spineMaterial, pagesMaterial, pagesEdgeMaterial, goldMaterial, glowMaterial, fallbackCoverMaterial, fallbackSpineMaterial]);
 
   return (
     <group>
@@ -155,50 +177,47 @@ export function Book({ isRotating, coverImage = DEFAULT_COVER, spineImage = DEFA
           ref={bookRef}
           onPointerOver={() => setHovered(true)}
           onPointerOut={() => setHovered(false)}
-          position={[0, 0.6, 0]}
+          position={POSITIONS.frontCover}
         >
-          {/* Задняя обложка */}
-          <mesh position={[0, 0, -BOOK_DEPTH/2 + COVER_THICKNESS/2]} castShadow>
-            <primitive object={COVER_GEOMETRY} />
-            <primitive object={backCoverTexture ? backCoverMaterial : fallbackCoverMaterial} />
+          <mesh position={POSITIONS.backCover} castShadow>
+            <primitive object={GEOMETRIES.cover} attach="geometry" />
+            <primitive object={bookMaterials.back} attach="material" />
           </mesh>
 
-          {/* Страницы */}
-          <mesh position={[0, 0, 0]} castShadow>
-            <primitive object={PAGES_GEOMETRY} />
-            <primitive object={pagesMaterial} />
+          <mesh position={POSITIONS.pages} castShadow>
+            <primitive object={GEOMETRIES.pages} attach="geometry" />
+            <primitive object={bookMaterials.pages} attach="material" />
           </mesh>
 
-          {/* Передняя обложка */}
-          <mesh position={[0, 0, BOOK_DEPTH/2 - COVER_THICKNESS/2]} castShadow>
-            <primitive object={COVER_GEOMETRY} />
-            <primitive object={coverTexture ? coverMaterial : fallbackCoverMaterial} />
+          <mesh position={POSITIONS.frontCover} castShadow>
+            <primitive object={GEOMETRIES.cover} attach="geometry" />
+            <primitive object={bookMaterials.front} attach="material" />
           </mesh>
 
-          <mesh position={[-BOOK_WIDTH/2 - 0.008, 0, 0]} castShadow>
-            <primitive object={SPINE_GEOMETRY} />
-            <primitive object={spineTexture ? spineMaterial : fallbackSpineMaterial} />
+          <mesh position={POSITIONS.spine} castShadow>
+            <primitive object={GEOMETRIES.spine} attach="geometry" />
+            <primitive object={bookMaterials.spine} attach="material" />
           </mesh>
 
-          <mesh position={[BOOK_WIDTH/2 - 0.035, 0, 0]}>
-            <primitive object={PAGES_EDGE_GEOMETRY} />
-            <primitive object={pagesEdgeMaterial} />
+          <mesh position={POSITIONS.pagesEdge}>
+            <primitive object={GEOMETRIES.pagesEdge} attach="geometry" />
+            <primitive object={bookMaterials.pagesEdge} attach="material" />
           </mesh>
 
-          <mesh position={[0, BOOK_HEIGHT/2 - 0.008, 0]}>
-            <primitive object={GOLD_TOP_GEOMETRY} />
-            <primitive object={goldMaterial} />
+          <mesh position={POSITIONS.goldTop}>
+            <primitive object={GEOMETRIES.goldTop} attach="geometry" />
+            <primitive object={bookMaterials.gold} attach="material" />
           </mesh>
-          <mesh position={[0, -BOOK_HEIGHT/2 + 0.008, 0]}>
-            <primitive object={GOLD_TOP_GEOMETRY} />
-            <primitive object={goldMaterial} />
+          <mesh position={POSITIONS.goldBottom}>
+            <primitive object={GEOMETRIES.goldTop} attach="geometry" />
+            <primitive object={bookMaterials.gold} attach="material" />
           </mesh>
         </group>
       </Float>
 
-      <mesh ref={glowRef} position={[0, 0.04, 0]} rotation={[-Math.PI/2, 0, 0]}>
-        <primitive object={GLOW_GEOMETRY} />
-        <primitive object={glowMaterial} />
+      <mesh ref={glowRef} position={POSITIONS.glow} rotation={[-Math.PI / 2, 0, 0]}>
+        <primitive object={GEOMETRIES.glow} attach="geometry" />
+        <primitive object={bookMaterials.glow} attach="material" />
       </mesh>
     </group>
   );

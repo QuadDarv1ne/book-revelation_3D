@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { QuotesPanel } from "@/components/quotes";
 import { WebGLError, useWebGLSupport, SettingsBar, PWAInstall, ToastProvider, BookSelector, MainMenu } from "@/components/ui";
 import { SceneContainer } from "@/components/book/SceneContainer";
@@ -193,40 +193,67 @@ export default function Home() {
     }
   }, [exportSettings, showToast, captureMessage, exportFavoritesToFile, captureException]);
 
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const handleImportFavorites = useCallback(() => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
+    if (!fileInputRef.current) return;
+    fileInputRef.current.click();
+  }, []);
 
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement)?.files?.[0];
-      if (!file) return;
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target?.result as string;
-        importFavoritesFromFile(content, showToast, captureMessage, captureException);
-      };
-
-      reader.onerror = () => {
-        showToast("Ошибка чтения файла", "error");
-      };
-
-      reader.readAsText(file);
+    const reader = new FileReader();
+    reader.onload = (readEvent) => {
+      const content = readEvent.target?.result as string;
+      importFavoritesFromFile(content, showToast, captureMessage, captureException);
     };
 
-    input.click();
+    reader.onerror = () => {
+      showToast("Ошибка чтения файла", "error");
+    };
+
+    reader.readAsText(file);
+
+    // Сброс input для повторного выбора того же файла
+    e.target.value = '';
   }, [showToast, captureMessage, captureException, importFavoritesFromFile]);
+
+  // Вычисляем useMemo до условного return
+  const backgroundGradient = useMemo(() => settings.theme === "light" || settings.theme === "relax"
+    ? 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(180,160,80,0.12)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(160,140,70,0.08)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(255,255,255,0.9)_0%,transparent_50%)'
+    : 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.08)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.06)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(30,30,50,0.7)_0%,transparent_50%)',
+    [settings.theme]);
+
+  const gridPattern = useMemo(() => 'linear-gradient(rgba(212,175,55,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.5)_1px,transparent_1px)', []);
+
+  const jsonLd = useMemo(() => JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Book Revelation 3D",
+    "alternateName": ["Откровение Книги 3D", "Stoic Book 3D"],
+    "url": "https://book-revelation-3d.vercel.app",
+    "description": "Интерактивный 3D модуль с вращающейся книгой философии и цитатами великих мыслителей",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Any",
+    "browserRequirements": "Requires JavaScript",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Book Revelation 3D Team"
+    },
+    "keywords": "стоицизм, 3D книга, Марк Аврелий, Эпиктет, Стивен Хокинг, философия, цитаты",
+    "inLanguage": ["ru", "en", "zh", "he", "es", "fr"]
+  }), []);
 
   if (hasWebGL === false || webGLError) {
     return <WebGLError onRetry={handleRetry} />;
   }
-
-  const backgroundGradient = settings.theme === "light" || settings.theme === "relax" 
-    ? 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(180,160,80,0.12)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(160,140,70,0.08)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(255,255,255,0.9)_0%,transparent_50%)'
-    : 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.08)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.06)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(30,30,50,0.7)_0%,transparent_50%)';
-  
-  const gridPattern = 'linear-gradient(rgba(212,175,55,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.5)_1px,transparent_1px)';
 
   return (
     <ToastProvider>
@@ -343,32 +370,18 @@ export default function Home() {
 
         {!isZenMode && <PWAInstall />}
 
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          onChange={handleFileChange}
+          className="hidden"
+          aria-hidden="true"
+        />
+
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebApplication",
-              "name": "Book Revelation 3D",
-              "alternateName": ["Откровение Книги 3D", "Stoic Book 3D"],
-              "url": "https://book-revelation-3d.vercel.app",
-              "description": "Интерактивный 3D модуль с вращающейся книгой философии и цитатами великих мыслителей",
-              "applicationCategory": "EducationalApplication",
-              "operatingSystem": "Any",
-              "browserRequirements": "Requires JavaScript",
-              "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "USD"
-              },
-              "author": {
-                "@type": "Person",
-                "name": "Book Revelation 3D Team"
-              },
-              "keywords": "стоицизм, 3D книга, Марк Аврелий, Эпиктет, Стивен Хокинг, философия, цитаты",
-              "inLanguage": ["ru", "en", "zh", "he", "es", "fr"]
-            })
-          }}
+          dangerouslySetInnerHTML={{ __html: jsonLd }}
         />
 
         <KeyboardShortcutsHelp isOpen={showShortcutsHelp} onClose={() => setShowShortcutsHelp(false)} />

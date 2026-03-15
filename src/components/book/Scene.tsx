@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useRef, useEffect, useCallback, useState } from "react";
+import { memo, useRef, useEffect, useCallback, useState, useMemo } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { Sparkles, ContactShadows } from "@react-three/drei";
 import { Book } from "./Book";
@@ -137,18 +137,23 @@ export const Scene = memo(function Scene({
   spineImage,
   backCoverImage,
   theme,
-  onKeyboardRotate
+  onKeyboardRotate,
+  rotationSpeed = 0.5,
 }: SceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { cameraState, isLoaded, updateZoom, resetCamera, updatePosition } = useCameraPersistence();
   const [cameraZoom, setCameraZoom] = useState(1);
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  // Initialize camera position from saved state
-  const initialCameraPosition = isLoaded ? cameraState.position : { x: 0, y: 1.25, z: 4.0 };
-  const initialZoom = isLoaded ? cameraState.zoom : 1;
+  const initialCameraPosition = useMemo(
+    () => isLoaded ? cameraState.position : { x: 0, y: 1.25, z: 4.0 },
+    [isLoaded, cameraState.position]
+  );
+  const initialZoom = useMemo(
+    () => isLoaded ? cameraState.zoom : 1,
+    [isLoaded, cameraState.zoom]
+  );
 
-  // Если включено prefers-reduced-motion, отключаем вращение
   const effectiveIsRotating = prefersReducedMotion ? false : isRotating;
 
   const handleZoomIn = useCallback(() => {
@@ -172,12 +177,11 @@ export const Scene = memo(function Scene({
     resetCamera();
   }, [resetCamera]);
 
-  // Sync with saved zoom on load
   useEffect(() => {
-    if (isLoaded && initialZoom !== 1) {
+    if (isLoaded && initialZoom !== 1 && initialZoom !== cameraZoom) {
       setCameraZoom(initialZoom);
     }
-  }, [isLoaded, initialZoom]);
+  }, [isLoaded, initialZoom, cameraZoom]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -205,7 +209,16 @@ export const Scene = memo(function Scene({
     };
   }, [handleZoomIn, handleZoomOut, handleReset]);
 
-  const fov = 38 / cameraZoom;
+  const fov = useMemo(() => 38 / cameraZoom, [cameraZoom]);
+
+  const canvasOptions = useMemo(() => ({
+    antialias: true,
+    alpha: true,
+    powerPreference: "high-performance" as const,
+    preserveDrawingBuffer: false,
+  }), []);
+
+  const performanceConfig = useMemo(() => ({ min: 0.5, max: 1, debounce: 200 }), []);
 
   return (
     <div
@@ -218,18 +231,19 @@ export const Scene = memo(function Scene({
       </div>
       <Canvas
         ref={canvasRef}
-        camera={{ position: [initialCameraPosition.x, initialCameraPosition.y, initialCameraPosition.z], fov }}
+        camera={{ 
+          position: [initialCameraPosition.x, initialCameraPosition.y, initialCameraPosition.z], 
+          fov,
+          near: 0.1,
+          far: 100,
+        }}
         shadows
         dpr={[1, 1.5]}
-        gl={{
-          antialias: true,
-          alpha: true,
-          powerPreference: "high-performance",
-          preserveDrawingBuffer: false
-        }}
-        performance={{ min: 0.5 }}
+        gl={canvasOptions}
+        performance={performanceConfig}
         onError={onError}
         style={{ outline: 'none' }}
+        tabIndex={0}
       >
         <SceneContent
           isRotating={effectiveIsRotating}
@@ -237,6 +251,7 @@ export const Scene = memo(function Scene({
           spineImage={spineImage}
           backCoverImage={backCoverImage}
           theme={theme}
+          rotationSpeed={rotationSpeed}
         />
         <KeyboardHandler
           onRotate={onKeyboardRotate || (() => {})}
