@@ -352,7 +352,7 @@ export default function Home() {
                 "name": "Book Revelation 3D Team"
               },
               "keywords": "стоицизм, 3D книга, Марк Аврелий, Эпиктет, Стивен Хокинг, философия, цитаты",
-              "inLanguage": ["ru", "en", "he", "zh"]
+              "inLanguage": ["ru", "en", "zh", "he", "es", "fr"]
             })
           }}
         />

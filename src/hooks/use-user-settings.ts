@@ -65,7 +65,7 @@ const defaultSettings: UserSettings = {
 };
 
 const STORAGE_KEY = 'user-settings';
-const VALID_LOCALES = ['en', 'ru', 'zh', 'he'] as const;
+const VALID_LOCALES = ['en', 'ru', 'zh', 'he', 'es', 'fr'] as const;
 const VALID_THEMES = ['dark', 'light', 'blue', 'purple', 'ambient', 'relax', 'auto', 'auto-time'] as const;
 
 function isValidLocale(value: unknown): value is Locale {

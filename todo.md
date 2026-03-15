@@ -15,11 +15,11 @@
 - [x] Install prompt улучшение (iOS инструкции)
 
 ### i18n — Интернационализация
-- [x] Добавлена поддержка 4 языков: EN, RU, ZH, HE
+- [x] Добавлена поддержка 6 языков: EN, RU, ZH, HE, ES, FR
 - [x] useI18n хук с localStorage persistence
 - [x] Перевод всех UI компонентов:
   - ThemeSelector (названия тем)
-  - MainMenu (навигация, настройки, о проекте)
+  - MainMenu (навигация, настройки, о проекте, язык)
   - SettingsBar (вкладки, экспорт/импорт)
   - QuotesPanel (фильтры, поиск, aria-labels)
   - ControlButton (вращение, пауза)
@@ -183,7 +183,7 @@
 | Тесты | 104 passed ✅ | 95+ |
 | ESLint errors | 0 ✅ | 0 |
 | ESLint warnings | 0 ✅ | 0 |
-| Языки | 4 | 6+ |
+| Языки | 6 ✅ (EN, RU, ZH, HE, ES, FR) | 6+ |
 | Цитат | 65+ ✅ (stoic-quotes.ts) | 50+ |
 | Цитат в книгах | 48 ✅ (books.ts: 6 книг × 8 цитат) | 40+ |
 | Достижения | 22 ✅ | - |
@@ -197,7 +197,7 @@
 ## 🚀 Релизы
 
 ### v0.2.0 (текущая) ✅
-- ✅ i18n поддержка (4 языка: EN, RU, ZH, HE)
+- ✅ i18n поддержка (6 языков: EN, RU, ZH, HE, ES, FR)
 - ✅ Экспорт/импорт избранных цитат
 - ✅ Share цитат (Web Share API + fallback)
 - ✅ Деплой конфигурации (Netlify, Vercel, Cloudflare, Docker, etc.)
@@ -219,6 +219,7 @@
 - ✅ ESLint: 0 errors, 0 warnings
 - ✅ TypeScript strict mode (noImplicitAny: true)
 - ✅ 6 книг: Марк Аврелий, Эпиктет, Сенека, Сунь-цзы, Хокинг, Кристенсен
+- ✅ Переключатель языков в MainMenu
 
 ### v0.3.0 (план) 🔄
 - [ ] Интеграция с Open Library API для обложек
@@ -232,4 +233,5 @@
 ### v0.4.0 (план)
 - [ ] PWA push уведомления
 - [ ] Интеграция API обложек
-- [ ] Расширение переводов (6+ языков)
+- [ ] Интеграция с Open Library API
+- [ ] Интеграция с Google Books API
