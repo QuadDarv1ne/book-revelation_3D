@@ -2,7 +2,9 @@
 
 import {useState, useCallback, useEffect} from 'react';
 
-export type Locale = 'en' | 'ru' | 'zh' | 'he' | 'de' | 'fr';
+export type Locale = 'en' | 'ru' | 'zh' | 'he' | 'es' | 'fr';
+
+const VALID_LOCALES: readonly Locale[] = ['en', 'ru', 'zh', 'he', 'es', 'fr'] as const;
 
 const translations: Record<Locale, Record<string, string>> = {
   en: {
@@ -374,6 +376,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'achievement.early_bird': 'ציפור מוקדמת',
     'achievement.zen_master': 'מאסטר זן',
   },
+<<<<<<< HEAD
   de: {
     'quotes.search': 'Zitate suchen...',
     'quotes.all': 'Alle',
@@ -457,12 +460,112 @@ const translations: Record<Locale, Record<string, string>> = {
     'settings.collapse': 'Einstellungen einklappen',
     'settings.open': 'Einstellungen öffnen',
     'app.title': 'Buch Offenbarung 3D',
+=======
+  es: {
+    'quotes.search': 'Buscar citas...',
+    'quotes.all': 'Todas',
+    'quotes.favorites': 'Favoritos',
+    'quotes.shuffle': 'Aleatorio',
+    'quotes.export': 'Exportar',
+    'quotes.import': 'Importar',
+    'quotes.copy': 'Copiar',
+    'quotes.share': 'Compartir',
+    'quotes.filters': 'Filtros de citas',
+    'quotes.noFavorites': 'Aún no hay citas favoritas. Haz clic en el corazón para añadir una.',
+    'quotes.loading': 'Cargando citas de "{book}"...',
+    'quotes.ariaLabel': 'Panel de citas. Usa las flechas Arriba/Abajo o desliza para navegar.',
+    'quotes.categories': 'Categorías',
+    'category.all': 'Todas',
+    'category.thinking': 'Pensamiento',
+    'category.life': 'Vida',
+    'category.selfControl': 'Autocontrol',
+    'category.wisdom': 'Sabiduría',
+    'category.freedom': 'Libertad',
+    'category.knowledge': 'Conocimiento',
+    'category.resilience': 'Resiliencia',
+    'category.goal': 'Objetivo',
+    'category.calmness': 'Calma',
+    'category.strategy': 'Estrategia',
+    'category.patience': 'Paciencia',
+    'category.action': 'Acción',
+    'category.inspiration': 'Inspiración',
+    'theme.dark': 'Oscuro',
+    'theme.light': 'Claro',
+    'theme.blue': 'Azul',
+    'theme.purple': 'Morado',
+    'theme.ambient': 'Ambiente',
+    'theme.relax': 'Relax',
+    'theme.auto': 'Auto',
+    'theme.autoTime': 'Auto Tiempo',
+    'time.morning': 'Mañana',
+    'time.day': 'Día',
+    'time.evening': 'Tarde',
+    'time.night': 'Noche',
+    'toast.noFavoritesToExport': 'No hay favoritos para exportar',
+    'toast.favoritesExported': 'Favoritos exportados',
+    'toast.exportError': 'Error de exportación',
+    'toast.favoritesImported': 'Importadas {count} citas',
+    'toast.importError': 'Error de importación',
+    'toast.readFileError': 'Error de lectura de archivo',
+    'menu.favorites': 'Favoritos',
+    'menu.rotation': 'Rotación',
+    'menu.pause': 'Pausa',
+    'menu.play': 'Reproducir',
+    'menu.zenMode': 'Modo Zen',
+    'menu.about': 'Acerca de',
+    'menu.aboutText': 'Módulo 3D interactivo con un libro giratorio de filosofía estoica. Incluye sabiduría de Marco Aurelio, Epicteto y otros grandes pensadores.',
+    'menu.controls': 'Controles',
+    'menu.pauseRotation': 'Pausa/rotación',
+    'menu.quoteNav': 'Navegación de citas',
+    'control.rotation': 'Rotación',
+    'control.pause': 'Pausar rotación',
+    'control.play': 'Iniciar rotación',
+    'control.space': 'Espacio',
+    'book.select': 'Seleccionar libro',
+    'book.cover': 'Portada del libro',
+    'book.changed': 'Libro cambiado a',
+    'settings.theme': 'Tema',
+    'settings.rotation': 'Rotación del libro',
+    'settings.notifications': 'Notificaciones',
+    'settings.speed': 'Velocidad',
+    'settings.rotationSpeed': 'Velocidad de rotación del libro',
+    'settings.app': 'Configuración de la aplicación',
+    'settings.general': 'General',
+    'settings.account': 'Cuenta',
+    'settings.appearance': 'Apariencia',
+    'menu.main': 'Menú principal',
+    'swipe': 'DESLIZAR',
+    'stoicPhilosophy': 'Filosofía Estoica',
+    'stoicWisdom': 'Sabiduría Estoica',
+    'pwa.install': 'Instalar aplicación',
+    'pwa.add': 'Añadir',
+    'common.close': 'Cerrar',
+    'settings.expand': 'Expandir configuración',
+    'settings.collapse': 'Contraer configuración',
+    'settings.open': 'Abrir configuración',
+    'app.title': 'Revelación del Libro 3D',
+    'achievement.rotation_legend': 'Leyenda de rotación',
+    'achievement.stoic_sage': 'Sabio estoico',
+    'achievement.year_streak': 'Racha anual',
+    'achievement.book_library': 'Bibliotecario',
+    'achievement.favorites_master': 'Guardián de la sabiduría',
+    'achievement.daily_visitor': 'Visitante diario',
+    'achievement.quote_sharer': 'Compartidor de sabiduría',
+    'achievement.category_explorer': 'Explorador de categorías',
+    'achievement.night_owl': 'Búho nocturno',
+    'achievement.early_bird': 'Pájaro madrugador',
+    'achievement.zen_master': 'Maestro zen',
+>>>>>>> dev
   },
   fr: {
     'quotes.search': 'Rechercher des citations...',
     'quotes.all': 'Toutes',
     'quotes.favorites': 'Favoris',
+<<<<<<< HEAD
     'quotes.shuffle': 'Mélanger',
+=======
+    'quotes.shuffle': 'Aléatoire',
+>>>>>>> dev
     'quotes.export': 'Exporter',
     'quotes.import': 'Importer',
     'quotes.copy': 'Copier',
@@ -470,7 +573,11 @@ const translations: Record<Locale, Record<string, string>> = {
     'quotes.filters': 'Filtres de citations',
     'quotes.noFavorites': 'Pas encore de citations favorites. Cliquez sur le cœur pour en ajouter une.',
     'quotes.loading': 'Chargement des citations de "{book}"...',
+<<<<<<< HEAD
     'quotes.ariaLabel': 'Panneau de citations. Utilisez les flèches Haut/Bas ou balayez sur les écrans tactiles.',
+=======
+    'quotes.ariaLabel': 'Panneau de citations. Utilisez les flèches Haut/Bas ou glissez pour naviguer.',
+>>>>>>> dev
     'quotes.categories': 'Catégories',
     'category.all': 'Toutes',
     'category.thinking': 'Pensée',
@@ -491,7 +598,11 @@ const translations: Record<Locale, Record<string, string>> = {
     'theme.blue': 'Bleu',
     'theme.purple': 'Violet',
     'theme.ambient': 'Ambiant',
+<<<<<<< HEAD
     'theme.relax': 'Détendu',
+=======
+    'theme.relax': 'Détente',
+>>>>>>> dev
     'theme.auto': 'Auto',
     'theme.autoTime': 'Auto Temps',
     'time.morning': 'Matin',
@@ -501,9 +612,15 @@ const translations: Record<Locale, Record<string, string>> = {
     'toast.noFavoritesToExport': 'Aucun favori à exporter',
     'toast.favoritesExported': 'Favoris exportés',
     'toast.exportError': 'Erreur d\'exportation',
+<<<<<<< HEAD
     'toast.favoritesImported': '{count} citations importées',
     'toast.importError': 'Erreur d\'importation',
     'toast.readFileError': 'Erreur de lecture du fichier',
+=======
+    'toast.favoritesImported': 'Importées {count} citations',
+    'toast.importError': 'Erreur d\'importation',
+    'toast.readFileError': 'Erreur de lecture de fichier',
+>>>>>>> dev
     'menu.favorites': 'Favoris',
     'menu.rotation': 'Rotation',
     'menu.pause': 'Pause',
@@ -518,7 +635,11 @@ const translations: Record<Locale, Record<string, string>> = {
     'control.pause': 'Pause de la rotation',
     'control.play': 'Démarrer la rotation',
     'control.space': 'Espace',
+<<<<<<< HEAD
     'book.select': 'Sélectionner un livre',
+=======
+    'book.select': 'Sélectionner le livre',
+>>>>>>> dev
     'book.cover': 'Couverture du livre',
     'book.changed': 'Livre changé pour',
     'settings.theme': 'Thème',
@@ -531,9 +652,15 @@ const translations: Record<Locale, Record<string, string>> = {
     'settings.account': 'Compte',
     'settings.appearance': 'Apparence',
     'menu.main': 'Menu principal',
+<<<<<<< HEAD
     'swipe': 'BALAYER',
     'stoicPhilosophy': 'Philosophie stoïcienne',
     'stoicWisdom': 'Sagesse stoïcienne',
+=======
+    'swipe': 'GLISSER',
+    'stoicPhilosophy': 'Philosophie Stoïcienne',
+    'stoicWisdom': 'Sagesse Stoïcienne',
+>>>>>>> dev
     'pwa.install': 'Installer l\'application',
     'pwa.add': 'Ajouter',
     'common.close': 'Fermer',
@@ -541,6 +668,20 @@ const translations: Record<Locale, Record<string, string>> = {
     'settings.collapse': 'Réduire les paramètres',
     'settings.open': 'Ouvrir les paramètres',
     'app.title': 'Révélation du Livre 3D',
+<<<<<<< HEAD
+=======
+    'achievement.rotation_legend': 'Légende de rotation',
+    'achievement.stoic_sage': 'Sage stoïcien',
+    'achievement.year_streak': 'Série annuelle',
+    'achievement.book_library': 'Bibliothécaire',
+    'achievement.favorites_master': 'Gardien de la sagesse',
+    'achievement.daily_visitor': 'Visiteur quotidien',
+    'achievement.quote_sharer': 'Partageur de sagesse',
+    'achievement.category_explorer': 'Explorateur de catégories',
+    'achievement.night_owl': 'Hibou nocturne',
+    'achievement.early_bird': 'Oiseau matinal',
+    'achievement.zen_master': 'Maître zen',
+>>>>>>> dev
   },
 };
 

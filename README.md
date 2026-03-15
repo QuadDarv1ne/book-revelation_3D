@@ -7,6 +7,8 @@
 - 🇷🇺 Русский: **Откровение Книги 3D**
 - 🇮🇱 עברית: **גילוי הספר 3D**
 - 🇨🇳 中文：书籍启示 3D
+- 🇪🇸 Español: **Revelación del Libro 3D**
+- 🇫🇷 Français: **Révélation du Livre 3D**
 
 ![Book Revelation 3D](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)
 ![Three.js](https://img.shields.io/badge/Three.js-r148-orange?style=flat-square&logo=three.js)
@@ -23,6 +25,7 @@
 - 🌟 **Частицы и эффекты свечения**
 - 🎛️ **Единое главное меню** с навигацией по разделам
 - 🎨 **6 тем оформления** (Тёмная, Светлая, Синяя, Фиолетовая, Атмосферная, Расслабляющая)
+- 🌍 **6 языков интерфейса** (EN, RU, ZH, HE, ES, FR)
 - ⭐ **Избранные цитаты** с экспортом/импортом
 - 🧘 **Zen-режим** для погружения
 - 🔍 **Поиск и фильтры** по цитатам

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from "react";
 import { useToast } from "./Toast";
-import { useI18n } from "@/hooks/use-i18n";
+import { useI18n, type Locale } from "@/hooks/use-i18n";
 import { useMenuState } from "@/hooks/use-menu-state";
 import { BottomSheet } from "./BottomSheet";
 import { GamificationDashboard } from "./GamificationDashboard";
@@ -19,6 +19,15 @@ interface MainMenuProps {
 }
 
 type MenuSection = "settings" | "about" | null;
+
+const LANGUAGES = [
+  { value: "ru" as Locale, label: "Русский", flag: "🇷🇺" },
+  { value: "en" as Locale, label: "English", flag: "🇬🇧" },
+  { value: "zh" as Locale, label: "中文", flag: "🇨🇳" },
+  { value: "he" as Locale, label: "עברית", flag: "🇮🇱" },
+  { value: "es" as Locale, label: "Español", flag: "🇪🇸" },
+  { value: "fr" as Locale, label: "Français", flag: "🇫🇷" },
+] as const;
 
 const THEMES_DATA = [
   { value: "dark", labelKey: "theme.dark", color: "bg-[#1a1a1a]" },
@@ -44,7 +53,7 @@ export function MainMenu({
   const [showGamification, setShowGamification] = useState(false);
   const [rotationSpeed, setRotationSpeed] = useState(0.5);
   const { showToast } = useToast();
-  const { t } = useI18n();
+  const { t, locale, setLocale } = useI18n();
 
   const THEMES = useMemo(() => THEMES_DATA.map(theme => ({
     value: theme.value,
@@ -56,6 +65,11 @@ export function MainMenu({
     onThemeChange(themeValue);
     showToast(`Тема: ${themeValue}`, "success");
   }, [onThemeChange, showToast]);
+
+  const handleLanguageSelect = useCallback((langValue: Locale) => {
+    setLocale(langValue);
+    showToast(`Language: ${LANGUAGES.find(l => l.value === langValue)?.label || langValue}`, "success");
+  }, [setLocale, showToast]);
 
   const handleRotationSpeedChange = useCallback((speed: number) => {
     setRotationSpeed(speed);
@@ -140,6 +154,29 @@ export function MainMenu({
             {/* Панель настроек */}
             {activeSection === "settings" && (
               <div className="px-5 pb-4 space-y-4">
+                {/* Язык интерфейса */}
+                <div>
+                  <h4 className="text-xs uppercase tracking-[0.12em] text-amber-500/70 dark:text-amber-500/70 light:text-amber-700/70 relax:text-amber-700/70 mb-2">Язык / Language</h4>
+                  <div className="grid grid-cols-3 gap-2">
+                    {LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.value}
+                        onClick={() => handleLanguageSelect(lang.value)}
+                        className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-amber-400 ${
+                          locale === lang.value
+                            ? "bg-[rgba(212,175,55,0.25)] ring-1 ring-amber-500/50"
+                            : "hover:bg-[rgba(212,175,55,0.1)]"
+                        }`}
+                        type="button"
+                        dir="ltr"
+                      >
+                        <span className="text-lg">{lang.flag}</span>
+                        <span className={`text-[9px] ${locale === lang.value ? "text-amber-100 dark:text-amber-100 light:text-amber-900 relax:text-amber-900" : "text-gray-400 dark:text-gray-400 light:text-gray-600 relax:text-gray-600"}`}>{lang.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Тема оформления */}
                 <div>
                   <h4 className="text-xs uppercase tracking-[0.12em] text-amber-500/70 dark:text-amber-500/70 light:text-amber-700/70 relax:text-amber-700/70 mb-2">Тема оформления</h4>
