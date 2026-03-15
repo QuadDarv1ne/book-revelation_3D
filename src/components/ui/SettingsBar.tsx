@@ -1,29 +1,13 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
-import type { ComponentType } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect, type ComponentType } from "react";
 import { useToast } from "./Toast";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useI18n } from "@/hooks/use-i18n";
+import { useUserSettings } from "@/hooks/use-user-settings";
 
 interface IconProps {
   className?: string;
-}
-
-function Settings({ className }: IconProps) {
-  return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
-    </svg>
-  );
-}
-
-function User({ className }: IconProps) {
-  return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-    </svg>
-  );
 }
 
 function Moon({ className }: IconProps) {
@@ -38,22 +22,6 @@ function Sun({ className }: IconProps) {
   return (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
-    </svg>
-  );
-}
-
-function ChevronUp({ className }: IconProps) {
-  return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m18 15-6-6-6 6"/>
-    </svg>
-  );
-}
-
-function ChevronDown({ className }: IconProps) {
-  return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m6 9 6 6 6-6"/>
     </svg>
   );
 }
@@ -82,76 +50,110 @@ function Monitor({ className }: IconProps) {
   );
 }
 
-interface SettingsBarProps {
-  theme: string;
-  onThemeChange: (theme: "dark" | "light" | "blue" | "purple" | "ambient" | "relax" | "auto" | "auto-time") => void;
+function ChevronDown({ className }: IconProps) {
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m6 9 6 6 6-6"/>
+    </svg>
+  );
 }
 
-const THEMES_DATA = [
-  { value: "dark" as const, labelKey: "theme.dark", preview: "bg-[#1a1a1a]" },
-  { value: "light" as const, labelKey: "theme.light", preview: "bg-[#f5f5f5]" },
-  { value: "blue" as const, labelKey: "theme.blue", preview: "bg-[#1e3a5f]" },
-  { value: "purple" as const, labelKey: "theme.purple", preview: "bg-[#3f2a5f]" },
-  { value: "ambient" as const, labelKey: "theme.ambient", preview: "bg-[#1a3f2f]" },
-  { value: "relax" as const, labelKey: "theme.relax", preview: "bg-[#d4dcc4]" },
-  { value: "auto" as const, labelKey: "theme.auto", preview: "bg-gradient-to-br from-[#1a1a1a] to-[#f5f5f5]" },
-  { value: "auto-time" as const, labelKey: "theme.autoTime", preview: "bg-gradient-to-br from-[#1a1a2e] to-[#f5f5dc]" },
-] as const;
+function Speed({ className }: IconProps) {
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/>
+    </svg>
+  );
+}
 
-const ICON_MAP: Record<string, ComponentType<IconProps>> = {
-  moon: Moon,
-  sun: Sun,
-  palette: Palette,
-  monitor: Monitor,
-  clock: Clock,
-  user: User,
-  settings: Settings,
-  chevronUp: ChevronUp,
-  chevronDown: ChevronDown,
+function Check({ className }: IconProps) {
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  );
+}
+
+interface ThemeOption {
+  value: "dark" | "light" | "blue" | "purple" | "ambient" | "relax" | "auto" | "auto-time";
+  label: string;
+  icon: ComponentType<IconProps>;
+  preview: string;
+}
+
+const THEMES_DATA: readonly { value: ThemeOption["value"]; labelKey: string; preview: string }[] = [
+  { value: "dark", labelKey: "theme.dark", preview: "bg-[#1a1a1a]" },
+  { value: "light", labelKey: "theme.light", preview: "bg-[#f5f5f5]" },
+  { value: "blue", labelKey: "theme.blue", preview: "bg-[#1e3a5f]" },
+  { value: "purple", labelKey: "theme.purple", preview: "bg-[#3f2a5f]" },
+  { value: "ambient", labelKey: "theme.ambient", preview: "bg-[#1a3f2f]" },
+  { value: "relax", labelKey: "theme.relax", preview: "bg-[#d4dcc4]" },
+  { value: "auto", labelKey: "theme.auto", preview: "bg-gradient-to-br from-[#1a1a1a] to-[#f5f5f5]" },
+  { value: "auto-time", labelKey: "theme.autoTime", preview: "bg-gradient-to-br from-[#1a1a2e] to-[#f5f5dc]" },
+];
+
+const THEME_ICONS: Record<ThemeOption["value"], ComponentType<IconProps>> = {
+  dark: Moon,
+  light: Sun,
+  blue: Palette,
+  purple: Palette,
+  ambient: Palette,
+  relax: Palette,
+  auto: Monitor,
+  "auto-time": Clock,
 };
 
-const THEME_ICONS: Record<string, string> = {
-  dark: "moon",
-  light: "sun",
-  blue: "palette",
-  purple: "palette",
-  ambient: "palette",
-  relax: "palette",
-  auto: "monitor",
-  "auto-time": "clock",
-};
+interface SettingsBarProps {
+  theme: string;
+  onThemeChange: (theme: ThemeOption["value"]) => void;
+}
 
 export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showThemeDropdown, setShowThemeDropdown] = useState(false);
+  const [rotationSpeed, setRotationSpeed] = useState(0.5);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
   const { exportFavorites, importFavorites } = useFavorites();
   const { t } = useI18n();
+  const { settings, updateSettings } = useUserSettings();
 
-  const THEMES = useMemo(() => THEMES_DATA.map(themeData => ({
+  const THEMES: ThemeOption[] = useMemo(() => THEMES_DATA.map(themeData => ({
     value: themeData.value,
     label: t(themeData.labelKey),
-    icon: ICON_MAP[THEME_ICONS[themeData.value]],
+    icon: THEME_ICONS[themeData.value],
     preview: themeData.preview
   })), [t]);
-
-  const cycleTheme = useCallback(() => {
-    const currentIndex = THEMES.findIndex(t => t.value === theme);
-    const nextIndex = (currentIndex + 1) % THEMES.length;
-    onThemeChange(THEMES[nextIndex].value as "dark" | "light" | "blue" | "purple" | "ambient" | "relax");
-  }, [theme, THEMES, onThemeChange]);
 
   const currentTheme = useMemo(() => THEMES.find(t => t.value === theme) || THEMES[0], [theme, THEMES]);
   const CurrentIcon = currentTheme.icon;
 
-  // Обработчик экспорта избранных цитат
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowThemeDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    setRotationSpeed(settings.rotationSpeed);
+  }, [settings.rotationSpeed]);
+
+  const handleSpeedChange = useCallback((newSpeed: number) => {
+    setRotationSpeed(newSpeed);
+    updateSettings('rotationSpeed', newSpeed);
+  }, [updateSettings]);
+
   const handleExportFavorites = useCallback(() => {
     const exportData = exportFavorites();
-
     if (!exportData) {
       showToast(t('toast.noFavoritesToExport'), "info");
       return;
     }
-
     try {
       const blob = new Blob([exportData], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -162,42 +164,32 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-
       showToast(t('toast.favoritesExported'), "success");
     } catch {
       showToast(t('toast.exportError'), "error");
     }
   }, [exportFavorites, showToast, t]);
 
-  // Обработчик импорта избранных цитат
   const handleImportFavorites = useCallback(() => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement)?.files?.[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = (e) => {
         const content = e.target?.result as string;
         const result = importFavorites(content);
-
         if (result.success) {
           showToast(t('toast.favoritesImported').replace('{count}', String(result.count)), "success");
         } else {
           showToast(`${t('toast.importError')}: ${result.error}`, "error");
         }
       };
-
-      reader.onerror = () => {
-        showToast(t('toast.readFileError'), "error");
-      };
-
+      reader.onerror = () => showToast(t('toast.readFileError'), "error");
       reader.readAsText(file);
     };
-    
     input.click();
   }, [importFavorites, showToast, t]);
 
@@ -210,140 +202,111 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
           }`}
         >
           <div className="flex items-center gap-1 p-2" role="toolbar" aria-label="Панель настроек">
-            <button
-              onClick={cycleTheme}
-              className="group relative flex items-center justify-center w-12 h-12 sm:w-11 sm:h-11 rounded-xl text-amber-400/80 hover:text-amber-300 hover:bg-[rgba(212,175,55,0.1)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(15,15,25,0.85)] min-w-[48px] min-h-[48px] sm:min-w-[44px] sm:min-h-[44px]"
-              title={`Сменить тему (${currentTheme.label})`}
-              aria-label={`Сменить тему (текущая: ${currentTheme.label})`}
-              type="button"
-            >
-              <CurrentIcon className="w-5 h-5 sm:w-5 sm:h-5" aria-hidden="true" />
-              <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 text-[10px] text-amber-100 bg-[rgba(15,15,25,0.9)] border border-[rgba(212,175,55,0.2)] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                {currentTheme.label}
-              </span>
-            </button>
+            {/* Компактный селектор тем */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setShowThemeDropdown(!showThemeDropdown)}
+                className="group flex items-center gap-2 px-3 py-2 rounded-xl text-amber-100 hover:bg-[rgba(212,175,55,0.1)] transition-all focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[44px]"
+                aria-label={t('settings.theme')}
+                aria-expanded={showThemeDropdown}
+                type="button"
+              >
+                <CurrentIcon className="w-5 h-5 text-amber-400" aria-hidden="true" />
+                <span className="text-sm text-amber-100 hidden sm:block">{currentTheme.label}</span>
+                <ChevronDown className={`w-4 h-4 text-amber-400/60 transition-transform ${showThemeDropdown ? "rotate-180" : ""}`} aria-hidden="true" />
+              </button>
 
-            <div className="flex gap-0.5 sm:gap-1 ml-0.5 sm:ml-1" role="group" aria-label="Выбор темы оформления">
-              {THEMES.map((t) => {
-                const Icon = t.icon;
-                const isActive = theme === t.value;
-                return (
-                  <button
-                    key={t.value}
-                    onClick={() => onThemeChange(t.value as "dark" | "light" | "blue" | "purple" | "ambient" | "relax")}
-                    className={`group relative flex items-center justify-center w-9 h-9 sm:w-8 sm:h-8 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(15,15,25,0.85)] min-w-[40px] min-h-[40px] sm:min-w-[36px] sm:min-h-[36px] ${
-                      isActive
-                        ? "bg-[rgba(212,175,55,0.25)] text-amber-300 ring-1 ring-amber-500/50"
-                        : "text-amber-400/60 hover:text-amber-300 hover:bg-[rgba(212,175,55,0.1)]"
-                    }`}
-                    title={t.label}
-                    aria-label={`Тема: ${t.label}${isActive ? ' (активна)' : ''}`}
-                    aria-pressed={isActive}
-                    type="button"
-                  >
-                    <Icon className="w-4 h-4" aria-hidden="true" />
-                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 text-[10px] text-amber-100 bg-[rgba(15,15,25,0.9)] border border-[rgba(212,175,55,0.2)] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
-                      {t.label}
-                    </span>
-                  </button>
-                );
-              })}
+              {showThemeDropdown && (
+                <div className="absolute bottom-full left-0 mb-2 w-56 rounded-xl overflow-hidden backdrop-blur-xl bg-[rgba(15,15,25,0.98)] border border-[rgba(212,175,55,0.2)] shadow-[0_8px_32px_rgba(0,0,0,0.5)] animate-in fade-in slide-in-from-bottom-2 duration-200">
+                  <div className="p-2 space-y-1">
+                    {THEMES.map((t) => {
+                      const Icon = t.icon;
+                      const isActive = theme === t.value;
+                      return (
+                        <button
+                          key={t.value}
+                          onClick={() => {
+                            onThemeChange(t.value);
+                            setShowThemeDropdown(false);
+                          }}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
+                            isActive
+                              ? "bg-[rgba(212,175,55,0.2)] text-amber-100"
+                              : "text-amber-100/70 hover:bg-[rgba(212,175,55,0.1)] hover:text-amber-100"
+                          }`}
+                          type="button"
+                        >
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive ? "bg-[rgba(212,175,55,0.3)]" : "bg-[rgba(255,255,255,0.05)]"}`}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <span className="flex-1 text-left text-sm">{t.label}</span>
+                          {isActive && <Check className="w-4 h-4 text-amber-400" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="w-px h-6 bg-gradient-to-b from-transparent via-[rgba(212,175,55,0.2)] to-transparent mx-1" />
 
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="group flex items-center justify-center w-12 h-12 sm:w-11 sm:h-11 rounded-xl text-amber-400/80 hover:text-amber-300 hover:bg-[rgba(212,175,55,0.1)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[rgba(15,15,25,0.85)] min-w-[48px] min-h-[48px] sm:min-w-[44px] sm:min-h-[44px]"
-              title={t('settings.theme')}
-              aria-label={isExpanded ? t('settings.collapse') : t('settings.open')}
-              aria-expanded={isExpanded}
-              aria-controls="settings-panel"
-              type="button"
-            >
-              <Settings className={`w-5 h-5 sm:w-5 sm:h-5 transition-transform duration-300 ${isExpanded ? "rotate-90" : ""}`} aria-hidden="true" />
-            </button>
+            {/* Скорость вращения */}
+            <div className="flex items-center gap-2 px-2">
+              <Speed className="w-4 h-4 text-amber-400/60" aria-hidden="true" />
+              <input
+                type="range"
+                min="0"
+                max="2"
+                step="0.1"
+                value={rotationSpeed}
+                onChange={(e) => handleSpeedChange(parseFloat(e.target.value))}
+                className="w-20 sm:w-24 h-1 bg-[rgba(255,255,255,0.1)] rounded-lg appearance-none cursor-pointer accent-amber-500"
+                aria-label={t('settings.rotationSpeed')}
+              />
+              <span className="text-xs text-amber-400/60 w-8">{rotationSpeed.toFixed(1)}x</span>
+            </div>
 
+            <div className="w-px h-6 bg-gradient-to-b from-transparent via-[rgba(212,175,55,0.2)] to-transparent mx-1" />
+
+            {/* Кнопка расширения */}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center justify-center w-9 h-11 sm:w-8 sm:h-11 text-amber-500/50 hover:text-amber-400 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-400 rounded min-w-[44px] min-h-[44px]"
+              className="group flex items-center justify-center w-11 h-11 rounded-xl text-amber-400/80 hover:text-amber-300 hover:bg-[rgba(212,175,55,0.1)] transition-all focus:outline-none focus:ring-2 focus:ring-amber-400 min-w-[44px] min-h-[44px]"
               aria-label={isExpanded ? t('settings.collapse') : t('settings.expand')}
+              aria-expanded={isExpanded}
               type="button"
             >
-              {isExpanded ? (
-                <ChevronDown className="w-4 h-4" aria-hidden="true" />
-              ) : (
-                <ChevronUp className="w-4 h-4" aria-hidden="true" />
-              )}
+              <svg className={`w-5 h-5 transition-transform ${isExpanded ? "rotate-90" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
             </button>
           </div>
 
           {isExpanded && (
-            <div id="settings-panel" className="px-3 pb-3 pt-1 border-t border-[rgba(212,175,55,0.1)]" role="region" aria-label={t('settings.app')}>
+            <div className="px-3 pb-3 pt-1 border-t border-[rgba(212,175,55,0.1)]">
               <div className="grid grid-cols-2 gap-2">
                 <button
+                  onClick={handleExportFavorites}
                   className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  aria-label={t('settings.general')}
                   type="button"
                 >
-                  <Settings className="w-4 h-4" aria-hidden="true" />
-                  <span>{t('settings.general')}</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  <span>{t('quotes.export')}</span>
                 </button>
                 <button
+                  onClick={handleImportFavorites}
                   className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  aria-label={t('settings.account')}
                   type="button"
                 >
-                  <User className="w-4 h-4" aria-hidden="true" />
-                  <span>{t('settings.account')}</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14" />
+                  </svg>
+                  <span>{t('quotes.import')}</span>
                 </button>
-                <button
-                  className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  aria-label={t('settings.appearance')}
-                  type="button"
-                >
-                  <Moon className="w-4 h-4" aria-hidden="true" />
-                  <span>{t('settings.appearance')}</span>
-                </button>
-                <button
-                  className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                  aria-label={t('settings.notifications')}
-                  type="button"
-                >
-                  <span className="w-4 h-4 flex items-center justify-center text-[10px]" aria-hidden="true">🔔</span>
-                  <span>{t('settings.notifications')}</span>
-                </button>
-              </div>
-
-              {/* Секция для управления избранным */}
-              <div className="mt-3 pt-3 border-t border-[rgba(212,175,55,0.1)]">
-                <h3 className="text-xs uppercase tracking-[0.15em] text-amber-500/70 mb-2">{t('menu.favorites')}</h3>
-                <div className="flex flex-col gap-2">
-                  <button
-                    id="export-favorites"
-                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                    aria-label={t('quotes.export')}
-                    onClick={handleExportFavorites}
-                    type="button"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                    </svg>
-                    <span>{t('quotes.export')}</span>
-                  </button>
-                  <button
-                    id="import-favorites"
-                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
-                    aria-label={t('quotes.import')}
-                    onClick={handleImportFavorites}
-                    type="button"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14" />
-                    </svg>
-                    <span>{t('quotes.import')}</span>
-                  </button>
-                </div>
               </div>
             </div>
           )}
