@@ -26,7 +26,7 @@ export default function Home() {
   const hasWebGL = useWebGLSupport();
   const { trackEvent } = useAnalytics();
   const { themeConfig: autoThemeConfig } = useAutoTheme();
-  const { addThemeExplored, addBookViewed, trackTime } = useGamification();
+  const { addThemeExplored, addBookViewed, trackTime, incrementCategoryRead } = useGamification();
   const { isZenMode, toggleZenMode } = useZenMode({ autoSave: true });
   const {
     settings,
@@ -119,10 +119,17 @@ export default function Home() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveQuote((prev) => (prev + 1) % activeBook.quotes.length);
+      setActiveQuote((prev) => {
+        const next = (prev + 1) % activeBook.quotes.length;
+        const quote = activeBook.quotes[next];
+        if (quote?.category) {
+          incrementCategoryRead(quote.category);
+        }
+        return next;
+      });
     }, QUOTE_ROTATION_INTERVAL);
     return () => clearInterval(interval);
-  }, [activeBook.quotes.length]);
+  }, [activeBook.quotes.length, activeBook.quotes, incrementCategoryRead]);
 
   const handleBookChange = useCallback((bookId: string) => {
     trackBookChange(settings.activeBookId, bookId);
