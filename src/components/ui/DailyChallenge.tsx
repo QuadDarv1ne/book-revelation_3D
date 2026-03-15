@@ -41,7 +41,7 @@ function Copy({ className }: IconProps) {
 }
 
 export function DailyChallenge() {
-  const { quoteOfDay, toggleQuoteLike } = useGamification();
+  const { quoteOfDay, toggleQuoteLike, themeOfDay, completeThemeChallenge } = useGamification();
   const { showToast } = useToast();
   const [isLiked, setIsLiked] = useState(quoteOfDay.liked);
 
@@ -105,6 +105,36 @@ export function DailyChallenge() {
           — {quoteOfDay.author}
         </footer>
       </blockquote>
+
+      {/* Theme of the Day Challenge */}
+      <div className="relative mb-4 p-3 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-lg">🎨</span>
+          <span className="text-xs font-semibold text-amber-100">Испытание: Тема дня</span>
+        </div>
+        <div className="text-xs text-amber-100/80 mb-1">
+          <strong>{themeOfDay.themeName}</strong> — {themeOfDay.description}
+        </div>
+        {themeOfDay.completed ? (
+          <div className="flex items-center gap-1 text-xs text-green-400">
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <span>Выполнено!</span>
+          </div>
+        ) : (
+          <button
+            onClick={() => {
+              completeThemeChallenge();
+              showToast(`Тема "${themeOfDay.themeName}" активирована! Испытание выполнено.`, "success");
+            }}
+            className="text-xs px-3 py-1.5 rounded-lg bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-colors"
+            type="button"
+          >
+            Активировать тему
+          </button>
+        )}
+      </div>
 
       {/* Actions */}
       <div className="relative flex items-center gap-2 pt-4 border-t border-amber-500/20">
