@@ -50,12 +50,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: process.env.CI ? 'npm run start' : 'bun run dev',
+    command: 'npm run build && npm run start',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
+    timeout: 180000,
     env: {
-      NODE_ENV: process.env.CI ? 'production' : 'development',
+      NODE_ENV: 'production',
     },
   },
 });

@@ -46,7 +46,7 @@ export interface UserProgress {
   firstVisitDate: string;
 }
 
-const INITIAL_ACHIEVEMENTS: Achievement[] = [
+const INITIAL_ACHIEVEMENTS_DATA = [
   {
     id: "first_visit",
     title: "Первое знакомство",
@@ -369,6 +369,8 @@ const INITIAL_ACHIEVEMENTS: Achievement[] = [
     category: "knowledge",
   },
 ];
+
+const INITIAL_ACHIEVEMENTS: Achievement[] = INITIAL_ACHIEVEMENTS_DATA as Achievement[];
 
 function getDayOfYear(): number {
   const now = new Date();

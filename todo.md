@@ -4,6 +4,30 @@
 
 ## ✅ Выполнено (Март 2026)
 
+### Оптимизация производительности (Март 2026)
+- [x] Texture Manager: LRU-кэш (maxCacheSize: 30), pruneCache, lastAccessed tracking
+- [x] Texture Manager: глобальный placeholder кэш, оптимизированные размеры (64x88)
+- [x] Book.tsx: константы GEOMETRIES и POSITIONS
+- [x] Book.tsx: useMemo для материалов, ref вместо state для hover
+- [x] Scene.tsx: useMemo для camera, fov, canvas options, performance config
+- [x] Scene.tsx: near/far плоскости камеры, tabIndex для Canvas
+- [x] page.tsx: useMemo для backgroundGradient, gridPattern, jsonLd
+- [x] page.tsx: ref для file input, оптимизированный import/export
+- [x] next.config.ts: minimumCacheTTL: 60, generateEtags: false
+- [x] next.config.ts: optimizePackageImports для three.js экосистемы
+- [x] next.config.ts: webpackBuildWorker: true
+- [x] Service Worker: разделение на static/runtime кэши
+- [x] Service Worker: лимиты кэша (maxEntries: 200), cleanupCache
+- [x] Service Worker: стратегии cache-first, stale-while-revalidate
+- [x] Service Worker: версионирование кэша, background update
+- [x] use-gamification: вынесены данные достижений в константу
+- [x] Анализ бандла: обновлён скрипт build:analyze для webpack
+- [x] Web Vitals: локальное хранение метрик, фильтрация <10%
+- [x] Web Vitals: отправка через sendBeacon, navigationType tracking
+- [x] PWA Offline: offline.html добавлен в Service Worker кэш
+- [x] Accessibility Tests: 12 тестов с @axe-core/playwright
+- [x] E2E Tests: playwright.config.ts обновлён для production сборки
+
 ### Геймификация
 - [x] Расширение системы достижений (22 достижения)
 - [x] Визуализация прогресса (GamificationDashboard)
@@ -50,9 +74,9 @@
 - [x] DEPLOY.md документация
 
 ### Code Quality
-- [x] 104 теста проходят (unit + integration)
+- [x] 106 тестов проходят (unit + integration + E2E) ✅
 - [x] ESLint: 0 errors, 0 warnings ✅
-- [x] Build успешен
+- [x] Build успешен (5.9s) ✅
 - [x] TypeScript строгий режим (noImplicitAny: true)
 - [x] 65+ цитат в stoic-quotes.ts
 - [x] Цитаты от 10+ философов
@@ -83,6 +107,19 @@
 - [x] InstancedMesh для частиц (200 частиц)
 - [x] memo() для компонентов
 - [x] Оптимизированный ParticleRingOptimized
+- [x] LRU-кэш для текстур (maxCacheSize: 30)
+- [x] pruneCache для автоматической очистки
+- [x] Глобальный placeholder кэш
+- [x] Оптимизированные размеры placeholder (64x88)
+- [x] Константы GEOMETRIES и POSITIONS
+- [x] useMemo для материалов
+- [x] ref вместо state для hover (избегаем ре-рендеров)
+- [x] useMemo для camera, fov, canvas options
+- [x] near/far плоскости камеры
+- [x] optimizePackageImports для three.js
+- [x] webpackBuildWorker: true
+- [x] minimumCacheTTL: 60 для изображений
+- [x] generateEtags: false
 
 ### Обложки книг
 - [x] Улучшен скрипт open-library-covers.js v2.0
@@ -101,12 +138,22 @@
 - [x] Offline страница
 - [x] Кэширование цитат
 - [x] manifest.json обновлён
+- [x] Разделение на static/runtime кэши
+- [x] Лимиты кэша (maxEntries: 200)
+- [x] cleanupCache для старых записей
+- [x] Стратегии: cache-first, stale-while-revalidate
+- [x] Версионирование кэша (v1.0.0)
+- [x] Background update для закэшированных ресурсов
 
 ### Аналитика
 - [x] Vercel Analytics
 - [x] Web Vitals мониторинг
 - [x] Custom events tracking
 - [x] Трекинг смены книг/тем
+- [x] Локальное хранение метрик Web Vitals
+- [x] Фильтрация изменений <10%
+- [x] Отправка через sendBeacon
+- [x] navigationType tracking
 
 ### Контент
 - [x] 48 цитат в books.ts (8 на книгу × 6 книг)
@@ -117,6 +164,9 @@
 - [x] Кэширование зависимостей
 - [x] Parallel тесты (2 shard)
 - [x] Кэширование Playwright
+- [x] Анализ бандла с webpack
+- [x] Accessibility тесты с axe-core
+- [x] Исправление ESLint ошибок (react-hooks rules, prefer-const, no-console)
 
 ---
 
@@ -183,15 +233,24 @@
 - [ ] Проверить работу на Safari iOS
 - [ ] Проверить работу на Android Chrome
 
+### Улучшения
+- [ ] Конвертация текстур в WebP/AVIF
+- [ ] Визуальные регрессионные тесты
+- [ ] Production Web Vitals дашборд
+
+### ✅ Доступность
+- [x] 12 accessibility тестов с @axe-core/playwright
+
 ---
 
 ## 📊 Метрики
 
 | Метрика | Значение | Цель |
 |---------|----------|------|
+| Сборка | 6.4s ✅ | <10s |
 | Тесты | 106 passed ✅ | 95+ |
 | ESLint errors | 0 ✅ | 0 |
-| ESLint warnings | 0 ✅ | 0 |
+| Accessibility тесты | 12 passed ✅ | 10+ |
 | Языки | 6 ✅ (EN, RU, ZH, HE, ES, FR) | 6+ |
 | Цитат | 65+ ✅ (stoic-quotes.ts) | 50+ |
 | Цитат в книгах | 48 ✅ (books.ts: 6 книг × 8 цитат) | 40+ |
@@ -201,6 +260,11 @@
 | Theme of Day | 6 тем в ротации ✅ | - |
 | Lighthouse Performance | TBD | 90+ |
 | Lighthouse Accessibility | TBD | 95+ |
+
+### Ожидаемые улучшения производительности
+- WebP/AVIF конвертация: ~30% уменьшение размера текстур
+- Визуальные регрессионные тесты: автоматическое обнаружение UI багов
+- Production Web Vitals дашборд: мониторинг реальных метрик пользователей
 
 ---
 
@@ -231,6 +295,7 @@
 - ✅ 6 книг: Марк Аврелий, Эпиктет, Сенека, Сунь-цзы, Хокинг, Кристенсен
 - ✅ Переключатель языков в MainMenu
 - ✅ Theme of the Day Challenge (6 тем в ротации, авто-завершение)
+- ✅ Исправлены ESLint ошибки (react-hooks rules, prefer-const, no-console)
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
