@@ -432,7 +432,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
       {/* Quotes List - оптимизировано для мобильных */}
       <div
         className="space-y-2 sm:space-y-2.5 flex-1 overflow-y-auto pr-1.5 custom-scrollbar"
-        role="list"
+        role="group"
         aria-label="Список цитат"
       >
         {quoteCards}

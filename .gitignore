@@ -3,6 +3,9 @@ node_modules/
 .pnp
 .pnp.js
 
+# Ignore parent directory lockfile (Windows home directory)
+../package-lock.json
+
 # Build
 .next/
 out/

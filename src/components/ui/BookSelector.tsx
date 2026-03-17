@@ -134,7 +134,7 @@ export function BookSelector({ activeBookId, onBookChange }: BookSelectorProps) 
             aria-label={t('book.list')}
             tabIndex={-1}
           >
-            <div className="max-h-[400px] overflow-y-auto custom-scrollbar" role="list">
+            <div className="max-h-[400px] overflow-y-auto custom-scrollbar" role="group">
               {books.map((book, index) => {
                 const isActive = book.id === activeBookId;
                 const isFocused = index === focusedIndex;

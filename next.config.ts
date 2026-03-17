@@ -6,6 +6,15 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+  // Explicitly set project root to silence multiple lockfiles warning
+  experimental: {
+    webpackBuildWorker: true,
+    optimizePackageImports: ["@react-three/fiber", "@react-three/drei", "three"],
+    optimizeCss: true,
+  },
+  turbopack: {
+    root: __dirname,
+  },
   output: process.env.DOCKER === "true" ? "standalone" : "export",
   reactStrictMode: true,
   images: {
@@ -24,11 +33,6 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   generateEtags: false,
-  experimental: {
-    optimizeCss: true,
-    optimizePackageImports: ["@react-three/fiber", "@react-three/drei", "three"],
-    webpackBuildWorker: true,
-  },
 };
 
 export default withBundleAnalyzer(nextConfig);
