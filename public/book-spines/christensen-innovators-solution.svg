@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="60" height="600" viewBox="0 0 60 600" xmlns="http://www.w3.org/2000/svg">
+<svg width="80" height="600" viewBox="0 0 80 600" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="spine-christensen-innovators-solution" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" style="stop-color:#5a4a3a;stop-opacity:1" />
@@ -7,6 +7,6 @@
       <stop offset="100%" style="stop-color:#5a4a3a;stop-opacity:1" />
     </linearGradient>
   </defs>
-  <rect width="60" height="600" fill="url(#spine-christensen-innovators-solution)"/>
-  <text x="30" y="300" font-family="Georgia, serif" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle" transform="rotate(-90 30 300)">Clayton M..</text>
+  <rect width="80" height="600" fill="url(#spine-christensen-innovators-solution)"/>
+  <text x="40" y="300" font-family="Georgia, serif" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle" transform="rotate(-90 40 300)">Кристенсен</text>
 </svg>

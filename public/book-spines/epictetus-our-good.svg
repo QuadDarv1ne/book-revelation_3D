@@ -1,23 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="60" height="600" viewBox="0 0 60 600" xmlns="http://www.w3.org/2000/svg">
+<svg width="80" height="600" viewBox="0 0 80 600" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="spine-grad-epictetus-our-good" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#065f46;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#065f46ee;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#065f46;stop-opacity:1" />
+    <linearGradient id="spine-epictetus-our-good" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#7d6b4f;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#c9a961;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7d6b4f;stop-opacity:1" />
     </linearGradient>
   </defs>
-  
-  <!-- Фон -->
-  <rect width="60" height="600" fill="url(#spine-grad-epictetus-our-good)"/>
-  
-  <!-- Вертикальный текст названия -->
-  <text x="30" y="350" text-anchor="middle" fill="white" font-family="Georgia, serif" font-size="16" font-weight="bold" transform="rotate(-90 30 350)">
-    On
-  </text>
-  
-  <!-- Автор внизу -->
-  <text x="30" y="550" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="Georgia, serif" font-size="12" transform="rotate(-90 30 550)">
-    Epictetus
-  </text>
+  <rect width="80" height="600" fill="url(#spine-epictetus-our-good)"/>
+  <text x="40" y="300" font-family="Georgia, serif" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle" transform="rotate(-90 40 300)">Эпиктет</text>
 </svg>
