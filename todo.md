@@ -199,6 +199,11 @@
 - [ ] Расширение цитат до 100+
 - [ ] Аудио-версии цитат (TTS)
 
+### Качество кода
+- [x] ESLint: 0 errors ✅
+- [x] Build: 6.4s ✅
+- [ ] Unit тесты (в процессе выполнения)
+
 ---
 
 ## 📋 TODO — Приоритет 1
@@ -302,6 +307,12 @@
 - ✅ Переключатель языков в MainMenu
 - ✅ Theme of the Day Challenge (6 тем в ротации, авто-завершение)
 - ✅ Исправлены ESLint ошибки (react-hooks rules, prefer-const, no-console)
+- ✅ Загрузка реальных обложек через ISBN (Open Library)
+
+### v0.2.1 (dev) 🔄
+- [x] Удаление неиспользуемого кода (BookCover.tsx, use-book-cover.ts, google-books.ts, open-library.ts)
+- [x] Рефакторинг use-i18n.ts
+- [x] Синхронизация dev → main
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
