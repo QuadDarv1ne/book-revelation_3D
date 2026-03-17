@@ -350,6 +350,9 @@
 - [x] Улучшения доступности (aria-атрибуты, role="group")
 - [x] Конфигурация turbopack (root, эксперименты)
 - [x] Улучшены стили WebGLError для светлой темы
+- [x] Добавлена поддержка немецкого языка (de) в i18n
+- [x] Исправлены ESLint ошибки (BookCover, use-book-cover, api файлы)
+- [x] Синхронизация dev → main ✅
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
