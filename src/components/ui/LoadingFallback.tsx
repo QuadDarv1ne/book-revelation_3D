@@ -42,14 +42,12 @@ export function LoadingFallback({
         <p className="text-amber-100/80 text-sm tracking-wide mb-3">{message}</p>
         
         {showProgress && (
-          <div className="w-full h-1 bg-amber-900/30 rounded-full overflow-hidden">
-            <div 
+          <div className="w-full h-1 bg-amber-900/30 rounded-full overflow-hidden" role="progressbar" aria-label="Прогресс загрузки" aria-valuemin={0} aria-valuemax={100}>
+            <div
               className="h-full bg-gradient-to-r from-amber-500 to-amber-300 transition-all duration-300 ease-out"
               style={{ width: `${progress}%` }}
-              role="progressbar"
               aria-valuenow={progress}
-              aria-valuemin={0}
-              aria-valuemax={100}
+              aria-valuetext={`${progress}% загружено`}
             />
           </div>
         )}
