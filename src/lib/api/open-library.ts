@@ -35,34 +35,34 @@ const SEARCH_URL = 'https://openlibrary.org/search.json';
 const BOOK_URL = 'https://openlibrary.org';
 
 /**
- * Размеры обложек
+ * Размеры обложек Open Library
  */
-export const CoverSize = {
+export const OpenLibraryCoverSize = {
   SMALL: 'S',
   MEDIUM: 'M',
   LARGE: 'L',
 } as const;
 
-export type CoverSize = typeof CoverSize[keyof typeof CoverSize];
+export type OpenLibraryCoverSizeType = typeof OpenLibraryCoverSize[keyof typeof OpenLibraryCoverSize];
 
 /**
  * Построить URL обложки по ID
  */
-export function buildCoverUrl(id: string | number, size: CoverSize = 'M'): string {
+export function buildCoverUrl(id: string | number, size: OpenLibraryCoverSizeType = 'M'): string {
   return `${BASE_URL}/id/${id}-${size}.jpg`;
 }
 
 /**
  * Построить URL обложки по ISBN
  */
-export function buildCoverUrlByISBN(isbn: string, size: CoverSize = 'M'): string {
+export function buildCoverUrlByISBN(isbn: string, size: OpenLibraryCoverSizeType = 'M'): string {
   return `${BASE_URL}/isbn/${isbn}-${size}.jpg`;
 }
 
 /**
  * Построить URL обложки по OLID (Open Library ID)
  */
-export function buildCoverUrlByOLID(olid: string, size: CoverSize = 'M'): string {
+export function buildCoverUrlByOLID(olid: string, size: OpenLibraryCoverSizeType = 'M'): string {
   // OLID формата OL12345M
   return `${BASE_URL}/olid/${olid}-${size}.jpg`;
 }
@@ -92,8 +92,17 @@ export async function searchBook(
     }
 
     const data = await response.json();
-    
-    return data.docs?.map((doc: any) => ({
+
+    interface SearchDoc {
+      key: string;
+      title: string;
+      author_key?: string[];
+      cover_i?: number;
+      isbn?: string[];
+      isbn_13?: string[];
+    }
+
+    return data.docs?.map((doc: SearchDoc) => ({
       key: doc.key,
       title: doc.title,
       authors: doc.author_key?.map((key: string) => ({ key })),
@@ -143,7 +152,7 @@ export async function getBookCover(
   title: string,
   author?: string,
   isbn?: string,
-  size: CoverSize = 'M'
+  size: OpenLibraryCoverSizeType = 'M'
 ): Promise<string | null> {
   // Если есть ISBN, пробуем получить обложку по нему
   if (isbn) {
@@ -196,7 +205,7 @@ async function checkImageExists(url: string): Promise<boolean> {
  */
 export async function getAuthorCover(
   authorKey: string,
-  size: CoverSize = 'M'
+  size: OpenLibraryCoverSizeType = 'M'
 ): Promise<string | null> {
   try {
     const response = await fetch(`${BOOK_URL}${authorKey}.json`);
@@ -230,7 +239,7 @@ export async function getCachedCover(
   title: string,
   author?: string,
   isbn?: string,
-  size: CoverSize = 'M'
+  size: OpenLibraryCoverSizeType = 'M'
 ): Promise<string | null> {
   // Проверяем кэш
   if (coverCache.has(cacheKey)) {

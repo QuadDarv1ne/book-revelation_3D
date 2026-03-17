@@ -67,21 +67,21 @@ export interface GoogleBooksSearchResponse {
 const BASE_URL = 'https://www.googleapis.com/books/v1';
 
 /**
- * Размеры обложек
+ * Размеры обложек Google Books
  */
-export const CoverSize = {
+export const GoogleBooksCoverSize = {
   SMALL: 'small',
   MEDIUM: 'medium',
   LARGE: 'large',
 } as const;
 
-export type CoverSize = typeof CoverSize[keyof typeof CoverSize];
+export type GoogleBooksCoverSizeType = typeof GoogleBooksCoverSize[keyof typeof GoogleBooksCoverSize];
 
 /**
  * Построить URL обложки из Google Books
  */
-export function buildCoverUrl(volumeId: string, size: CoverSize = 'medium'): string {
-  const zoomLevels: Record<CoverSize, number> = {
+export function buildCoverUrl(volumeId: string, size: GoogleBooksCoverSizeType = 'medium'): string {
+  const zoomLevels: Record<GoogleBooksCoverSizeType, number> = {
     small: 2,
     medium: 3,
     large: 4,
@@ -158,7 +158,7 @@ export async function getBookCover(
   title: string,
   author?: string,
   isbn?: string,
-  size: CoverSize = 'medium'
+  size: GoogleBooksCoverSizeType = 'medium'
 ): Promise<string | null> {
   // Ищем книгу
   const volumes = await searchBook(title, author, isbn, 3);
@@ -171,10 +171,10 @@ export async function getBookCover(
     // Если название совпадает или содержит искомое
     if (volumeTitle.includes(searchTitle) || searchTitle.includes(volumeTitle)) {
       const imageLinks = volume.volumeInfo.imageLinks;
-      
+
       if (imageLinks) {
         // Возвращаем подходящий размер
-        const sizeMap: Record<CoverSize, keyof typeof imageLinks> = {
+        const sizeMap: Record<GoogleBooksCoverSizeType, keyof typeof imageLinks> = {
           small: 'small',
           medium: 'medium',
           large: 'large',
@@ -224,7 +224,7 @@ export async function getCachedCover(
   title: string,
   author?: string,
   isbn?: string,
-  size: CoverSize = 'medium'
+  size: GoogleBooksCoverSizeType = 'medium'
 ): Promise<string | null> {
   // Проверяем кэш
   if (coverCache.has(cacheKey)) {

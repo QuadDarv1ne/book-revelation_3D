@@ -1,20 +1,18 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useBookCover } from '@/hooks/use-book-cover';
 import type { Book } from '@/data/books';
 
 interface BookCoverProps {
   book: Book;
   size?: 'small' | 'medium' | 'large';
-  showFallback?: boolean;
   className?: string;
 }
 
 export function BookCover({
   book,
   size = 'medium',
-  showFallback = true,
   className = '',
 }: BookCoverProps) {
   const [imageError, setImageError] = useState(false);
