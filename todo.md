@@ -28,6 +28,22 @@
 - [x] Accessibility Tests: 12 тестов с @axe-core/playwright
 - [x] E2E Tests: playwright.config.ts обновлён для production сборки
 
+### Unit тесты (Март 2026)
+- [x] useI18n: 11 тестов (локаль, переводы, RTL, localStorage)
+- [x] useGamification: 10 тестов
+- [x] useFavorites: 8 тестов
+- [x] useAccessibility: 11 тестов
+- [x] useCameraPersistence: 5 тестов
+- [x] usePrefersColorScheme: 3 теста
+- [x] useZenMode: 2 теста
+- [x] Book3DContext: 15 тестов
+- [x] ThreeOptimization: 14 тестов
+- [x] BookCoverAPI: 13 тестов
+- [x] Quotes: 4 теста
+- [x] Security: 17 тестов
+- [x] ErrorBoundary: 5 тестов
+- [x] Итого: 117 тестов (13 файлов)
+
 ### Автоматическая тема по времени суток
 - [x] useAutoTheme хук создан
 - [x] 4 временные темы (morning/day/evening/night)
@@ -196,13 +212,11 @@
 ## 🔄 В процессе
 
 ### Контент
-- [x] Расширение цитат до 100+ (98+ цитат в stoic-quotes.ts)
 - [ ] Аудио-версии цитат (TTS)
 
 ### Качество кода
-- [x] ESLint: 0 errors ✅
-- [x] Build: 6.3s ✅
-- [x] Unit тесты: 117 тестов (13 файлов) ✅
+- [ ] E2E тесты (Playwright)
+- [ ] Lighthouse тестирование
 
 ---
 
@@ -313,12 +327,13 @@
 - ✅ Исправлены ESLint ошибки (react-hooks rules, prefer-const, no-console)
 - ✅ Загрузка реальных обложек через ISBN (Open Library)
 
-### v0.2.1 (dev) 🔄
+### v0.2.1 (dev) ✅
 - [x] Удаление неиспользуемого кода (BookCover.tsx, use-book-cover.ts, google-books.ts, open-library.ts)
 - [x] Рефакторинг use-i18n.ts
 - [x] Добавлено 33 новые цитаты (Сократ, Сенека, Эпиктет, Марк Аврелий, Сунь-цзы, Хокинг)
-- [x] Unit тесты useI18n (13 тестов)
-- [ ] Синхронизация dev → main
+- [x] Unit тесты useI18n (11 тестов)
+- [x] Unit тесты: 117 тестов (13 файлов)
+- [x] Синхронизация dev → main
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
