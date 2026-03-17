@@ -2,9 +2,9 @@
 
 import {useState, useCallback, useEffect} from 'react';
 
-export type Locale = 'en' | 'ru' | 'zh' | 'he' | 'es' | 'fr';
+export type Locale = 'en' | 'ru' | 'zh' | 'he' | 'de' | 'es' | 'fr';
 
-const VALID_LOCALES: readonly Locale[] = ['en', 'ru', 'zh', 'he', 'es', 'fr'] as const;
+const VALID_LOCALES: readonly Locale[] = ['en', 'ru', 'zh', 'he', 'de', 'es', 'fr'] as const;
 
 const translations: Record<Locale, Record<string, string>> = {
   en: {
@@ -376,7 +376,6 @@ const translations: Record<Locale, Record<string, string>> = {
     'achievement.early_bird': 'ציפור מוקדמת',
     'achievement.zen_master': 'מאסטר זן',
   },
-<<<<<<< HEAD
   de: {
     'quotes.search': 'Zitate suchen...',
     'quotes.all': 'Alle',
@@ -460,7 +459,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'settings.collapse': 'Einstellungen einklappen',
     'settings.open': 'Einstellungen öffnen',
     'app.title': 'Buch Offenbarung 3D',
-=======
+  },
   es: {
     'quotes.search': 'Buscar citas...',
     'quotes.all': 'Todas',
@@ -555,17 +554,12 @@ const translations: Record<Locale, Record<string, string>> = {
     'achievement.night_owl': 'Búho nocturno',
     'achievement.early_bird': 'Pájaro madrugador',
     'achievement.zen_master': 'Maestro zen',
->>>>>>> dev
   },
   fr: {
     'quotes.search': 'Rechercher des citations...',
     'quotes.all': 'Toutes',
     'quotes.favorites': 'Favoris',
-<<<<<<< HEAD
-    'quotes.shuffle': 'Mélanger',
-=======
     'quotes.shuffle': 'Aléatoire',
->>>>>>> dev
     'quotes.export': 'Exporter',
     'quotes.import': 'Importer',
     'quotes.copy': 'Copier',
@@ -573,11 +567,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'quotes.filters': 'Filtres de citations',
     'quotes.noFavorites': 'Pas encore de citations favorites. Cliquez sur le cœur pour en ajouter une.',
     'quotes.loading': 'Chargement des citations de "{book}"...',
-<<<<<<< HEAD
-    'quotes.ariaLabel': 'Panneau de citations. Utilisez les flèches Haut/Bas ou balayez sur les écrans tactiles.',
-=======
     'quotes.ariaLabel': 'Panneau de citations. Utilisez les flèches Haut/Bas ou glissez pour naviguer.',
->>>>>>> dev
     'quotes.categories': 'Catégories',
     'category.all': 'Toutes',
     'category.thinking': 'Pensée',
@@ -598,11 +588,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'theme.blue': 'Bleu',
     'theme.purple': 'Violet',
     'theme.ambient': 'Ambiant',
-<<<<<<< HEAD
-    'theme.relax': 'Détendu',
-=======
     'theme.relax': 'Détente',
->>>>>>> dev
     'theme.auto': 'Auto',
     'theme.autoTime': 'Auto Temps',
     'time.morning': 'Matin',
@@ -612,15 +598,9 @@ const translations: Record<Locale, Record<string, string>> = {
     'toast.noFavoritesToExport': 'Aucun favori à exporter',
     'toast.favoritesExported': 'Favoris exportés',
     'toast.exportError': 'Erreur d\'exportation',
-<<<<<<< HEAD
-    'toast.favoritesImported': '{count} citations importées',
-    'toast.importError': 'Erreur d\'importation',
-    'toast.readFileError': 'Erreur de lecture du fichier',
-=======
     'toast.favoritesImported': 'Importées {count} citations',
     'toast.importError': 'Erreur d\'importation',
     'toast.readFileError': 'Erreur de lecture de fichier',
->>>>>>> dev
     'menu.favorites': 'Favoris',
     'menu.rotation': 'Rotation',
     'menu.pause': 'Pause',
@@ -635,11 +615,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'control.pause': 'Pause de la rotation',
     'control.play': 'Démarrer la rotation',
     'control.space': 'Espace',
-<<<<<<< HEAD
-    'book.select': 'Sélectionner un livre',
-=======
     'book.select': 'Sélectionner le livre',
->>>>>>> dev
     'book.cover': 'Couverture du livre',
     'book.changed': 'Livre changé pour',
     'settings.theme': 'Thème',
@@ -652,15 +628,9 @@ const translations: Record<Locale, Record<string, string>> = {
     'settings.account': 'Compte',
     'settings.appearance': 'Apparence',
     'menu.main': 'Menu principal',
-<<<<<<< HEAD
-    'swipe': 'BALAYER',
-    'stoicPhilosophy': 'Philosophie stoïcienne',
-    'stoicWisdom': 'Sagesse stoïcienne',
-=======
     'swipe': 'GLISSER',
     'stoicPhilosophy': 'Philosophie Stoïcienne',
     'stoicWisdom': 'Sagesse Stoïcienne',
->>>>>>> dev
     'pwa.install': 'Installer l\'application',
     'pwa.add': 'Ajouter',
     'common.close': 'Fermer',
@@ -668,8 +638,6 @@ const translations: Record<Locale, Record<string, string>> = {
     'settings.collapse': 'Réduire les paramètres',
     'settings.open': 'Ouvrir les paramètres',
     'app.title': 'Révélation du Livre 3D',
-<<<<<<< HEAD
-=======
     'achievement.rotation_legend': 'Légende de rotation',
     'achievement.stoic_sage': 'Sage stoïcien',
     'achievement.year_streak': 'Série annuelle',
@@ -681,7 +649,6 @@ const translations: Record<Locale, Record<string, string>> = {
     'achievement.night_owl': 'Hibou nocturne',
     'achievement.early_bird': 'Oiseau matinal',
     'achievement.zen_master': 'Maître zen',
->>>>>>> dev
   },
 };
 
@@ -690,7 +657,7 @@ export function useI18n() {
 
   useEffect(() => {
     const saved = localStorage.getItem('locale') as Locale;
-    if (saved && ['en', 'ru', 'zh', 'he', 'de', 'fr'].includes(saved)) {
+    if (saved && VALID_LOCALES.includes(saved)) {
       setLocaleState(saved);
     }
   }, []);
