@@ -196,13 +196,13 @@
 ## 🔄 В процессе
 
 ### Контент
-- [ ] Расширение цитат до 100+
+- [x] Расширение цитат до 100+ (98+ цитат в stoic-quotes.ts)
 - [ ] Аудио-версии цитат (TTS)
 
 ### Качество кода
 - [x] ESLint: 0 errors ✅
 - [x] Build: 6.4s ✅
-- [ ] Unit тесты (в процессе выполнения)
+- [x] Unit тесты: 13 тестов для useI18n ✅
 
 ---
 
@@ -215,6 +215,10 @@
 - [x] Statistics dashboard (время в приложении, прочитано цитат)
 - [x] Экспорт прогресса пользователя (JSON: статистика, достижения, избранное)
 - [x] Расширение системы достижений (10 новых по категориям: wisdom_seeker, wisdom_master, stoic_warrior, peaceful_soul, action_hero, life_philosopher, knowledge_hunter, freedom_lover, strategy_master, inspiration_seeker)
+
+### Контент — цитаты
+- [x] Добавлено 33 новые цитаты в stoic-quotes.ts (Сократ, Сенека, Эпиктет, Марк Аврелий, Сунь-цзы, Хокинг)
+- [x] 98+ цитат в stoic-quotes.ts
 
 ---
 
@@ -259,11 +263,11 @@
 | Метрика | Значение | Цель |
 |---------|----------|------|
 | Сборка | 6.4s ✅ | <10s |
-| Тесты | 106 passed ✅ | 95+ |
+| Тесты | 119 passed ✅ (106 + 13 unit) | 95+ |
 | ESLint errors | 0 ✅ | 0 |
 | Accessibility тесты | 12 passed ✅ | 10+ |
 | Языки | 6 ✅ (EN, RU, ZH, HE, ES, FR) | 6+ |
-| Цитат | 65+ ✅ (stoic-quotes.ts) | 50+ |
+| Цитат | 98+ ✅ (stoic-quotes.ts) | 50+ |
 | Цитат в книгах | 48 ✅ (books.ts: 6 книг × 8 цитат) | 40+ |
 | Достижения | 32 ✅ (22 + 10 новых) | - |
 | Категории | 13 ✅ | - |
@@ -293,14 +297,14 @@
 - ✅ PWA Offline (Service Worker, offline page)
 - ✅ Аналитика (Vercel Analytics, Web Vitals, custom events)
 - ✅ 48 цитат в books.ts (6 книг × 8 цитат)
-- ✅ 65+ цитат в stoic-quotes.ts для геймификации
+- ✅ 98+ цитат в stoic-quotes.ts для геймификации
 - ✅ Геймификация (22 достижения, dashboard, daily challenges)
 - ✅ Daily Challenge (цитата дня)
 - ✅ PWA Install prompt (iOS инструкции)
 - ✅ Категоризация цитат (13 категорий)
 - ✅ Авто-тема по времени суток (morning/day/evening/night)
 - ✅ Улучшенные частицы (200 частиц, реакция на вращение)
-- ✅ 106 тестов (unit + integration + E2E)
+- ✅ 119 тестов (106 unit + integration + E2E + 13 useI18n)
 - ✅ ESLint: 0 errors, 0 warnings
 - ✅ TypeScript strict mode (noImplicitAny: true)
 - ✅ 6 книг: Марк Аврелий, Эпиктет, Сенека, Сунь-цзы, Хокинг, Кристенсен
@@ -312,7 +316,9 @@
 ### v0.2.1 (dev) 🔄
 - [x] Удаление неиспользуемого кода (BookCover.tsx, use-book-cover.ts, google-books.ts, open-library.ts)
 - [x] Рефакторинг use-i18n.ts
-- [x] Синхронизация dev → main
+- [x] Добавлено 33 новые цитаты (Сократ, Сенека, Эпиктет, Марк Аврелий, Сунь-цзы, Хокинг)
+- [x] Unit тесты useI18n (13 тестов)
+- [ ] Синхронизация dev → main
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
