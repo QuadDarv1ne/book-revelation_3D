@@ -5,6 +5,7 @@ import { useToast } from "./Toast";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useI18n } from "@/hooks/use-i18n";
 import { useUserSettings } from "@/hooks/use-user-settings";
+import { BookProgressTracker } from "@/components/gamification/BookProgressTracker";
 
 interface IconProps {
   className?: string;
@@ -113,6 +114,7 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
   const [showThemeDropdown, setShowThemeDropdown] = useState(false);
   const [rotationSpeed, setRotationSpeed] = useState(0.5);
   const [showSpeedPresets, setShowSpeedPresets] = useState(false);
+  const [showProgress, setShowProgress] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const speedRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
@@ -355,6 +357,19 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
                   <span>{t('quotes.import')}</span>
                 </button>
               </div>
+
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => setShowProgress(true)}
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-100/70 hover:text-amber-100 hover:bg-[rgba(212,175,55,0.08)] transition-all text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  type="button"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  <span>Прогресс книг</span>
+                </button>
+              </div>
               
               <div className="mt-3 pt-3 border-t border-[rgba(212,175,55,0.1)]">
                 <button
@@ -378,6 +393,41 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
           )}
         </div>
       </div>
+
+      {/* Модальное окно прогресса чтения */}
+      {showProgress && (
+        <div 
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => setShowProgress(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Прогресс чтения книг"
+        >
+          <div 
+            className="relative w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-2xl bg-[rgba(15,15,25,0.98)] border border-[rgba(212,175,55,0.2)] shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Заголовок */}
+            <div className="sticky top-0 flex items-center justify-between px-4 py-3 border-b border-[rgba(212,175,55,0.1)] bg-[rgba(15,15,25,0.98)]">
+              <h3 className="text-lg font-semibold text-amber-100">Прогресс чтения книг</h3>
+              <button
+                onClick={() => setShowProgress(false)}
+                className="p-2 text-amber-100/60 hover:text-amber-100 transition-colors rounded-lg hover:bg-[rgba(212,175,55,0.1)]"
+                aria-label="Закрыть"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            {/* Контент */}
+            <div className="p-4">
+              <BookProgressTracker />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -38,6 +38,7 @@ interface UserSettings {
     booksViewed: string[];
     themesExplored: string[];
     rotations: number;
+    bookQuotesRead: Record<string, number>; // Прогресс по книгам: { bookId: count }
   };
   activeBookId: string;
   cameraState: CameraState;
@@ -56,6 +57,7 @@ const defaultSettings: UserSettings = {
     booksViewed: [],
     themesExplored: [],
     rotations: 0,
+    bookQuotesRead: {}, // Прогресс по книгам
   },
   activeBookId: 'marcus-aurelius-meditations',
   cameraState: {
@@ -163,6 +165,30 @@ export function useUserSettings() {
     }));
   }, []);
 
+  // Инкремент прочитанных цитат по книге
+  const incrementBookQuoteRead = useCallback((bookId: string) => {
+    setSettings(prev => ({
+      ...prev,
+      statistics: {
+        ...prev.statistics,
+        bookQuotesRead: {
+          ...prev.statistics.bookQuotesRead,
+          [bookId]: (prev.statistics.bookQuotesRead[bookId] || 0) + 1,
+        },
+      },
+    }));
+  }, []);
+
+  // Получение прогресса по книге
+  const getBookProgress = useCallback((bookId: string, totalQuotes: number) => {
+    const read = settings.statistics.bookQuotesRead[bookId] || 0;
+    return {
+      read,
+      total: totalQuotes,
+      percentage: totalQuotes > 0 ? Math.round((read / totalQuotes) * 100) : 0,
+    };
+  }, [settings.statistics.bookQuotesRead]);
+
   const addFavorite = useCallback((quote: Quote) => {
     setSettings(prev => ({
       ...prev,
@@ -260,6 +286,8 @@ export function useUserSettings() {
     updateSettings,
     updateStatistics,
     incrementTimeSpent,
+    incrementBookQuoteRead,
+    getBookProgress,
     addFavorite,
     removeFavorite,
     isFavorite,
