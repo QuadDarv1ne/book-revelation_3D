@@ -293,7 +293,7 @@
 
 | Метрика | Значение | Цель |
 |---------|----------|------|
-| Сборка | ~4.5s ✅ | <10s |
+| Сборка | ~4.8s ✅ | <10s |
 | Тесты | 98 passed ✅ (9 файлов) | 95+ |
 | ESLint errors | 0 ✅ | 0 |
 | Accessibility тесты | 12 passed ✅ | 10+ |
@@ -358,10 +358,12 @@
 - [x] Добавлена поддержка немецкого языка (de) в i18n
 - [x] Исправлены ESLint ошибки (BookCover, use-book-cover, api файлы)
 - [x] Синхронизация dev → main ✅
-- [x] Сборка ~4.5s, ESLint: 0 errors
+- [x] Сборка ~4.8s, ESLint: 0 errors
 - [x] Трекинг времени и сессий (useSessionTracking, автосохранение)
 - [x] useAnalytics: sendBeacon + батчинг событий
 - [x] Геймификация: zen_master достижение (30 мин сессия)
+- [x] Трекер прогресса чтения книг (bookQuotesRead, BookProgressTracker)
+- [x] SettingsBar: модальное окно прогресса чтения
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
