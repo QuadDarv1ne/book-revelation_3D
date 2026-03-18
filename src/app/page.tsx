@@ -33,6 +33,7 @@ export default function Home() {
     isLoaded: settingsLoaded,
     updateSettings,
     incrementTimeSpent,
+    incrementBookQuoteRead,
     exportSettings,
   } = useUserSettings();
   const { captureException, captureMessage } = useErrorHandler({ enabled: true });
@@ -128,11 +129,13 @@ export default function Home() {
         if (quote?.category) {
           incrementCategoryRead(quote.category);
         }
+        // Трекинг прочитанной цитаты по книге
+        incrementBookQuoteRead(activeBook.id);
         return next;
       });
     }, QUOTE_ROTATION_INTERVAL);
     return () => clearInterval(interval);
-  }, [activeBook.quotes.length, activeBook.quotes, incrementCategoryRead]);
+  }, [activeBook.quotes.length, activeBook.quotes, activeBook.id, incrementCategoryRead, incrementBookQuoteRead]);
 
   // Автоматическое завершение theme challenge при смене темы
   useEffect(() => {
