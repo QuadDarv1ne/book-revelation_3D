@@ -365,6 +365,7 @@
 - [x] Трекер прогресса чтения книг (bookQuotesRead, BookProgressTracker)
 - [x] SettingsBar: модальное окно прогресса чтения
 - [x] Оптимизация текстур: приоритеты загрузки + lazy loading
+- [x] Расширенные горячие клавиши (z,q,a,t,p,s,g,1-6)
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
