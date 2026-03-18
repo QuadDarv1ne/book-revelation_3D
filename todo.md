@@ -364,6 +364,7 @@
 - [x] Геймификация: zen_master достижение (30 мин сессия)
 - [x] Трекер прогресса чтения книг (bookQuotesRead, BookProgressTracker)
 - [x] SettingsBar: модальное окно прогресса чтения
+- [x] Оптимизация текстур: приоритеты загрузки + lazy loading
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)

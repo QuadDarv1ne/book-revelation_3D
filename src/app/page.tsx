@@ -10,7 +10,7 @@ import { useAnalytics, trackBookChange, trackThemeChange } from "@/hooks/use-ana
 import { useAutoTheme } from "@/hooks/use-auto-theme";
 import { useGamification } from "@/hooks/use-gamification";
 import { useZenMode } from "@/hooks/use-zen-mode";
-import { useUserSettings } from "@/hooks/use-user-settings";
+import { useUserSettings, type Theme } from "@/hooks/use-user-settings";
 import { useFPSMonitor } from "@/hooks/use-fps-monitor";
 import { useErrorHandler } from "@/hooks/use-error-handler";
 import { KeyboardShortcutsHelp } from "@/components/ui/KeyboardShortcutsHelp";
@@ -74,24 +74,71 @@ export default function Home() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'z' || e.key === 'Z') {
-        if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+      // Игнорируем комбинации с модификаторами
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      switch (e.key.toLowerCase()) {
+        case 'z':
           toggleZenMode();
-        }
-      }
-      if (e.key === 'Escape' && isZenMode) {
-        toggleZenMode();
-      }
-      if (e.key === 'h' || e.key === 'H') {
-        if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+          break;
+        case 'escape':
+          if (isZenMode) toggleZenMode();
+          if (showShortcutsHelp) setShowShortcutsHelp(false);
+          break;
+        case 'h':
           setShowShortcutsHelp(prev => !prev);
-        }
+          break;
+        case 'p':
+          // Открыть прогресс книг (эмуляция клика)
+          const progressButton = document.querySelector('[aria-label="Прогресс чтения книг"]') as HTMLButtonElement;
+          progressButton?.click();
+          break;
+        case 'q':
+          // Следующая цитата
+          setActiveQuote(prev => (prev + 1) % activeBook.quotes.length);
+          break;
+        case 'a':
+          // Предыдущая цитата
+          setActiveQuote(prev => (prev - 1 + activeBook.quotes.length) % activeBook.quotes.length);
+          break;
+        case 't':
+          // Циклическая смена темы
+          const themes: Theme[] = ['dark', 'light', 'blue', 'purple', 'ambient', 'relax'];
+          const currentIndex = themes.indexOf(settings.theme as Theme);
+          const nextTheme = themes[(currentIndex + 1) % themes.length];
+          updateSettings('theme', nextTheme);
+          break;
+        case 's':
+          // Открыть настройки
+          const settingsButton = document.querySelector('[aria-label="Панель настроек"]') as HTMLButtonElement;
+          settingsButton?.click();
+          break;
+        case 'g':
+          // Открыть достижения
+          const achievementButton = document.querySelector('[aria-label="Достижения"]') as HTMLButtonElement;
+          achievementButton?.click();
+          break;
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+          // Быстрая смена книги (1-6)
+          const bookIndex = parseInt(e.key) - 1;
+          if (bookIndex < books.length) {
+            const newBook = books[bookIndex];
+            updateSettings('activeBookId', newBook.id);
+            addBookViewed(newBook.id);
+            showToast(`Выбрана книга: ${newBook.title}`, 'info');
+          }
+          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isZenMode, toggleZenMode]);
+  }, [isZenMode, toggleZenMode, showShortcutsHelp, settings.theme, activeBook.quotes.length, updateSettings, addBookViewed, showToast]);
 
   useEffect(() => {
     if (!settingsLoaded) return;
