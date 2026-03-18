@@ -292,7 +292,7 @@
 | Тесты | 117 passed ✅ (13 файлов) | 95+ |
 | ESLint errors | 0 ✅ | 0 |
 | Accessibility тесты | 12 passed ✅ | 10+ |
-| Языки | 6 ✅ (EN, RU, ZH, HE, ES, FR) | 6+ |
+| Языки | 7 ✅ (EN, RU, ZH, HE, ES, FR, DE) | 6+ |
 | Цитат | 98+ ✅ (stoic-quotes.ts) | 50+ |
 | Цитат в книгах | 48 ✅ (books.ts: 6 книг × 8 цитат) | 40+ |
 | Достижения | 32 ✅ (22 + 10 новых) | - |
@@ -313,7 +313,7 @@
 ## 🚀 Релизы
 
 ### v0.2.0 (текущая) ✅
-- ✅ i18n поддержка (6 языков: EN, RU, ZH, HE, ES, FR)
+- ✅ i18n поддержка (7 языков: EN, RU, ZH, HE, ES, FR, DE)
 - ✅ Экспорт/импорт избранных цитат
 - ✅ Share цитат (Web Share API + fallback)
 - ✅ Деплой конфигурации (Netlify, Vercel, Cloudflare, Docker, etc.)
@@ -350,6 +350,9 @@
 - [x] Улучшения доступности (aria-атрибуты, role="group")
 - [x] Конфигурация turbopack (root, эксперименты)
 - [x] Улучшены стили WebGLError для светлой темы
+- [x] Добавлена поддержка немецкого языка (de) в i18n
+- [x] Исправлены ESLint ошибки (BookCover, use-book-cover, api файлы)
+- [x] Синхронизация dev → main ✅
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
