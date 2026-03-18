@@ -19,6 +19,14 @@ const SHORTCUTS: Shortcut[] = [
   { key: 'h', description: 'Показать горячие клавиши', category: 'general' },
   { key: 'f', description: 'Полноэкранный режим', category: 'view' },
   { key: 'c', description: 'Копировать цитату', category: 'general' },
+  { key: 'z', description: 'Режим дзен', category: 'control' },
+  { key: 'q', description: 'Следующая цитата', category: 'navigation' },
+  { key: 'a', description: 'Предыдущая цитата', category: 'navigation' },
+  { key: 't', description: 'Сменить тему', category: 'view' },
+  { key: 'p', description: 'Прогресс книг', category: 'view' },
+  { key: 's', description: 'Настройки', category: 'general' },
+  { key: 'g', description: 'Достижения', category: 'view' },
+  { key: '1-6', description: 'Выбрать книгу (1-6)', category: 'navigation' },
 ];
 
 export function getShortcutsHelp(): { category: string; shortcuts: { key: string; description: string }[] }[] {
