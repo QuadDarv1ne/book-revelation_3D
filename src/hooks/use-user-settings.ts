@@ -152,6 +152,17 @@ export function useUserSettings() {
     }));
   }, []);
 
+  // Инкремент времени с обновлением statistics
+  const incrementTimeSpent = useCallback((seconds: number) => {
+    setSettings(prev => ({
+      ...prev,
+      statistics: {
+        ...prev.statistics,
+        timeSpent: prev.statistics.timeSpent + seconds,
+      },
+    }));
+  }, []);
+
   const addFavorite = useCallback((quote: Quote) => {
     setSettings(prev => ({
       ...prev,
@@ -248,6 +259,7 @@ export function useUserSettings() {
     isLoaded,
     updateSettings,
     updateStatistics,
+    incrementTimeSpent,
     addFavorite,
     removeFavorite,
     isFavorite,

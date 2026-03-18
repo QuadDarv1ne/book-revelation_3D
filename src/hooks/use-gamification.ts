@@ -662,15 +662,20 @@ export function useGamification() {
     booksViewed: settings.statistics.booksViewed.length,
     themesExplored: settings.statistics.themesExplored.length,
     streakDays: 0,
-    totalTimeSeconds: 0,
+    totalTimeSeconds: settings.statistics.timeSpent,
     firstVisitDate: "",
     lastVisitDate: "",
   }), [achievements, totalUnlocked, completionPercentage, settings]);
 
-  // Отслеживание времени в приложении
-  const trackTime = useCallback((_seconds: number) => {
-    // Упрощено для централизации
-  }, []);
+  // Отслеживание времени в приложении с проверкой достижения zen_master
+  const trackTime = useCallback((seconds: number) => {
+    const totalTime = settings.statistics.timeSpent + seconds;
+    
+    // Проверка достижения zen_master (30 минут = 1800 секунд)
+    if (totalTime >= 1800 && !achievements.find(a => a.id === 'zen_master')?.unlocked) {
+      checkAchievement('zen_master', totalTime);
+    }
+  }, [settings.statistics.timeSpent, achievements, checkAchievement]);
 
   /**
    * Экспорт прогресса пользователя в JSON

@@ -32,6 +32,7 @@ export default function Home() {
     settings,
     isLoaded: settingsLoaded,
     updateSettings,
+    incrementTimeSpent,
     exportSettings,
   } = useUserSettings();
   const { captureException, captureMessage } = useErrorHandler({ enabled: true });
@@ -110,12 +111,14 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [effectiveTheme, settings.theme, settingsLoaded, trackEvent, autoThemeConfig, addThemeExplored]);
 
+  // Трекинг времени с обновлением statistics
   useEffect(() => {
     const interval = setInterval(() => {
       trackTime(10);
+      incrementTimeSpent(10);
     }, 10000);
     return () => clearInterval(interval);
-  }, [trackTime]);
+  }, [trackTime, incrementTimeSpent]);
 
   useEffect(() => {
     const interval = setInterval(() => {
