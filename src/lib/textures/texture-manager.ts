@@ -14,6 +14,13 @@ interface TextureManagerOptions {
   onTextureLoadError?: (path: string, error: Error) => void;
 }
 
+interface LoadPriority {
+  cover: 0;
+  spine: 1;
+  back: 2;
+}
+
+const PRIORITY: LoadPriority = { cover: 0, spine: 1, back: 2 };
 const MAX_CACHE_SIZE = 50;
 const PLACEHOLDER_CACHE = new Map<string, THREE.CanvasTexture>();
 
@@ -55,11 +62,15 @@ class TextureManager {
   }
 
   async preloadBookTextures(coverImage: string, spineImage: string, backCoverImage: string): Promise<void> {
+    // Приоритетная загрузка: сначала обложка, потом корешок, затем задняя обложка
     const texturePaths = [
-      { key: `cover-${coverImage}`, path: coverImage, type: 'cover' as const },
-      { key: `spine-${spineImage}`, path: spineImage, type: 'spine' as const },
-      { key: `back-${backCoverImage}`, path: backCoverImage, type: 'back' as const }
+      { key: `cover-${coverImage}`, path: coverImage, type: 'cover' as const, priority: PRIORITY.cover },
+      { key: `spine-${spineImage}`, path: spineImage, type: 'spine' as const, priority: PRIORITY.spine },
+      { key: `back-${backCoverImage}`, path: backCoverImage, type: 'back' as const, priority: PRIORITY.back }
     ];
+
+    // Сортировка по приоритету
+    texturePaths.sort((a, b) => a.priority - b.priority);
 
     const results = await Promise.allSettled(
       texturePaths.map(({ path }) => {
@@ -73,8 +84,8 @@ class TextureManager {
     results.forEach((result, index) => {
       const { key, path, type } = texturePaths[index];
       if (result.status === 'fulfilled') {
-        this.cache.set(key, { 
-          texture: result.value, 
+        this.cache.set(key, {
+          texture: result.value,
           loadComplete: true,
           lastAccessed: Date.now()
         });
@@ -91,6 +102,42 @@ class TextureManager {
         this.onTextureLoadError?.(path, error);
       }
     });
+  }
+
+  // Lazy загрузка с низким приоритетом (неблокирующая)
+  getTextureLazy(imagePath: string, type: 'cover' | 'spine' | 'back'): THREE.Texture {
+    const cacheKey = `${type}-${imagePath}`;
+    const cached = this.cache.get(cacheKey);
+
+    if (cached?.loadComplete) {
+      cached.lastAccessed = Date.now();
+      return cached.texture;
+    }
+    if (cached?.promise) return this.getPlaceholder(type);
+
+    const placeholder = this.getPlaceholder(type);
+    
+    // Lazy загрузка через requestIdleCallback или setTimeout
+    const loadLazy = () => {
+      const promise = this.loadTextureWithRetry(imagePath, this.maxRetries);
+      
+      this.cache.set(cacheKey, {
+        texture: placeholder,
+        loadComplete: false,
+        promise,
+        lastAccessed: Date.now()
+      });
+      
+      this.pruneCache();
+    };
+
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(loadLazy, { timeout: 2000 });
+    } else {
+      setTimeout(loadLazy, 100);
+    }
+    
+    return placeholder;
   }
 
   private async loadTextureWithRetry(path: string, retries: number): Promise<THREE.Texture> {
