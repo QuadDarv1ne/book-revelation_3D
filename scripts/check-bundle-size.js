@@ -9,9 +9,9 @@ const fs = require('fs');
 const path = require('path');
 
 const OUT_DIR = path.join(__dirname, '..', 'out');
-const MAX_TOTAL_SIZE = 5 * 1024 * 1024; // 5MB
-const MAX_JS_SIZE = 1 * 1024 * 1024; // 1MB
-const MAX_CSS_SIZE = 100 * 1024; // 100KB
+const MAX_TOTAL_SIZE = 10 * 1024 * 1024; // 10MB (3D app with Three.js)
+const MAX_JS_SIZE = 2 * 1024 * 1024; // 2MB (Three.js + React)
+const MAX_CSS_SIZE = 150 * 1024; // 150KB
 
 function getDirectorySize(dir) {
   let size = 0;

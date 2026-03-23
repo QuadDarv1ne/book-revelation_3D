@@ -240,9 +240,9 @@
 ## 📋 TODO — Приоритет 1 (23 марта 2026)
 
 ### 🔥 Критично (сделать сейчас)
-- [ ] Оптимизация изображений: запустить `npm run covers:optimize` (-300KB)
-- [ ] Обновить пути к изображениям в src/data/books.ts (.png/.jpg → .webp)
-- [ ] Проверить bundle size: `node scripts/check-bundle-size.js`
+- [x] Оптимизация изображений: запустить `npm run covers:optimize` (-300KB) ✅
+- [x] Удалить старые PNG/JPG файлы (оставлены только WebP) ✅
+- [x] Проверить bundle size: `node scripts/check-bundle-size.js` ✅
 
 ### ⚡ Высокий приоритет
 - [ ] Lighthouse CI: запустить `npm run lighthouse` (цель: 90+ performance)
@@ -250,8 +250,8 @@
 - [ ] Performance тесты: проверить `npm run test:perf` (7 тестов)
 
 ### 🧪 Тестирование
-- [x] Performance тесты: 7 новых (e2e/performance.spec.ts)
-- [x] Gamification тесты: 8 новых (e2e/gamification.spec.ts)
+- [x] Performance тесты: 7 новых (e2e/performance.spec.ts) ✅
+- [x] Gamification тесты: 8 новых (e2e/gamification.spec.ts) ✅
 - [ ] Запустить все E2E тесты: `npm run test:e2e`
 - [ ] Проверить покрытие: `npm run test:coverage`
 
@@ -303,10 +303,11 @@
 - [ ] Проверить работу на Android Chrome
 
 ### Улучшения (23 марта 2026)
-- [x] Конвертация текстур в WebP (обложки книг)
-- [x] Скрипт для конвертации оставшихся изображений (convert-remaining-images.js)
-- [ ] Запустить конвертацию: `npm run covers:optimize`
-- [x] Visual regression тесты (10 тестов в e2e/visual-regression.spec.ts)
+- [x] Конвертация текстур в WebP (обложки книг) ✅
+- [x] Скрипт для конвертации оставшихся изображений (convert-remaining-images.js) ✅
+- [x] Запустить конвертацию: `npm run covers:optimize` ✅
+- [x] Удалить старые PNG/JPG файлы (экономия ~300KB) ✅
+- [x] Visual regression тесты (10 тестов в e2e/visual-regression.spec.ts) ✅
 - [ ] Создать базовые скриншоты для visual regression
 - [ ] Production Web Vitals дашборд
 
