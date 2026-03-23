@@ -69,7 +69,28 @@ npm run test:coverage
 
 # E2E тесты
 npm run test:e2e
+
+# Performance тесты
+npm run test:perf
+
+# Visual regression тесты
+npm run test:visual
 ```
+
+### Оптимизация
+
+```bash
+# Конвертация изображений в WebP
+npm run covers:optimize
+
+# Lighthouse CI
+npm run lighthouse
+
+# Проверка размера бандла
+node scripts/check-bundle-size.js
+```
+
+> 📖 **Подробнее:** См. [QUICKSTART_IMPROVEMENTS.md](QUICKSTART_IMPROVEMENTS.md) и [docs/TESTING.md](docs/TESTING.md)
 
 ## 🔌 Интеграция в Tilda
 

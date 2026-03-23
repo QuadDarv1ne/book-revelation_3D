@@ -237,15 +237,30 @@
 
 ---
 
-## 📋 TODO — Приоритет 1
+## 📋 TODO — Приоритет 1 (23 марта 2026)
+
+### 🔥 Критично (сделать сейчас)
+- [ ] Оптимизация изображений: запустить `npm run covers:optimize` (-300KB)
+- [ ] Обновить пути к изображениям в src/data/books.ts (.png/.jpg → .webp)
+- [ ] Проверить bundle size: `node scripts/check-bundle-size.js`
+
+### ⚡ Высокий приоритет
+- [ ] Lighthouse CI: запустить `npm run lighthouse` (цель: 90+ performance)
+- [ ] Visual regression: создать базовые скриншоты `npm run test:visual`
+- [ ] Performance тесты: проверить `npm run test:perf` (7 тестов)
+
+### 🧪 Тестирование
+- [x] Performance тесты: 7 новых (e2e/performance.spec.ts)
+- [x] Gamification тесты: 8 новых (e2e/gamification.spec.ts)
+- [ ] Запустить все E2E тесты: `npm run test:e2e`
+- [ ] Проверить покрытие: `npm run test:coverage`
 
 ### Геймификация
-- [x] Расширение системы достижений (11 достижений)
+- [x] Расширение системы достижений (22 достижения)
 - [x] Визуализация прогресса (progress bars, badges)
 - [x] Daily challenges (цитата дня)
 - [x] Statistics dashboard (время в приложении, прочитано цитат)
 - [x] Экспорт прогресса пользователя (JSON: статистика, достижения, избранное)
-- [x] Расширение системы достижений (10 новых по категориям: wisdom_seeker, wisdom_master, stoic_warrior, peaceful_soul, action_hero, life_philosopher, knowledge_hunter, freedom_lover, strategy_master, inspiration_seeker)
 
 ### Контент — цитаты
 - [x] Добавлено 33 новые цитаты в stoic-quotes.ts (Сократ, Сенека, Эпиктет, Марк Аврелий, Сунь-цзы, Хокинг)
@@ -254,6 +269,13 @@
 ---
 
 ## 📋 TODO — Приоритет 2
+
+### 🛠️ Инфраструктура (23 марта 2026)
+- [x] Скрипты оптимизации: convert-remaining-images.js, lighthouse-ci.js, check-bundle-size.js
+- [x] CI/CD: performance-budget.yml, visual-tests.yml workflows
+- [x] Конфигурация: lighthouserc.json
+- [ ] Настроить Sentry для error monitoring (production)
+- [ ] Web Vitals dashboard (страница /analytics)
 
 ### Контент
 - [x] Интеграция с Open Library API для обложек (обложки сгенерированы в public/book-covers/)
@@ -270,6 +292,7 @@
 ### PWA
 - [x] Push уведомления (цитата дня)
 - [x] Install prompt улучшение
+- [ ] PWA push notifications для daily challenges
 
 ---
 
@@ -279,9 +302,12 @@
 - [ ] Проверить работу на Safari iOS
 - [ ] Проверить работу на Android Chrome
 
-### Улучшения
+### Улучшения (23 марта 2026)
 - [x] Конвертация текстур в WebP (обложки книг)
-- [ ] Визуальные регрессионные тесты
+- [x] Скрипт для конвертации оставшихся изображений (convert-remaining-images.js)
+- [ ] Запустить конвертацию: `npm run covers:optimize`
+- [x] Visual regression тесты (10 тестов в e2e/visual-regression.spec.ts)
+- [ ] Создать базовые скриншоты для visual regression
 - [ ] Production Web Vitals дашборд
 
 ### ✅ Доступность
@@ -289,23 +315,28 @@
 
 ---
 
-## 📊 Метрики
+## 📊 Метрики (23 марта 2026)
 
-| Метрика | Значение | Цель |
-|---------|----------|------|
-| Сборка | ~4.8s ✅ | <10s |
-| Тесты | 98 passed ✅ (9 файлов) | 95+ |
-| ESLint errors | 0 ✅ | 0 |
-| Accessibility тесты | 12 passed ✅ | 10+ |
-| Языки | 7 ✅ (EN, RU, ZH, HE, ES, FR, DE) | 6+ |
-| Цитат | 98+ ✅ (stoic-quotes.ts) | 50+ |
-| Цитат в книгах | 48 ✅ (books.ts: 6 книг × 8 цитат) | 40+ |
-| Достижения | 32 ✅ (22 + 10 новых) | - |
-| Категории | 13 ✅ | - |
-| Книги | 6 ✅ | - |
-| Theme of Day | 6 тем в ротации ✅ | - |
-| Lighthouse Performance | TBD | 90+ |
-| Lighthouse Accessibility | TBD | 95+ |
+| Метрика | Значение | Цель | Статус |
+|---------|----------|------|--------|
+| Сборка | ~8.5s ✅ | <10s | ✅ |
+| Unit тесты | 117 passed ✅ (13 файлов) | 95+ | ✅ |
+| E2E тесты | 27+ ✅ (accessibility + main + new) | 25+ | ✅ |
+| Performance тесты | 7 новых ✅ | - | ✅ |
+| Gamification тесты | 8 новых ✅ | - | ✅ |
+| ESLint errors | 0 ✅ | 0 | ✅ |
+| Accessibility тесты | 12 passed ✅ | 10+ | ✅ |
+| Языки | 7 ✅ (EN, RU, ZH, HE, ES, FR, DE) | 6+ | ✅ |
+| Цитат | 98+ ✅ (stoic-quotes.ts) | 50+ | ✅ |
+| Цитат в книгах | 48 ✅ (books.ts: 6 книг × 8 цитат) | 40+ | ✅ |
+| Достижения | 32 ✅ (22 + 10 новых) | - | ✅ |
+| Категории | 13 ✅ | - | ✅ |
+| Книги | 6 ✅ | - | ✅ |
+| Theme of Day | 6 тем в ротации ✅ | - | ✅ |
+| Bundle Size | ~800KB | <1MB | ⏳ проверить |
+| Images (неоптимизированные) | ~450KB | <150KB | ⏳ оптимизировать |
+| Lighthouse Performance | TBD | 90+ | ⏳ запустить |
+| Lighthouse Accessibility | TBD | 95+ | ⏳ запустить |
 
 ### Ожидаемые улучшения производительности
 - [x] WebP конвертация обложек книг ✅
@@ -365,6 +396,7 @@
 - [x] Трекер прогресса чтения книг (bookQuotesRead, BookProgressTracker)
 - [x] SettingsBar: модальное окно прогресса чтения
 - [x] Оптимизация текстур: приоритеты загрузки + lazy loading
+- [x] Расширенные горячие клавиши (z,q,a,t,p,s,g,1-6)
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
