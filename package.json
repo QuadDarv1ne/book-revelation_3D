@@ -25,6 +25,7 @@
     "covers:set": "node scripts/set-cover.js",
     "covers:create-spine": "node scripts/create-spine.js",
     "covers:optimize": "node scripts/convert-remaining-images.js",
+    "covers:download": "node scripts/download-all-covers.js",
     "lighthouse": "node scripts/lighthouse-ci.js",
     "perf": "npm run lighthouse && npm run test:visual"
   },
