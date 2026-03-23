@@ -12,7 +12,8 @@
       "Bash(git commit -m \"fix: remove console.log statements from performance tests:*)",
       "Bash(node:*)",
       "Bash(rm -f *.png *.jpg)",
-      "Bash(ls -lh *.webp)"
+      "Bash(ls -lh *.webp)",
+      "Bash(git commit:*)"
     ]
   }
 }
