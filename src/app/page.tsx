@@ -357,6 +357,7 @@ export default function Home() {
                 <div>activeBook: {activeBook.id}</div>
                 <div>FPS: {fpsStats.fps} (min: {fpsStats.min}, max: {fpsStats.max})</div>
                 <div>theme: {settings.theme}</div>
+                <div>quality: {settings.graphicsQuality} 🔼</div>
               </div>
             )}
 
