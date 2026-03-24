@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import type { Locale } from './use-i18n';
 
 export type Theme = 'dark' | 'light' | 'blue' | 'purple' | 'ambient' | 'relax' | 'auto' | 'auto-time';
+export type GraphicsQuality = 'low' | 'medium' | 'high';
 
 interface Quote {
   id?: string;
@@ -42,6 +43,7 @@ interface UserSettings {
   };
   activeBookId: string;
   cameraState: CameraState;
+  graphicsQuality: GraphicsQuality;
 }
 
 const defaultSettings: UserSettings = {
@@ -64,11 +66,13 @@ const defaultSettings: UserSettings = {
     position: { x: 0, y: 1.25, z: 4.0 },
     zoom: 1,
   },
+  graphicsQuality: 'high',
 };
 
 const STORAGE_KEY = 'user-settings';
 const VALID_LOCALES = ['en', 'ru', 'zh', 'he', 'de', 'es', 'fr'] as const;
 const VALID_THEMES = ['dark', 'light', 'blue', 'purple', 'ambient', 'relax', 'auto', 'auto-time'] as const;
+const VALID_GRAPHICS_QUALITY = ['low', 'medium', 'high'] as const;
 
 function isValidLocale(value: unknown): value is Locale {
   return typeof value === 'string' && VALID_LOCALES.includes(value as Locale);
@@ -100,6 +104,10 @@ function isValidCameraState(value: unknown): value is CameraState {
   );
 }
 
+function isValidGraphicsQuality(value: unknown): value is GraphicsQuality {
+  return typeof value === 'string' && VALID_GRAPHICS_QUALITY.includes(value as GraphicsQuality);
+}
+
 export function useUserSettings() {
   const [settings, setSettings] = useState<UserSettings>(defaultSettings);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -121,7 +129,8 @@ export function useUserSettings() {
         if (Array.isArray(parsed.achievements)) validated.achievements = parsed.achievements.filter((a: unknown) => typeof a === 'object' && a !== null && 'id' in a).slice(0, 100);
         if (isValidCameraState(parsed.cameraState)) validated.cameraState = parsed.cameraState;
         if (typeof parsed.activeBookId === 'string') validated.activeBookId = parsed.activeBookId;
-        
+        if (isValidGraphicsQuality(parsed.graphicsQuality)) validated.graphicsQuality = parsed.graphicsQuality;
+
         setSettings({ ...defaultSettings, ...validated });
       }
     } catch (error) {
