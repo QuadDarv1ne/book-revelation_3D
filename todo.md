@@ -429,6 +429,9 @@
 - [x] PostProcessing компонент (bloom + SMAA anti-aliasing + SSAO)
 - [x] Ambient occlusion (SSAO) для глубины и реализма
 - [x] SMAA anti-aliasing для сглаживания краев
+- [x] Loading progress indicator (real-time texture loading с прогресс-баром)
+- [x] LoadingFallback: текстуры загрузка (textureManager.getCacheStats())
+- [x] 10-second timeout fallback для LoadingFallback
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
