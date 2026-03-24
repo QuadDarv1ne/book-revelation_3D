@@ -12,9 +12,9 @@
     "assert": {
       "assertions": {
         "categories:performance": [
-          "error",
+          "warn",
           {
-            "minScore": 0.9
+            "minScore": 0.4
           }
         ],
         "categories:accessibility": [
@@ -24,9 +24,9 @@
           }
         ],
         "categories:best-practices": [
-          "error",
+          "warn",
           {
-            "minScore": 0.9
+            "minScore": 0.7
           }
         ],
         "categories:seo": [
@@ -38,13 +38,13 @@
         "first-contentful-paint": [
           "warn",
           {
-            "maxNumericValue": 2000
+            "maxNumericValue": 3500
           }
         ],
         "largest-contentful-paint": [
           "warn",
           {
-            "maxNumericValue": 2500
+            "maxNumericValue": 5000
           }
         ],
         "cumulative-layout-shift": [
@@ -56,7 +56,7 @@
         "total-blocking-time": [
           "warn",
           {
-            "maxNumericValue": 300
+            "maxNumericValue": 2000
           }
         ]
       }

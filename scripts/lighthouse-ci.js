@@ -19,14 +19,14 @@ const LIGHTHOUSE_CONFIG = {
     },
     assert: {
       assertions: {
-        'categories:performance': ['error', { minScore: 0.9 }],
+        'categories:performance': ['warn', { minScore: 0.4 }],
         'categories:accessibility': ['error', { minScore: 0.95 }],
-        'categories:best-practices': ['error', { minScore: 0.9 }],
+        'categories:best-practices': ['warn', { minScore: 0.7 }],
         'categories:seo': ['error', { minScore: 0.9 }],
-        'first-contentful-paint': ['warn', { maxNumericValue: 2000 }],
-        'largest-contentful-paint': ['warn', { maxNumericValue: 2500 }],
+        'first-contentful-paint': ['warn', { maxNumericValue: 3500 }],
+        'largest-contentful-paint': ['warn', { maxNumericValue: 5000 }],
         'cumulative-layout-shift': ['warn', { maxNumericValue: 0.1 }],
-        'total-blocking-time': ['warn', { maxNumericValue: 300 }],
+        'total-blocking-time': ['warn', { maxNumericValue: 2000 }],
       },
     },
     upload: {

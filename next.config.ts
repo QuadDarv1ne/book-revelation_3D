@@ -33,6 +33,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   generateEtags: false,
+  productionBrowserSourceMaps: false,
 };
 
 export default withBundleAnalyzer(nextConfig);
