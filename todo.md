@@ -443,6 +443,7 @@
 - [x] Daily quote reminder: авто-напоминание через 2 часа ✅
 - [x] Daily quote reminder: 'd' клавиша для показа напоминания ✅
 - [x] Обновление тестов и конфигурации (март 2026) ✅
+- [x] Исправление ESLint: добавлен coverage/** в ignores ✅
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
