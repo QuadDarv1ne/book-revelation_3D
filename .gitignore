@@ -52,3 +52,6 @@ playwright-report/
 !public/*.jpg
 !public/book-covers/*.jpg
 !public/book-spines/*.jpg
+
+# Lighthouse
+.lighthouseci/

@@ -19,6 +19,7 @@ import { useFavorites } from "@/hooks/use-favorites";
 import { getBookById, getDefaultBook, books } from "@/data/books";
 import { textureManager } from "@/lib/textures/texture-manager";
 import { useToast } from "@/components/ui/Toast";
+import { useDailyReminder } from "@/hooks/use-daily-reminder";
 import type { Quote } from "@/types/quote";
 
 const QUOTE_ROTATION_INTERVAL = 5000;
@@ -41,6 +42,7 @@ export default function Home() {
   const fpsStats = useFPSMonitor(!isZenMode);
   const { showToast } = useToast();
   const { exportFavoritesToFile, importFavoritesFromFile } = useFavorites();
+  const { showReminderNow } = useDailyReminder();
 
   const [activeQuote, setActiveQuote] = useState(0);
   const [webGLError, setWebGLError] = useState(false);
@@ -119,6 +121,10 @@ export default function Home() {
           const achievementButton = document.querySelector('[aria-label="Достижения"]') as HTMLButtonElement;
           achievementButton?.click();
           break;
+        case 'd':
+          // Показать цитату дня
+          showReminderNow();
+          break;
         case '1':
         case '2':
         case '3':
@@ -139,7 +145,7 @@ export default function Home() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isZenMode, toggleZenMode, showShortcutsHelp, settings.theme, activeBook.quotes.length, updateSettings, addBookViewed, showToast]);
+  }, [isZenMode, toggleZenMode, showShortcutsHelp, settings.theme, activeBook.quotes.length, updateSettings, addBookViewed, showToast, showReminderNow]);
 
   useEffect(() => {
     if (!settingsLoaded) return;

@@ -26,6 +26,7 @@ const SHORTCUTS: Shortcut[] = [
   { key: 'p', description: 'Прогресс книг', category: 'view' },
   { key: 's', description: 'Настройки', category: 'general' },
   { key: 'g', description: 'Достижения', category: 'view' },
+  { key: 'd', description: 'Цитата дня', category: 'general' },
   { key: '1-6', description: 'Выбрать книгу (1-6)', category: 'navigation' },
 ];
 
