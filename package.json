@@ -17,7 +17,7 @@
     "test:e2e:ui": "playwright test --ui",
     "test:visual": "playwright test --grep @visual",
     "test:perf": "playwright test e2e/performance.spec.ts",
-    "covers:download": "node scripts/download-covers.js",
+    "covers:download": "node scripts/download-all-covers.js",
     "covers:parse": "node scripts/parse-book-covers.js",
     "covers:azbooka": "node scripts/parse-azbooka.js",
     "covers:google": "node scripts/parse-google-books.js",
@@ -25,13 +25,13 @@
     "covers:set": "node scripts/set-cover.js",
     "covers:create-spine": "node scripts/create-spine.js",
     "covers:optimize": "node scripts/convert-remaining-images.js",
-    "covers:download": "node scripts/download-all-covers.js",
     "lighthouse": "node scripts/lighthouse-ci.js",
     "perf": "npm run lighthouse && npm run test:visual"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
+    "@react-three/postprocessing": "^3.0.4",
     "@types/three": "^0.183.1",
     "@vercel/analytics": "^1.6.1",
     "dompurify": "^3.3.2",

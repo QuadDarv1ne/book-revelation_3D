@@ -69,11 +69,11 @@ export function useBookMaterials({ coverTexture, backCoverTexture, spineTexture 
     });
 
     const goldMaterial = new THREE.MeshStandardMaterial({
-      color: "#d4af37",
-      roughness: 0.25,
-      metalness: 0.85,
-      emissive: "#d4af37",
-      emissiveIntensity: 0.1
+      color: "#ffd700",
+      roughness: 0.2,
+      metalness: 0.9,
+      emissive: "#ffd700",
+      emissiveIntensity: 0.25
     });
 
     const glowMaterial = new THREE.MeshBasicMaterial({

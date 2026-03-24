@@ -424,6 +424,9 @@
 - [x] Создана утилита book-metadata.ts для book-specific SEO
 - [x] Добавлен JSON-LD Book schema для каждой книги
 - [x] Обновлены language alternates (ru/en/zh/he/es/fr/de)
+- [x] Bloom effect для золотых элементов книги (@react-three/postprocessing)
+- [x] Улучшен gold материал (emissive: #ffd700, intensity: 0.25)
+- [x] BloomEffect компонент (intensity: 0.35, radius: 0.5, threshold: 0.8)
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
