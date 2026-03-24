@@ -8,6 +8,7 @@ import { Podium } from "./Podium";
 import { ParticleRingOptimized } from "./ParticleRingOptimized";
 import { Lighting } from "./Lighting";
 import { ThemeParticleEffect } from "./ThemeParticleEffect";
+import { BloomEffect } from "./BloomEffect";
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion";
 import { useCameraPersistence } from "@/hooks/use-camera-persistence";
 import * as THREE from "three";
@@ -53,6 +54,7 @@ const SceneContent = memo(function SceneContent({
       <Sparkles count={20} scale={4} size={1.5} speed={0.1} color="#d4af37" opacity={0.25} />
       <ContactShadows position={[0, -0.78, 0]} opacity={0.4} scale={5} blur={2.5} far={3} color="#000" />
       {theme && <ThemeParticleEffect activeTheme={theme} graphicsQuality={graphicsQuality} />}
+      <BloomEffect intensity={0.35} radius={0.5} threshold={0.8} levels={3} />
     </>
   );
 });
