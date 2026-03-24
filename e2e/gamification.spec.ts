@@ -9,7 +9,7 @@ test.describe('Gamification Features', () => {
 
   test('achievements are tracked', async ({ page }) => {
     // Открываем меню геймификации
-    await page.click('button[aria-label*="Меню"]');
+    await page.click('button[aria-label*="меню настроек"]');
     await page.waitForTimeout(500);
     await page.click('text=Настройки');
     await page.waitForTimeout(300);
@@ -57,7 +57,7 @@ test.describe('Gamification Features', () => {
   });
 
   test('statistics are tracked', async ({ page }) => {
-    await page.click('button[aria-label*="Меню"]');
+    await page.click('button[aria-label*="меню настроек"]');
     await page.waitForTimeout(500);
     await page.click('text=Настройки');
     await page.waitForTimeout(300);
@@ -101,7 +101,7 @@ test.describe('Gamification Features', () => {
     }
 
     // Открываем настройки
-    await page.click('button[aria-label*="Меню"]');
+    await page.click('button[aria-label*="меню настроек"]');
     await page.waitForTimeout(500);
     await page.click('text=Настройки');
     await page.waitForTimeout(300);
@@ -149,7 +149,7 @@ test.describe('Settings and Preferences', () => {
   });
 
   test('export settings works', async ({ page }) => {
-    await page.click('button[aria-label*="Меню"]');
+    await page.click('button[aria-label*="меню настроек"]');
     await page.waitForTimeout(500);
     await page.click('text=Настройки');
     await page.waitForTimeout(300);
@@ -165,7 +165,7 @@ test.describe('Settings and Preferences', () => {
   });
 
   test('language can be changed', async ({ page }) => {
-    await page.click('button[aria-label*="Меню"]');
+    await page.click('button[aria-label*="меню настроек"]');
     await page.waitForTimeout(500);
 
     // Ищем переключатель языка
@@ -187,7 +187,7 @@ test.describe('Settings and Preferences', () => {
   });
 
   test('rotation speed can be adjusted', async ({ page }) => {
-    await page.click('button[aria-label*="Меню"]');
+    await page.click('button[aria-label*="меню настроек"]');
     await page.waitForTimeout(500);
     await page.click('text=Настройки');
     await page.waitForTimeout(300);

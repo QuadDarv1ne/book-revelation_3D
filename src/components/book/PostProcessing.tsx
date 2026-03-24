@@ -53,7 +53,7 @@ export function PostProcessing({
   );
 
   return (
-    <EffectComposer enableNormalPass={false}>
+    <EffectComposer enableNormalPass={true}>
       <SMAAEffect preset={enableSMAA ? "high" : "off"} />
       <Bloom
         intensity={bloomSettings.intensity}

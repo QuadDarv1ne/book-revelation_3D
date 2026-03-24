@@ -66,12 +66,18 @@ export function LoadingFallback({
 
         {showProgress && (
           <>
-            <div className="w-full h-2 bg-amber-900/30 rounded-full overflow-hidden" role="progressbar" aria-label="Прогресс загрузки" aria-valuemin={0} aria-valuemax={100}>
+            <div
+              className="w-full h-2 bg-amber-900/30 rounded-full overflow-hidden"
+              role="progressbar"
+              aria-label="Прогресс загрузки"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={progress}
+              aria-valuetext={`${progress}% загружено`}
+            >
               <div
                 className="h-full bg-gradient-to-r from-amber-500 to-amber-300 transition-all duration-300 ease-out"
                 style={{ width: `${progress}%` }}
-                aria-valuenow={progress}
-                aria-valuetext={`${progress}% загружено`}
               />
             </div>
             <p className="text-amber-200/50 text-xs mt-3">{status}</p>
