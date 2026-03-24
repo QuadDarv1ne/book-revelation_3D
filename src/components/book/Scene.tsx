@@ -24,6 +24,7 @@ interface SceneProps {
   rotationSpeed?: number;
   particleCount?: number;
   graphicsQuality?: 'low' | 'medium' | 'high';
+  color?: string;
 }
 
 const SceneContent = memo(function SceneContent({
@@ -34,7 +35,8 @@ const SceneContent = memo(function SceneContent({
   theme,
   rotationSpeed,
   particleCount,
-  graphicsQuality
+  graphicsQuality,
+  color
 }: {
   isRotating: boolean;
   coverImage?: string;
@@ -44,11 +46,12 @@ const SceneContent = memo(function SceneContent({
   rotationSpeed?: number;
   particleCount?: number;
   graphicsQuality?: 'low' | 'medium' | 'high';
+  color?: string;
 }) {
   return (
     <>
       <Lighting theme={theme} />
-      <Book isRotating={isRotating} coverImage={coverImage} spineImage={spineImage} backCoverImage={backCoverImage} rotationSpeed={rotationSpeed} />
+      <Book isRotating={isRotating} coverImage={coverImage} spineImage={spineImage} backCoverImage={backCoverImage} rotationSpeed={rotationSpeed} color={color} />
       <Podium />
       <ParticleRingOptimized isRotating={isRotating} particleCount={particleCount} graphicsQuality={graphicsQuality} />
       <Sparkles count={20} scale={4} size={1.5} speed={0.1} color="#d4af37" opacity={0.25} />

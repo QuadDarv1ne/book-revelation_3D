@@ -14,6 +14,7 @@ interface BookProps {
   spineImage?: string;
   backCoverImage?: string;
   rotationSpeed?: number;
+  color?: string;
 }
 
 const BOOK_WIDTH = 1.35;
@@ -42,12 +43,60 @@ const POSITIONS = {
   glow: [0, 0.04, 0],
 } as const;
 
+// Создаём запасную текстуру с градиентом и золотой рамкой
+function createFallbackTexture(colorHex: string): THREE.CanvasTexture {
+  const canvas = document.createElement("canvas");
+  canvas.width = 128;
+  canvas.height = 176;
+  const ctx = canvas.getContext("2d")!;
+  
+  // Градиент
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, colorHex);
+  gradient.addColorStop(0.5, adjustBrightness(colorHex, 20));
+  gradient.addColorStop(1, colorHex);
+  
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Золотая рамка
+  ctx.strokeStyle = "#d4af37";
+  ctx.lineWidth = 4;
+  ctx.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
+  
+  // Внутренняя рамка
+  ctx.strokeStyle = "#c9a961";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(12, 12, canvas.width - 24, canvas.height - 24);
+  
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.anisotropy = 8;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.LinearMipMapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  
+  return texture;
+}
+
+function adjustBrightness(hex: string, percent: number): string {
+  const num = parseInt(hex.replace("#", ""), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = Math.min(255, (num >> 16) + amt);
+  const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
+  const B = Math.min(255, (num & 0x0000FF) + amt);
+  return `#${(0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1)}`;
+}
+
 export function Book({
   isRotating,
   coverImage = "/book-cover.jpg",
   spineImage = "/book-spine.jpg",
   backCoverImage = "/book-cover.jpg",
-  rotationSpeed = DEFAULT_ROTATION_SPEED
+  rotationSpeed = DEFAULT_ROTATION_SPEED,
+  color = "#1a0f0a"
 }: BookProps) {
   const bookRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
@@ -66,11 +115,22 @@ export function Book({
   const [backCoverTexture, setBackCoverTexture] = useState<THREE.Texture | null>(null);
 
   useEffect(() => {
-    textureManager.preloadBookTextures(coverImage, spineImage, backCoverImage);
-    setCoverTexture(textureManager.getTexture(coverImage, 'cover'));
-    setSpineTexture(textureManager.getTexture(spineImage, 'spine'));
-    setBackCoverTexture(textureManager.getTexture(backCoverImage, 'back'));
-  }, [coverImage, spineImage, backCoverImage]);
+    const loadTextures = async () => {
+      try {
+        const [cover, spine, back] = await Promise.all([
+          textureManager.loadTexture(coverImage).catch(() => createFallbackTexture(color)),
+          textureManager.loadTexture(spineImage).catch(() => createFallbackTexture(color)),
+          textureManager.loadTexture(backCoverImage).catch(() => createFallbackTexture(color))
+        ]);
+        setCoverTexture(cover);
+        setSpineTexture(spine);
+        setBackCoverTexture(back);
+      } catch (error) {
+        console.error('Failed to load book textures:', error);
+      }
+    };
+    loadTextures();
+  }, [coverImage, spineImage, backCoverImage, color]);
 
   const {
     fallbackCoverMaterial,

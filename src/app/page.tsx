@@ -152,8 +152,42 @@ export default function Home() {
 
     document.body.classList.add('theme-transitioning');
 
-    const bodyTheme = settings.theme === "auto-time" ? autoThemeConfig.colorClass : `${effectiveTheme}-theme`;
-    document.body.className = bodyTheme;
+    // Определяем эффективную тему для class на body
+    let themeClass: string;
+    let shouldAddDarkClass = false;
+
+    if (settings.theme === "auto-time") {
+      // Автоматическая тема по времени суток
+      themeClass = autoThemeConfig.colorClass;
+      // Для evening и night добавляем класс dark для shadcn компонентов
+      shouldAddDarkClass = autoThemeConfig.theme === "evening" || autoThemeConfig.theme === "night";
+    } else if (settings.theme === "auto") {
+      // Автоматическая тема по системной схеме
+      themeClass = `${effectiveTheme}-theme`;
+      shouldAddDarkClass = effectiveTheme === "dark";
+    } else if (settings.theme === "dark") {
+      // Явная тёмная тема
+      themeClass = "dark-theme";
+      shouldAddDarkClass = true;
+    } else if (settings.theme === "light") {
+      // Явная светлая тема
+      themeClass = "light-theme";
+      shouldAddDarkClass = false;
+    } else {
+      // Кастомные темы (blue, purple, ambient, relax)
+      themeClass = `${settings.theme}-theme`;
+      shouldAddDarkClass = false;
+    }
+
+    // Применяем класс темы
+    document.body.className = themeClass;
+
+    // Добавляем/удаляем класс dark для совместимости с shadcn/ui
+    if (shouldAddDarkClass) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
 
     trackThemeChange(settings.theme);
     trackEvent("settings", "theme_change", settings.theme);
@@ -281,10 +315,19 @@ export default function Home() {
   }, [showToast, captureMessage, captureException, importFavoritesFromFile]);
 
   // Вычисляем useMemo до условного return
-  const backgroundGradient = useMemo(() => settings.theme === "light" || settings.theme === "relax"
-    ? 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(180,160,80,0.12)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(160,140,70,0.08)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(255,255,255,0.9)_0%,transparent_50%)'
-    : 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.08)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.06)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(30,30,50,0.7)_0%,transparent_50%)',
-    [settings.theme]);
+  const backgroundGradient = useMemo(() => {
+    // Определяем, является ли тема светлой
+    const isLightTheme = settings.theme === "light" || settings.theme === "relax";
+    const isAutoLight = settings.theme === "auto" && effectiveTheme === "light";
+    const isAutoTimeLight = settings.theme === "auto-time" && 
+      (autoThemeConfig.theme === "morning" || autoThemeConfig.theme === "day");
+    
+    const isLight = isLightTheme || isAutoLight || isAutoTimeLight;
+    
+    return isLight
+      ? 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(180,160,80,0.12)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(160,140,70,0.08)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(255,255,255,0.9)_0%,transparent_50%)'
+      : 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.08)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.06)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(30,30,50,0.7)_0%,transparent_50%)';
+  }, [settings.theme, effectiveTheme, autoThemeConfig]);
 
   const gridPattern = useMemo(() => 'linear-gradient(rgba(212,175,55,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.5)_1px,transparent_1px)', []);
 
@@ -327,13 +370,14 @@ export default function Home() {
   return (
     <ToastProvider>
       <main
-        className="relative w-full h-screen overflow-hidden select-none bg-[#f5f5f0] dark:bg-[#07070d] light:bg-[#f5f5f0] relax:bg-[#f0f0eb]"
+        className="relative w-full h-screen overflow-hidden select-none"
         role="main"
         style={{
           paddingTop: 'var(--safe-area-inset-top)',
           paddingBottom: 'var(--safe-area-inset-bottom)',
           paddingLeft: 'var(--safe-area-inset-left)',
-          paddingRight: 'var(--safe-area-inset-right)'
+          paddingRight: 'var(--safe-area-inset-right)',
+          backgroundColor: 'var(--background)'
         }}
       >
         <a href="#quotes" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-amber-600 focus:text-white focus:rounded-lg">

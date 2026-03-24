@@ -181,7 +181,7 @@ class TextureManager {
     }
   }
 
-  private loadTexture(imagePath: string): Promise<THREE.Texture> {
+  public async loadTexture(imagePath: string): Promise<THREE.Texture> {
     return new Promise((resolve, reject) => {
       const loader = new THREE.TextureLoader();
 
