@@ -21,15 +21,32 @@ interface SceneProps {
   theme?: string;
   onKeyboardRotate?: () => void;
   rotationSpeed?: number;
+  particleCount?: number;
 }
 
-const SceneContent = memo(function SceneContent({ isRotating, coverImage, spineImage, backCoverImage, theme, rotationSpeed }: { isRotating: boolean; coverImage?: string; spineImage?: string; backCoverImage?: string; theme?: string; rotationSpeed?: number }) {
+const SceneContent = memo(function SceneContent({
+  isRotating,
+  coverImage,
+  spineImage,
+  backCoverImage,
+  theme,
+  rotationSpeed,
+  particleCount
+}: {
+  isRotating: boolean;
+  coverImage?: string;
+  spineImage?: string;
+  backCoverImage?: string;
+  theme?: string;
+  rotationSpeed?: number;
+  particleCount?: number;
+}) {
   return (
     <>
       <Lighting theme={theme} />
       <Book isRotating={isRotating} coverImage={coverImage} spineImage={spineImage} backCoverImage={backCoverImage} rotationSpeed={rotationSpeed} />
       <Podium />
-      <ParticleRingOptimized isRotating={isRotating} />
+      <ParticleRingOptimized isRotating={isRotating} particleCount={particleCount} />
       <Sparkles count={20} scale={4} size={1.5} speed={0.1} color="#d4af37" opacity={0.25} />
       <ContactShadows position={[0, -0.78, 0]} opacity={0.4} scale={5} blur={2.5} far={3} color="#000" />
       {theme && <ThemeParticleEffect activeTheme={theme} />}
@@ -139,6 +156,7 @@ export const Scene = memo(function Scene({
   theme,
   onKeyboardRotate,
   rotationSpeed = 0.5,
+  particleCount = 200,
 }: SceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { cameraState, isLoaded, updateZoom, resetCamera, updatePosition } = useCameraPersistence();
@@ -252,6 +270,7 @@ export const Scene = memo(function Scene({
           backCoverImage={backCoverImage}
           theme={theme}
           rotationSpeed={rotationSpeed}
+          particleCount={particleCount}
         />
         <KeyboardHandler
           onRotate={onKeyboardRotate || (() => {})}
