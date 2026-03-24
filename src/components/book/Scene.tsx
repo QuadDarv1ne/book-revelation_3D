@@ -126,7 +126,7 @@ function KeyboardHandler({ onRotate, onZoomIn, onZoomOut, onReset, updatePositio
   useEffect(() => {
     const canvas = gl.domElement;
     canvas.setAttribute('role', 'application');
-    canvas.setAttribute('aria-label', 'Интерактивная 3D сцена. Используйте стрелки для навигации, пробел для управления вращением.');
+    canvas.setAttribute('aria-label', 'Интерактивная 3D сцена. Используйте стрелки для навигации, пробел для вращения, +/− для масштаба, 0 для сброса.');
     canvas.setAttribute('tabindex', '0');
     canvas.addEventListener('keydown', handleKeyDown);
     return () => canvas.removeEventListener('keydown', handleKeyDown);
