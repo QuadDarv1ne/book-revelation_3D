@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { QuotesPanel } from "@/components/quotes";
 import { WebGLError, useWebGLSupport, SettingsBar, PWAInstall, ToastProvider, BookSelector, MainMenu } from "@/components/ui";
 import { SceneContainer } from "@/components/book/SceneContainer";
+import { generateBookJsonLd } from "@/lib/seo/book-metadata";
 import { usePrefersColorScheme } from "@/hooks/use-prefers-color-scheme";
 import { useOfflineQuotes } from "@/hooks/use-offline-quotes";
 import { useAnalytics, trackBookChange, trackThemeChange } from "@/hooks/use-analytics";
@@ -281,28 +282,37 @@ export default function Home() {
 
   const gridPattern = useMemo(() => 'linear-gradient(rgba(212,175,55,0.5)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.5)_1px,transparent_1px)', []);
 
-  const jsonLd = useMemo(() => JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Book Revelation 3D",
-    "alternateName": ["Откровение Книги 3D", "Stoic Book 3D"],
-    "url": "https://book-revelation-3d.vercel.app",
-    "description": "Интерактивный 3D модуль с вращающейся книгой философии и цитатами великих мыслителей",
-    "applicationCategory": "EducationalApplication",
-    "operatingSystem": "Any",
-    "browserRequirements": "Requires JavaScript",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "author": {
-      "@type": "Person",
-      "name": "Book Revelation 3D Team"
-    },
-    "keywords": "стоицизм, 3D книга, Марк Аврелий, Эпиктет, Стивен Хокинг, философия, цитаты",
-    "inLanguage": ["ru", "en", "zh", "he", "es", "fr"]
-  }), []);
+  const jsonLd = useMemo(() => {
+    const baseSchema = {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Book Revelation 3D",
+      "alternateName": ["Откровение Книги 3D", "Stoic Book 3D"],
+      "url": "https://book-revelation-3d.vercel.app",
+      "description": "Интерактивный 3D модуль с вращающейся книгой философии и цитатами великих мыслителей",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Book Revelation 3D Team"
+      },
+      "keywords": "стоицизм, 3D книга, Марк Аврелий, Эпиктет, Стивен Хокинг, философия, цитаты",
+      "inLanguage": ["ru", "en", "zh", "he", "es", "fr", "de"]
+    };
+
+    const bookSchema = JSON.parse(generateBookJsonLd(activeBook));
+
+    return JSON.stringify({
+      ...baseSchema,
+      "@graph": [baseSchema, bookSchema]
+    });
+  }, [activeBook]);
 
   if (hasWebGL === false || webGLError) {
     return <WebGLError onRetry={handleRetry} />;

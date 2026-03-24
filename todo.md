@@ -420,6 +420,10 @@
 - [x] Интеграция graphicsQuality в ParticleRingOptimized (25%/50%/100% частиц)
 - [x] Интеграция graphicsQuality в ThemeParticleEffect (15/30/50 частиц)
 - [x] UI селектор качества в SettingsBar (dropdown с иконками 🔽◀️🔼)
+- [x] Улучшены SEO метаданные (layout.tsx: расширенные keywords, alternates languages)
+- [x] Создана утилита book-metadata.ts для book-specific SEO
+- [x] Добавлен JSON-LD Book schema для каждой книги
+- [x] Обновлены language alternates (ru/en/zh/he/es/fr/de)
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
