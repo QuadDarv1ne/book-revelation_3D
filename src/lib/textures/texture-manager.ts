@@ -12,6 +12,14 @@ interface TextureManagerOptions {
   maxRetries?: number;
   maxCacheSize?: number;
   onTextureLoadError?: (path: string, error: Error) => void;
+  useSVGPlaceholders?: boolean;
+}
+
+interface TextureLoadReport {
+  path: string;
+  success: boolean;
+  error?: Error;
+  timestamp: number;
 }
 
 interface LoadPriority {
@@ -23,18 +31,22 @@ interface LoadPriority {
 const PRIORITY: LoadPriority = { cover: 0, spine: 1, back: 2 };
 const MAX_CACHE_SIZE = 50;
 const PLACEHOLDER_CACHE = new Map<string, THREE.CanvasTexture>();
+const ERROR_LOG: TextureLoadReport[] = [];
+const MAX_ERROR_LOG_SIZE = 50;
 
 class TextureManager {
   private cache = new Map<string, TextureCacheEntry>();
   private readonly maxRetries: number;
   private readonly maxCacheSize: number;
   private readonly onTextureLoadError?: (path: string, error: Error) => void;
+  private readonly useSVGPlaceholders: boolean;
   private preloadPromises = new Map<string, Promise<THREE.Texture>>();
 
   constructor(options?: TextureManagerOptions) {
     this.maxRetries = options?.maxRetries ?? 3;
     this.maxCacheSize = options?.maxCacheSize ?? MAX_CACHE_SIZE;
     this.onTextureLoadError = options?.onTextureLoadError;
+    this.useSVGPlaceholders = options?.useSVGPlaceholders ?? false;
   }
 
   getTexture(imagePath: string, type: 'cover' | 'spine' | 'back'): THREE.Texture {
@@ -148,6 +160,7 @@ class TextureManager {
         return await this.loadTexture(path);
       } catch (error) {
         lastError = error as Error;
+        this.logError(path, error as Error);
         if (attempt < retries - 1) {
           await new Promise(resolve => setTimeout(resolve, 100 * (attempt + 1)));
         }
@@ -155,6 +168,17 @@ class TextureManager {
     }
 
     throw lastError ?? new Error(`Failed to load texture: ${path}`);
+  }
+
+  private logError(path: string, error: Error): void {
+    ERROR_LOG.push({ path, success: false, error, timestamp: Date.now() });
+    if (ERROR_LOG.length > MAX_ERROR_LOG_SIZE) {
+      ERROR_LOG.shift();
+    }
+    // В development режиме логируем ошибки в консоль
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[TextureManager] Failed to load: ${path}`, error);
+    }
   }
 
   private loadTexture(imagePath: string): Promise<THREE.Texture> {
@@ -218,9 +242,93 @@ class TextureManager {
     const cached = PLACEHOLDER_CACHE.get(cacheKey);
     if (cached) return cached;
 
-    const placeholder = type === 'spine' ? this.createSpinePlaceholder() : this.createCoverPlaceholder();
+    const placeholder = this.useSVGPlaceholders
+      ? this.createSVGPlaceholder(type)
+      : (type === 'spine' ? this.createSpinePlaceholder() : this.createCoverPlaceholder());
     PLACEHOLDER_CACHE.set(cacheKey, placeholder);
     return placeholder;
+  }
+
+  // SVG заглушка с градиентом и рамкой
+  private createSVGPlaceholder(type: 'cover' | 'spine' | 'back'): THREE.CanvasTexture {
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const width = type === 'spine' ? 32 : 128;
+    const height = type === 'spine' ? 176 : 176;
+
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('width', String(width));
+    svg.setAttribute('height', String(height));
+
+    // Градиент
+    const defs = document.createElementNS(svgNS, 'defs');
+    const gradient = document.createElementNS(svgNS, 'linearGradient');
+    gradient.setAttribute('id', 'grad');
+    gradient.setAttribute('x1', '0%');
+    gradient.setAttribute('y1', '0%');
+    gradient.setAttribute('x2', '100%');
+    gradient.setAttribute('y2', '100%');
+
+    const stop1 = document.createElementNS(svgNS, 'stop');
+    stop1.setAttribute('offset', '0%');
+    stop1.setAttribute('stop-color', '#1a0f0a');
+
+    const stop2 = document.createElementNS(svgNS, 'stop');
+    stop2.setAttribute('offset', '50%');
+    stop2.setAttribute('stop-color', '#2a1810');
+
+    const stop3 = document.createElementNS(svgNS, 'stop');
+    stop3.setAttribute('offset', '100%');
+    stop3.setAttribute('stop-color', '#1a0f0a');
+
+    gradient.appendChild(stop1);
+    gradient.appendChild(stop2);
+    gradient.appendChild(stop3);
+    defs.appendChild(gradient);
+    svg.appendChild(defs);
+
+    // Фон с градиентом
+    const rect = document.createElementNS(svgNS, 'rect');
+    rect.setAttribute('width', String(width));
+    rect.setAttribute('height', String(height));
+    rect.setAttribute('fill', 'url(#grad)');
+    svg.appendChild(rect);
+
+    // Золотая рамка
+    const border = document.createElementNS(svgNS, 'rect');
+    border.setAttribute('x', '4');
+    border.setAttribute('y', '4');
+    border.setAttribute('width', String(width - 8));
+    border.setAttribute('height', String(height - 8));
+    border.setAttribute('fill', 'none');
+    border.setAttribute('stroke', '#d4af37');
+    border.setAttribute('stroke-width', '2');
+    svg.appendChild(border);
+
+    // Сериализация SVG
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d', { willReadFrequently: false })!;
+
+    return new Promise<THREE.CanvasTexture>((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.anisotropy = 4;
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.generateMipmaps = false;
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        resolve(texture);
+      };
+      img.src = url;
+    }) as unknown as THREE.CanvasTexture;
   }
 
   private createCoverPlaceholder(): THREE.CanvasTexture {
@@ -299,6 +407,14 @@ class TextureManager {
       else if (entry.promise) pending++;
     }
     return { size: this.cache.size, loaded, pending };
+  }
+
+  getErrorLog(): TextureLoadReport[] {
+    return [...ERROR_LOG];
+  }
+
+  clearErrorLog(): void {
+    ERROR_LOG.length = 0;
   }
 }
 
