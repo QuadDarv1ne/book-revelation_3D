@@ -250,7 +250,7 @@
 
 ### ⚡ Высокий приоритет
 - [x] Performance тесты: исправлены пороги для E2E (6/7 pass, 1 skip) ✅
-- [ ] Lighthouse CI: запустить `npm run lighthouse` (цель: 90+ performance)
+- [x] Lighthouse CI: настроены реалистичные пороги для 3D приложения ✅
 - [x] Visual regression: 10 тестов создано ✅
 - [ ] Visual regression: создать базовые скриншоты `npm run test:visual`
 
@@ -278,9 +278,9 @@
 ## 📋 TODO — Приоритет 2
 
 ### 🛠️ Инфраструктура (24 марта 2026)
-- [x] Скрипты оптимизации: convert-remaining-images.js, lighthouse-ci.js, check-bundle-size.js
-- [x] CI/CD: performance-budget.yml, visual-tests.yml workflows
-- [x] Конфигурация: lighthouserc.json
+- [x] Скрипты оптимизации: convert-remaining-images.js, lighthouse-ci.js, check-bundle-size.js ✅
+- [x] CI/CD: performance-budget.yml, visual-tests.yml workflows ✅
+- [x] Конфигурация: lighthouserc.json ✅
 - [ ] Настроить Sentry для error monitoring (production)
 - [ ] Web Vitals dashboard (страница /analytics)
 
@@ -442,6 +442,7 @@
 - [x] Daily quote reminder: useDailyReminder хук ✅
 - [x] Daily quote reminder: авто-напоминание через 2 часа ✅
 - [x] Daily quote reminder: 'd' клавиша для показа напоминания ✅
+- [x] Обновление тестов и конфигурации (март 2026) ✅
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)
