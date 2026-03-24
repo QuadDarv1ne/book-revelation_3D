@@ -42,12 +42,12 @@ const POSITIONS = {
   glow: [0, 0.04, 0],
 } as const;
 
-export function Book({ 
-  isRotating, 
-  coverImage = "/book-cover.jpg", 
-  spineImage = "/book-spine.jpg", 
-  backCoverImage = "/book-cover.jpg", 
-  rotationSpeed = DEFAULT_ROTATION_SPEED 
+export function Book({
+  isRotating,
+  coverImage = "/book-cover.jpg",
+  spineImage = "/book-spine.jpg",
+  backCoverImage = "/book-cover.jpg",
+  rotationSpeed = DEFAULT_ROTATION_SPEED
 }: BookProps) {
   const bookRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
