@@ -22,6 +22,7 @@ interface SceneProps {
   onKeyboardRotate?: () => void;
   rotationSpeed?: number;
   particleCount?: number;
+  graphicsQuality?: 'low' | 'medium' | 'high';
 }
 
 const SceneContent = memo(function SceneContent({
@@ -31,7 +32,8 @@ const SceneContent = memo(function SceneContent({
   backCoverImage,
   theme,
   rotationSpeed,
-  particleCount
+  particleCount,
+  graphicsQuality
 }: {
   isRotating: boolean;
   coverImage?: string;
@@ -40,16 +42,17 @@ const SceneContent = memo(function SceneContent({
   theme?: string;
   rotationSpeed?: number;
   particleCount?: number;
+  graphicsQuality?: 'low' | 'medium' | 'high';
 }) {
   return (
     <>
       <Lighting theme={theme} />
       <Book isRotating={isRotating} coverImage={coverImage} spineImage={spineImage} backCoverImage={backCoverImage} rotationSpeed={rotationSpeed} />
       <Podium />
-      <ParticleRingOptimized isRotating={isRotating} particleCount={particleCount} />
+      <ParticleRingOptimized isRotating={isRotating} particleCount={particleCount} graphicsQuality={graphicsQuality} />
       <Sparkles count={20} scale={4} size={1.5} speed={0.1} color="#d4af37" opacity={0.25} />
       <ContactShadows position={[0, -0.78, 0]} opacity={0.4} scale={5} blur={2.5} far={3} color="#000" />
-      {theme && <ThemeParticleEffect activeTheme={theme} />}
+      {theme && <ThemeParticleEffect activeTheme={theme} graphicsQuality={graphicsQuality} />}
     </>
   );
 });
@@ -157,6 +160,7 @@ export const Scene = memo(function Scene({
   onKeyboardRotate,
   rotationSpeed = 0.5,
   particleCount = 200,
+  graphicsQuality = 'high',
 }: SceneProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { cameraState, isLoaded, updateZoom, resetCamera, updatePosition } = useCameraPersistence();
@@ -249,8 +253,8 @@ export const Scene = memo(function Scene({
       </div>
       <Canvas
         ref={canvasRef}
-        camera={{ 
-          position: [initialCameraPosition.x, initialCameraPosition.y, initialCameraPosition.z], 
+        camera={{
+          position: [initialCameraPosition.x, initialCameraPosition.y, initialCameraPosition.z],
           fov,
           near: 0.1,
           far: 100,
@@ -271,6 +275,7 @@ export const Scene = memo(function Scene({
           theme={theme}
           rotationSpeed={rotationSpeed}
           particleCount={particleCount}
+          graphicsQuality={graphicsQuality}
         />
         <KeyboardHandler
           onRotate={onKeyboardRotate || (() => {})}

@@ -7,9 +7,14 @@ import { Points, PointMaterial } from "@react-three/drei";
 
 interface ThemeParticleEffectProps {
   activeTheme: string;
+  graphicsQuality?: 'low' | 'medium' | 'high';
 }
 
-const PARTICLE_COUNT = 50;
+const QUALITY_PARTICLE_COUNT = {
+  low: 15,
+  medium: 30,
+  high: 50,
+};
 
 // Цвета частиц для разных тем
 const THEME_COLORS = {
@@ -28,13 +33,14 @@ interface ParticleData {
   velocities: { x: number; y: number; z: number }[];
 }
 
-function createParticleData(activeTheme: keyof typeof THEME_COLORS): ParticleData {
-  const pos = new Float32Array(PARTICLE_COUNT * 3);
-  const cols = new Float32Array(PARTICLE_COUNT * 3);
+function createParticleData(activeTheme: keyof typeof THEME_COLORS, graphicsQuality: 'low' | 'medium' | 'high' = 'high'): ParticleData {
+  const particleCount = QUALITY_PARTICLE_COUNT[graphicsQuality];
+  const pos = new Float32Array(particleCount * 3);
+  const cols = new Float32Array(particleCount * 3);
   const velocities: { x: number; y: number; z: number }[] = [];
   const baseColor = new THREE.Color(THEME_COLORS[activeTheme]);
 
-  for (let i = 0; i < PARTICLE_COUNT; i++) {
+  for (let i = 0; i < particleCount; i++) {
     const radius = 0.5 + Math.random() * 1.5;
     const theta = Math.random() * Math.PI * 2;
     const phi = Math.random() * Math.PI;
@@ -57,7 +63,7 @@ function createParticleData(activeTheme: keyof typeof THEME_COLORS): ParticleDat
   return { positions: pos, colors: cols, velocities };
 }
 
-export function ThemeParticleEffect({ activeTheme }: ThemeParticleEffectProps) {
+export function ThemeParticleEffect({ activeTheme, graphicsQuality = 'high' }: ThemeParticleEffectProps) {
   const [showParticles, setShowParticles] = useState(false);
   const particlesRef = useRef<THREE.Points>(null);
   const particleDataRef = useRef<ParticleData | null>(null);
@@ -68,8 +74,8 @@ export function ThemeParticleEffect({ activeTheme }: ThemeParticleEffectProps) {
 
   // Инициализация частиц при монтировании
   useEffect(() => {
-    particleDataRef.current = createParticleData(activeTheme as keyof typeof THEME_COLORS);
-  }, [activeTheme]);
+    particleDataRef.current = createParticleData(activeTheme as keyof typeof THEME_COLORS, graphicsQuality);
+  }, [activeTheme, graphicsQuality]);
 
   // Эффект при смене темы с плавным переходом цвета
   useEffect(() => {
@@ -115,10 +121,11 @@ export function ThemeParticleEffect({ activeTheme }: ThemeParticleEffectProps) {
     const positionsArray = geometry.attributes.position.array as Float32Array;
     const colorsArray = geometry.attributes.color.array as Float32Array;
     const velocities = particleDataRef.current.velocities;
+    const particleCount = QUALITY_PARTICLE_COUNT[graphicsQuality];
 
     // Плавное изменение цвета к целевому
     if (targetColorRef.current) {
-      for (let i = 0; i < PARTICLE_COUNT; i++) {
+      for (let i = 0; i < particleCount; i++) {
         const idx = i * 3;
         // Интерполяция к целевому цвету
         colorsArray[idx] += colorVelocityRef.current.r;
@@ -127,7 +134,7 @@ export function ThemeParticleEffect({ activeTheme }: ThemeParticleEffectProps) {
       }
     }
 
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
+    for (let i = 0; i < particleCount; i++) {
       positionsArray[i * 3] += velocities[i].x;
       positionsArray[i * 3 + 1] += velocities[i].y;
       positionsArray[i * 3 + 2] += velocities[i].z;
@@ -173,18 +180,18 @@ export function ThemeParticleEffect({ activeTheme }: ThemeParticleEffectProps) {
   if (!showParticles || !particleDataRef.current) return null;
 
   return (
-    <Points ref={particlesRef} limit={PARTICLE_COUNT}>
+    <Points ref={particlesRef} limit={QUALITY_PARTICLE_COUNT[graphicsQuality]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
           args={[particleDataRef.current.positions, 3]}
-          count={PARTICLE_COUNT}
+          count={QUALITY_PARTICLE_COUNT[graphicsQuality]}
           itemSize={3}
         />
         <bufferAttribute
           attach="attributes-color"
           args={[particleDataRef.current.colors, 3]}
-          count={PARTICLE_COUNT}
+          count={QUALITY_PARTICLE_COUNT[graphicsQuality]}
           itemSize={3}
         />
       </bufferGeometry>

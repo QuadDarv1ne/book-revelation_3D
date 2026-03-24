@@ -10,6 +10,7 @@ const RING_RADIUS = 1.5;
 interface ParticleRingOptimizedProps {
   isRotating: boolean;
   particleCount?: number;
+  graphicsQuality?: 'low' | 'medium' | 'high';
 }
 
 // Создаем кастомную геометрию для инстансинга частиц
@@ -42,12 +43,23 @@ function createParticleInstancedMesh(particleCount: number) {
   return { positions, colors, scales, phases, baseY };
 }
 
+const QUALITY_MULTIPLIERS = {
+  low: 0.25,
+  medium: 0.5,
+  high: 1,
+};
+
 export const ParticleRingOptimized = memo(function ParticleRingOptimized({
   isRotating,
-  particleCount = DEFAULT_PARTICLE_COUNT
+  particleCount = DEFAULT_PARTICLE_COUNT,
+  graphicsQuality = 'high'
 }: ParticleRingOptimizedProps) {
+  const effectiveParticleCount = useMemo(
+    () => Math.floor(particleCount * QUALITY_MULTIPLIERS[graphicsQuality]),
+    [particleCount, graphicsQuality]
+  );
   const meshRef = useRef<THREE.InstancedMesh>(null);
-  const particleData = useMemo(() => createParticleInstancedMesh(particleCount), [particleCount]);
+  const particleData = useMemo(() => createParticleInstancedMesh(effectiveParticleCount), [effectiveParticleCount]);
   const colorRef = useRef(new THREE.Color());
   const matrixRef = useRef(new THREE.Matrix4());
 
@@ -72,7 +84,7 @@ export const ParticleRingOptimized = memo(function ParticleRingOptimized({
     mesh.rotation.y += 0.002;
 
     // Обновляем позиции и цвета частиц
-    for (let i = 0; i < particleCount; i++) {
+    for (let i = 0; i < effectiveParticleCount; i++) {
       // Вертикальное движение
       const yOffset = Math.sin(time * 1.5 + phases[i]) * 0.03;
       const y = baseY[i] + yOffset;
@@ -109,7 +121,7 @@ export const ParticleRingOptimized = memo(function ParticleRingOptimized({
   return (
     <instancedMesh
       ref={meshRef}
-      args={[undefined, undefined, particleCount]}
+      args={[undefined, undefined, effectiveParticleCount]}
       frustumCulled={false}
     >
       <sphereGeometry args={[0.03, 8, 8]} />

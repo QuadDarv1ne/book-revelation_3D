@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo, useRef, useEffect, type ComponentType }
 import { useToast } from "./Toast";
 import { useFavorites } from "@/hooks/use-favorites";
 import { useI18n } from "@/hooks/use-i18n";
-import { useUserSettings } from "@/hooks/use-user-settings";
+import { useUserSettings, type GraphicsQuality } from "@/hooks/use-user-settings";
 import { BookProgressTracker } from "@/components/gamification/BookProgressTracker";
 
 interface IconProps {
@@ -75,6 +75,14 @@ function Check({ className }: IconProps) {
   );
 }
 
+function Quality({ className }: IconProps) {
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+    </svg>
+  );
+}
+
 interface ThemeOption {
   value: "dark" | "light" | "blue" | "purple" | "ambient" | "relax" | "auto" | "auto-time";
   label: string;
@@ -115,8 +123,10 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
   const [rotationSpeed, setRotationSpeed] = useState(0.5);
   const [showSpeedPresets, setShowSpeedPresets] = useState(false);
   const [showProgress, setShowProgress] = useState(false);
+  const [showQualityDropdown, setShowQualityDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const speedRef = useRef<HTMLDivElement>(null);
+  const qualityRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
   const { exportFavorites, importFavorites } = useFavorites();
   const { t } = useI18n();
@@ -141,6 +151,17 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
     { value: 2, label: '⚡' },
   ], []);
 
+  const QUALITY_OPTIONS = useMemo(() => [
+    { value: 'low' as GraphicsQuality, label: 'Низкое', icon: '🔽' },
+    { value: 'medium' as GraphicsQuality, label: 'Среднее', icon: '◀️' },
+    { value: 'high' as GraphicsQuality, label: 'Высокое', icon: '🔼' },
+  ], []);
+
+  const currentQuality = useMemo(() =>
+    QUALITY_OPTIONS.find(q => q.value === settings.graphicsQuality) || QUALITY_OPTIONS[2],
+    [settings.graphicsQuality, QUALITY_OPTIONS]
+  );
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -148,6 +169,9 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
       }
       if (speedRef.current && !speedRef.current.contains(event.target as Node)) {
         setShowSpeedPresets(false);
+      }
+      if (qualityRef.current && !qualityRef.current.contains(event.target as Node)) {
+        setShowQualityDropdown(false);
       }
     };
 
@@ -164,6 +188,12 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
     updateSettings('rotationSpeed', newSpeed);
     showToast(`Скорость: ${newSpeed.toFixed(2)}x`, "info");
   }, [updateSettings, showToast]);
+
+  const handleQualityChange = useCallback((newQuality: GraphicsQuality) => {
+    updateSettings('graphicsQuality', newQuality);
+    showToast(`Качество: ${QUALITY_OPTIONS.find(q => q.value === newQuality)?.label}`, "info");
+    setShowQualityDropdown(false);
+  }, [updateSettings, showToast, QUALITY_OPTIONS]);
 
   const handleResetSettings = useCallback(() => {
     updateSettings('rotationSpeed', 0.5);
@@ -317,6 +347,46 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
             </div>
 
             <div className="w-px h-6 bg-gradient-to-b from-transparent via-[rgba(212,175,55,0.2)] to-transparent mx-1" />
+
+            {/* Качество графики */}
+            <div className="relative" ref={qualityRef}>
+              <button
+                onClick={() => setShowQualityDropdown(!showQualityDropdown)}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[rgba(212,175,55,0.1)] hover:bg-[rgba(212,175,55,0.15)] transition-all focus:outline-none focus:ring-2 focus:ring-amber-400 min-h-[44px]"
+                aria-label="Качество графики"
+                aria-expanded={showQualityDropdown}
+                type="button"
+              >
+                <Quality className="w-4 h-4 text-amber-400" aria-hidden="true" />
+                <span className="text-sm text-amber-100">{currentQuality.icon}</span>
+                <ChevronDown className={`w-3 h-3 text-amber-400/60 transition-transform ${showQualityDropdown ? "rotate-180" : ""}`} aria-hidden="true" />
+              </button>
+
+              {showQualityDropdown && (
+                <div className="absolute bottom-full left-0 mb-2 w-40 rounded-xl overflow-hidden backdrop-blur-xl bg-[rgba(15,15,25,0.98)] border border-[rgba(212,175,55,0.2)] shadow-[0_8px_32px_rgba(0,0,0,0.5)] animate-in fade-in slide-in-from-bottom-2 duration-200">
+                  <div className="p-2 space-y-1">
+                    {QUALITY_OPTIONS.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => {
+                          handleQualityChange(option.value);
+                          setShowQualityDropdown(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all ${
+                          settings.graphicsQuality === option.value
+                            ? "bg-[rgba(212,175,55,0.2)] text-amber-100"
+                            : "text-amber-100/70 hover:bg-[rgba(212,175,55,0.1)] hover:text-amber-100"
+                        }`}
+                        type="button"
+                      >
+                        <span className="text-lg">{option.icon}</span>
+                        <span className="text-sm text-amber-400/60">{option.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
 
             {/* Кнопка расширения */}
             <button
