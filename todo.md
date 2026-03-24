@@ -416,6 +416,10 @@
 - [x] Performance E2E тесты: 7 тестов (6/7 pass)
 - [x] Gamification E2E тесты: 8 тестов
 - [x] Visual regression тесты: 10 тестов
+- [x] Настройка качества графики (low/medium/high с эмодзи иконками)
+- [x] Интеграция graphicsQuality в ParticleRingOptimized (25%/50%/100% частиц)
+- [x] Интеграция graphicsQuality в ThemeParticleEffect (15/30/50 частиц)
+- [x] UI селектор качества в SettingsBar (dropdown с иконками 🔽◀️🔼)
 
 ### v0.3.0 (план) 🔄
 - [x] Интеграция с Open Library API для обложек (обложки в public/book-covers/)

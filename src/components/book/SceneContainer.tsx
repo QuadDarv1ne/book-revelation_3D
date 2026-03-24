@@ -89,6 +89,7 @@ export function SceneContainer({ book, rotationSpeed, onError }: SceneContainerP
         theme={settings.theme}
         onKeyboardRotate={toggleRotation}
         rotationSpeed={rotationSpeed}
+        graphicsQuality={settings.graphicsQuality}
       />
     </>
   );
