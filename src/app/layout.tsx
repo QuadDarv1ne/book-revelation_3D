@@ -44,9 +44,17 @@ export const metadata: Metadata = {
     default: "Book Revelation 3D — Откровение Книги",
     template: "%s | Book Revelation 3D",
   },
-  description: "Интерактивный 3D модуль с вращающейся книгой стоической философии. Цитаты Марка Аврелия, Эпиктета, Стивена Хокинга и других великих мыслителей.",
-  keywords: ["стоицизм", "3D книга", "Марк Аврелий", "Эпиктет", "Стивен Хокинг", "философия", "Three.js", "React", "цитаты великих людей"],
-  authors: [{ name: "Book Revelation 3D Team" }],
+  description: "Интерактивный 3D модуль с вращающейся книгой стоической философии. Цитаты Марка Аврелия, Эпиктета, Сенеки, Сунь-цзы, Стивена Хокинга и Клейтона Кристенсена.",
+  keywords: [
+    "стоицизм", "3D книга", "Марк Аврелий", "Эпиктет", "Сенека", "Сунь-цзы",
+    "Стивен Хокинг", "Клейтон Кристенсен", "философия", "Three.js", "React",
+    "цитаты великих людей", "медитации", "искусство побеждать", "теория всего",
+    "закон успешных инноваций", "наше благо"
+  ],
+  authors: [
+    { name: "Book Revelation 3D Team" },
+    { name: "Stoic Philosophy Project" }
+  ],
   creator: "Book Revelation 3D Team",
   publisher: "Book Revelation 3D",
   robots: {
@@ -78,7 +86,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Book Revelation 3D — Откровение Книги",
-    description: "Интерактивный 3D модуль с цитатами стоических философов",
+    description: "Интерактивный 3D модуль с цитатами стоических философов и великих мыслителей. 6 книг, 100+ цитат, геймификация, PWA.",
     type: "website",
     locale: "ru_RU",
     siteName: "Book Revelation 3D",
@@ -95,13 +103,21 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Book Revelation 3D — Откровение Книги",
-    description: "Интерактивный 3D модуль с цитатами стоических философов",
-    creator: "@bookrevelation3d",
+    description: "Интерактивный 3D модуль с цитатами стоических философов и великих мыслителей",
     images: ["/og-image.png"],
   },
   metadataBase: new URL("https://book-revelation-3d.vercel.app"),
   alternates: {
     canonical: "/",
+    languages: {
+      'ru': '/ru',
+      'en': '/en',
+      'zh': '/zh',
+      'he': '/he',
+      'es': '/es',
+      'fr': '/fr',
+      'de': '/de',
+    },
   },
 };
 
