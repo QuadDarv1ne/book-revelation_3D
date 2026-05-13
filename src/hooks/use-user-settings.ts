@@ -15,7 +15,7 @@ interface Quote {
   bookId?: string;
 }
 
-interface Achievement {
+export interface Achievement {
   id: string;
   unlockedAt: string;
   progress: number;
@@ -228,6 +228,15 @@ export function useUserSettings() {
     });
   }, []);
 
+  const updateAchievement = useCallback((achievementId: string, updates: Partial<Achievement>) => {
+    setSettings(prev => ({
+      ...prev,
+      achievements: prev.achievements.map(a =>
+        a.id === achievementId ? { ...a, ...updates } : a
+      ),
+    }));
+  }, []);
+
   const exportSettings = useCallback(() => {
     const data = {
       favorites: settings.favorites,
@@ -301,6 +310,7 @@ export function useUserSettings() {
     removeFavorite,
     isFavorite,
     unlockAchievement,
+    updateAchievement,
     exportSettings,
     importSettings,
     resetSettings,

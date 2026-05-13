@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { useUserSettings } from "./use-user-settings";
+import { useUserSettings, type Achievement as PersistedAchievement } from "./use-user-settings";
 import { STOIC_QUOTES } from "@/data/stoic-quotes";
 
 /**
@@ -465,8 +465,77 @@ function getThemeOfDay(): ThemeOfDay {
  * Хук для управления геймификацией
  */
 export function useGamification() {
-  const { settings, updateStatistics } = useUserSettings();
-  const [achievements, setAchievements] = useState<Achievement[]>(INITIAL_ACHIEVEMENTS);
+  const { settings, updateStatistics, unlockAchievement, updateAchievement } = useUserSettings();
+  const [achievements, setAchievements] = useState<Achievement[]>(() => {
+    // Read persisted settings synchronously from localStorage
+    let persistedAchievements: PersistedAchievement[] = [];
+    let persistedStats = { rotations: 0, quotesRead: 0, timeSpent: 0, booksViewed: [], themesExplored: [] };
+    let persistedFavorites: unknown[] = [];
+    try {
+      const saved = localStorage.getItem('user-settings');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        persistedAchievements = parsed.achievements || [];
+        persistedStats = parsed.statistics || persistedStats;
+        persistedFavorites = parsed.favorites || [];
+      }
+    } catch { /* ignore parse errors */ }
+
+    // Build lookup map from persisted achievements
+    const persistedMap = new Map<string, PersistedAchievement>();
+    for (const pa of persistedAchievements) {
+      persistedMap.set(pa.id, pa);
+    }
+
+    // Merge persisted state with definitions
+    return INITIAL_ACHIEVEMENTS.map(def => {
+      const persisted = persistedMap.get(def.id);
+      if (!persisted) return { ...def };
+
+      const isUnlocked = !!persisted.unlockedAt;
+      let progress = persisted.progress ?? def.progress;
+
+      // Restore progress from statistics for achievements without explicit progress
+      if (!persisted.progress) {
+        switch (def.id) {
+          case 'rotation_master':
+          case 'rotation_expert':
+          case 'rotation_legend':
+            progress = persistedStats.rotations;
+            break;
+          case 'theme_explorer':
+          case 'theme_master':
+            progress = persistedStats.themesExplored.length;
+            break;
+          case 'book_collector':
+          case 'book_library':
+            progress = persistedStats.booksViewed.length;
+            break;
+          case 'stoic_scholar':
+          case 'stoic_philosopher':
+          case 'stoic_sage':
+            progress = persistedStats.quotesRead;
+            break;
+          case 'favorites_curator':
+          case 'favorites_master':
+            progress = persistedFavorites.length;
+            break;
+          case 'zen_master':
+            progress = persistedStats.timeSpent;
+            break;
+        }
+      }
+
+      progress = Math.min(progress, def.maxProgress);
+
+      return {
+        ...def,
+        unlocked: isUnlocked || progress >= def.maxProgress,
+        unlockedAt: persisted.unlockedAt ? new Date(persisted.unlockedAt) : undefined,
+        progress,
+      };
+    });
+  });
   const [quoteOfDay, setQuoteOfDay] = useState<QuoteOfDay>(getQuoteForToday);
   const [themeOfDay, setThemeOfDay] = useState<ThemeOfDay>(getThemeOfDay);
   const [showAchievement, setShowAchievement] = useState<Achievement | null>(null);
@@ -479,7 +548,15 @@ export function useGamification() {
         const shouldUnlock = newProgress >= ach.maxProgress && !ach.unlocked;
 
         if (shouldUnlock) {
-          setTimeout(() => setShowAchievement({ ...ach, unlocked: true }), 500);
+          const unlockTime = new Date();
+          unlockAchievement({
+            id: ach.id,
+            unlockedAt: unlockTime.toISOString(),
+            progress: ach.maxProgress,
+          });
+          setTimeout(() => setShowAchievement({ ...ach, unlocked: true, unlockedAt: unlockTime }), 500);
+        } else if (newProgress > ach.progress) {
+          updateAchievement(ach.id, { progress: newProgress });
         }
 
         return {
@@ -491,7 +568,7 @@ export function useGamification() {
       }
       return ach;
     }));
-  }, []);
+  }, [unlockAchievement, updateAchievement]);
 
   // Обновление прогресса при посещении - используем ref для избежания setState в effect
   const hasInitializedVisitRef = useRef(false);
