@@ -86,36 +86,36 @@ export const books: Book[] = [
     title: "Размышления",
     author: "Марк Аврелий",
     description: "Личные записи римского императора о стоической философии",
-    coverImage: "/book-covers/marcus-aurelius-meditations.webp",
+    coverImage: "/book-covers/marcus-aurelius-meditations.svg",
     spineImage: "/book-spines/marcus-aurelius-meditations.webp",
     backCoverImage: "/book-covers/marcus-aurelius-meditations-back.webp",
     quotes: marcusAureliusQuotes,
     color: "#d4af37",
-    isbn: "9780140449334", // ISBN-13 для Penguin Classics edition
+    isbn: "9780140449334",
   },
   {
     id: "epictetus-our-good",
     title: "Наше благо",
     author: "Эпиктет",
     description: "Учения о добродетели и внутренней свободе",
-    coverImage: "/book-covers/epictetus-our-good.webp",
+    coverImage: "/book-covers/epictetus-our-good.svg",
     spineImage: "/book-spines/epictetus-our-good.webp",
     backCoverImage: "/book-covers/epictetus-our-good-back.webp",
     quotes: epictetusQuotes,
     color: "#c9a961",
-    isbn: "9780195041583", // ISBN-13 для Oxford University Press
+    isbn: "9780195041583",
   },
   {
     id: "seneca-letters",
     title: "Нравственные письма к Луцилию",
     author: "Сенека",
     description: "Философские письма о мудрости и добродетели",
-    coverImage: "/book-covers/seneca-letters.webp",
+    coverImage: "/book-covers/seneca-letters.svg",
     spineImage: "/book-spines/seneca-letters.webp",
     backCoverImage: "/book-covers/seneca-letters-back.webp",
     quotes: senecaQuotes,
     color: "#b89f5e",
-    isbn: "9780140442106", // ISBN-13 для Penguin Classics
+    isbn: "9780140442106",
   },
   {
     id: "sun-tzu-art-of-war",
@@ -127,7 +127,7 @@ export const books: Book[] = [
     backCoverImage: "/book-covers/sun-tzu-art-of-war-back.webp",
     quotes: sunTzuQuotes,
     color: "#a67c52",
-    isbn: "9781599869773", // ISBN-13 для Filiquarian Publishing
+    isbn: "9781599869773",
   },
   {
     id: "hawking-theory-of-everything",
@@ -138,8 +138,8 @@ export const books: Book[] = [
     spineImage: "/book-spines/hawking-theory-of-everything.webp",
     backCoverImage: "/book-covers/hawking-theory-of-everything-back.webp",
     quotes: hawkingQuotes,
-    color: "#8b7355",
-    isbn: "9780762476282", // ISBN-13 для Running Press
+    color: "#8b7b55",
+    isbn: "9780762476282",
   },
   {
     id: "christensen-innovators-solution",
@@ -147,11 +147,11 @@ export const books: Book[] = [
     author: "Клейтон Кристенсен",
     description: "Зачем клиент «нанимает» ваш продукт и как это помогает новым разработкам",
     coverImage: "/book-covers/christensen-innovators-solution.svg",
-    spineImage: "/book-spines/christensen-innovators-solution.svg",
+    spineImage: "/book-spines/christensen-innovators-solution.webp",
     backCoverImage: "/book-covers/christensen-innovators-solution-back.svg",
     quotes: christensenQuotes,
     color: "#9a7b4f",
-    isbn: "9781422185889", // ISBN-13 для Harvard Business Review Press
+    isbn: "9781422185889",
   },
 ];
 

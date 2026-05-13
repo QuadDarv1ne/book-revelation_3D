@@ -38,22 +38,19 @@ export function useBookMaterials({ coverTexture, backCoverTexture, spineTexture 
     const coverMaterial = new THREE.MeshStandardMaterial({
       map: coverTexture,
       roughness: 0.45,
-      metalness: 0.15,
-      color: "#ffffff"
+      metalness: 0.15
     });
 
     const backCoverMaterial = new THREE.MeshStandardMaterial({
       map: backCoverTexture,
       roughness: 0.45,
-      metalness: 0.15,
-      color: "#ffffff"
+      metalness: 0.15
     });
 
     const spineMaterial = new THREE.MeshStandardMaterial({
       map: spineTexture,
       roughness: 0.45,
-      metalness: 0.15,
-      color: "#ffffff"
+      metalness: 0.15
     });
 
     const pagesMaterial = new THREE.MeshStandardMaterial({

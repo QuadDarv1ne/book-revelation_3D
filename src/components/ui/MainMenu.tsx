@@ -36,6 +36,8 @@ const THEMES_DATA = [
   { value: "purple", labelKey: "theme.purple", color: "bg-[#3f2a5f]" },
   { value: "ambient", labelKey: "theme.ambient", color: "bg-[#1a3f2f]" },
   { value: "relax", labelKey: "theme.relax", color: "bg-[#d4dcc4]" },
+  { value: "auto", labelKey: "theme.auto", color: "bg-gradient-to-br from-[#1a1a1a] to-[#f5f5f5]" },
+  { value: "auto-time", labelKey: "theme.autoTime", color: "bg-gradient-to-br from-[#1e3a5f] to-[#f5f5f5]" },
 ] as const;
 
 export function MainMenu({

@@ -23,10 +23,15 @@ export function useFPSMonitor(enabled = true): FPSStats & { reset: () => void } 
   const totalFramesRef = useRef(0);
   const totalTimeRef = useRef(0);
   const rafIdRef = useRef<number | null>(null);
+  const isMountedRef = useRef(false);
 
   // Инициализация при монтировании
   useEffect(() => {
     lastTimeRef.current = performance.now();
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
   }, []);
 
   const reset = useCallback(() => {
@@ -46,6 +51,8 @@ export function useFPSMonitor(enabled = true): FPSStats & { reset: () => void } 
     if (!enabled) return;
 
     const measure = () => {
+      if (!isMountedRef.current) return;
+
       const now = performance.now();
       const delta = now - lastTimeRef.current;
       
@@ -64,7 +71,6 @@ export function useFPSMonitor(enabled = true): FPSStats & { reset: () => void } 
           ? (totalFramesRef.current / totalTimeRef.current) * 1000 
           : 60;
         
-        setFps(frameCountRef.current);
         setFrameTime(1000 / frameCountRef.current);
         setMin(Math.round(minRef.current));
         setMax(Math.round(maxRef.current));
