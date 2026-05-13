@@ -93,7 +93,7 @@ export default function Home() {
           break;
         case 'p':
           // Открыть прогресс книг (эмуляция клика)
-          const progressButton = document.querySelector('[aria-label="Прогресс чтения книг"]') as HTMLButtonElement;
+          const progressButton = document.querySelector('[data-testid="book-progress"]') as HTMLButtonElement;
           progressButton?.click();
           break;
         case 'q':
@@ -113,12 +113,12 @@ export default function Home() {
           break;
         case 's':
           // Открыть настройки
-          const settingsButton = document.querySelector('[aria-label="Панель настроек"]') as HTMLButtonElement;
+          const settingsButton = document.querySelector('[data-testid="settings-toggle"]') as HTMLButtonElement;
           settingsButton?.click();
           break;
         case 'g':
           // Открыть достижения
-          const achievementButton = document.querySelector('[aria-label="Достижения"]') as HTMLButtonElement;
+          const achievementButton = document.querySelector('[data-testid="achievements-toggle"]') as HTMLButtonElement;
           achievementButton?.click();
           break;
         case 'd':
@@ -179,8 +179,10 @@ export default function Home() {
       shouldAddDarkClass = false;
     }
 
-    // Применяем класс темы
-    document.body.className = themeClass;
+    // Применяем класс темы, сохраняя остальные классы (например, переменные шрифтов)
+    const themeClasses = ['dark-theme', 'light-theme', 'blue-theme', 'purple-theme', 'ambient-theme', 'relax-theme', 'morning-theme', 'day-theme', 'evening-theme', 'night-theme'];
+    document.body.classList.remove(...themeClasses);
+    document.body.classList.add(themeClass);
 
     // Добавляем/удаляем класс dark для совместимости с shadcn/ui
     if (shouldAddDarkClass) {

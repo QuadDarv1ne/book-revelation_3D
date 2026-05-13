@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "next dev -p 3000 2>&1 | tee dev.log",
     "build": "next build",
-    "build:analyze": "next build --webpack && set ANALYZE=true&& next build --webpack",
-    "build:docker": "set DOCKER=true&& next build",
+    "build:analyze": "set ANALYZE=true && next build",
+    "build:docker": "set DOCKER=true && next build",
     "start": "npx serve out",
     "start:docker": "node server.js",
     "lint": "eslint .",

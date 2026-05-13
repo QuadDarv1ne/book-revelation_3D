@@ -170,11 +170,11 @@ const INITIAL_ACHIEVEMENTS_DATA = [
   {
     id: "book_collector",
     title: "Коллекционер книг",
-    description: "Посмотрите все 5 книг",
+    description: "Посмотрите все 6 книг",
     icon: "📖",
     unlocked: false,
     progress: 0,
-    maxProgress: 5,
+    maxProgress: 6,
     category: "exploration",
   },
   {

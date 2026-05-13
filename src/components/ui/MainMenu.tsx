@@ -103,6 +103,7 @@ export function MainMenu({
           onClick={handleOpenGamification}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-600/20 to-yellow-600/20 border border-amber-500/30 text-amber-100 dark:text-amber-100 light:text-amber-900 relax:text-amber-900 hover:from-amber-600/30 hover:to-yellow-600/30 transition-all focus:outline-none focus:ring-2 focus:ring-amber-400"
           type="button"
+          data-testid="achievements-toggle"
         >
           <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
