@@ -502,16 +502,17 @@ export function useGamification() {
 
   // Обновление прогресса вращения
   const incrementRotations = useCallback(() => {
-    updateStatistics({ rotations: settings.statistics.rotations + 1 });
+    const newCount = settings.statistics.rotations + 1;
+    updateStatistics({ rotations: newCount });
 
-    if (settings.statistics.rotations + 1 >= 10) {
-      checkAchievement("rotation_master", 1);
+    if (newCount >= 10) {
+      checkAchievement("rotation_master", newCount);
     }
-    if (settings.statistics.rotations + 1 >= 50) {
-      checkAchievement("rotation_expert", 1);
+    if (newCount >= 50) {
+      checkAchievement("rotation_expert", newCount);
     }
-    if (settings.statistics.rotations + 1 >= 100) {
-      checkAchievement("rotation_legend", 1);
+    if (newCount >= 100) {
+      checkAchievement("rotation_legend", newCount);
     }
   }, [checkAchievement, settings.statistics.rotations, updateStatistics]);
 
@@ -542,13 +543,13 @@ export function useGamification() {
     updateStatistics({ quotesRead: newCount });
 
     if (newCount >= 5) {
-      checkAchievement("stoic_scholar", 1);
+      checkAchievement("stoic_scholar", newCount);
     }
     if (newCount >= 25) {
-      checkAchievement("stoic_philosopher", 1);
+      checkAchievement("stoic_philosopher", newCount);
     }
     if (newCount >= 100) {
-      checkAchievement("stoic_sage", 1);
+      checkAchievement("stoic_sage", newCount);
     }
   }, [checkAchievement, settings.statistics.quotesRead, updateStatistics]);
 

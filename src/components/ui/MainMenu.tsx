@@ -53,7 +53,6 @@ export function MainMenu({
   const { isOpen, setIsOpen, menuRef } = useMenuState();
   const [activeSection, setActiveSection] = useState<MenuSection>(null);
   const [showGamification, setShowGamification] = useState(false);
-  const [rotationSpeed, setRotationSpeed] = useState(0.5);
   const { showToast } = useToast();
   const { t, locale, setLocale } = useI18n();
 
@@ -72,12 +71,6 @@ export function MainMenu({
     setLocale(langValue);
     showToast(`Language: ${LANGUAGES.find(l => l.value === langValue)?.label || langValue}`, "success");
   }, [setLocale, showToast]);
-
-  const handleRotationSpeedChange = useCallback((speed: number) => {
-    setRotationSpeed(speed);
-    localStorage.setItem('rotationSpeed', speed.toString());
-    showToast(`Скорость: ${speed}`, "info");
-  }, [showToast]);
 
   const toggleSection = useCallback((section: MenuSection) => {
     setActiveSection(prev => prev === section ? null : section);
@@ -245,20 +238,6 @@ export function MainMenu({
                       </svg>
                       <span className="text-xs">{t('menu.zenMode')}</span>
                     </button>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-amber-400/60">{t('settings.speed')}:</span>
-                    <input
-                      type="range"
-                      min="0.1"
-                      max="2"
-                      step="0.1"
-                      value={rotationSpeed}
-                      onChange={(e) => handleRotationSpeedChange(parseFloat(e.target.value))}
-                      className="flex-1 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400"
-                      aria-label={t('settings.rotationSpeed')}
-                    />
-                    <span className="text-xs text-amber-400/60 w-8 text-right">{rotationSpeed}</span>
                   </div>
                 </div>
 

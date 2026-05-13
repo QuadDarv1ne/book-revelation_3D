@@ -28,7 +28,7 @@ export default function Home() {
   const hasWebGL = useWebGLSupport();
   const { trackEvent } = useAnalytics();
   const { themeConfig: autoThemeConfig } = useAutoTheme();
-  const { addThemeExplored, addBookViewed, trackTime, incrementCategoryRead, themeOfDay, completeThemeChallenge } = useGamification();
+  const { addThemeExplored, addBookViewed, trackTime, incrementCategoryRead, themeOfDay, completeThemeChallenge, incrementRotations } = useGamification();
   const { isZenMode, toggleZenMode } = useZenMode({ autoSave: true });
   const {
     settings,
@@ -455,7 +455,10 @@ export default function Home() {
                 theme={settings.theme}
                 onThemeChange={(t: string) => updateSettings('theme', t as typeof settings.theme)}
                 isRotating={menuIsRotating}
-                onToggleRotation={() => setMenuIsRotating(!menuIsRotating)}
+                onToggleRotation={() => {
+                  setMenuIsRotating(!menuIsRotating);
+                  incrementRotations();
+                }}
                 zenMode={isZenMode}
                 onToggleZenMode={toggleZenMode}
                 onExportFavorites={handleExportFavorites}
