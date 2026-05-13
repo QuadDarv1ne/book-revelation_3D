@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, createContext, useContext, useEffect } from "react";
+import { useState, useCallback, createContext, useContext, useEffect, useRef } from "react";
 
 interface Toast {
   id: number;
@@ -24,29 +24,39 @@ export function useToast() {
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const timersRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+
+  const removeToast = useCallback((id: number) => {
+    const timer = timersRef.current.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      timersRef.current.delete(id);
+    }
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
 
   const showToast = useCallback((message: string, type: Toast["type"] = "success") => {
     const id = Date.now();
     setToasts((prev) => [...prev, { id, message, type }]);
 
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 3000);
-  }, []);
+    const timer = setTimeout(() => {
+      removeToast(id);
+    }, 5000);
+    timersRef.current.set(id, timer);
+  }, [removeToast]);
 
   const dismissToast = useCallback((id: number) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
+    removeToast(id);
+  }, [removeToast]);
 
-  // Auto-dismiss toasts after 5 seconds (accessibility improvement)
+  // Cleanup all timers on unmount
   useEffect(() => {
-    if (toasts.length > 0) {
-      const timer = setTimeout(() => {
-        setToasts((prev) => prev.slice(1));
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [toasts]);
+    const timers = timersRef.current;
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer));
+      timers.clear();
+    };
+  }, []);
 
   return (
     <ToastContext.Provider value={{ showToast }}>

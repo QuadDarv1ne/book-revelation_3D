@@ -75,7 +75,7 @@ export function useWebGLMonitoring() {
 
       const webglGl = gl as WebGLRenderingContext;
       const debugInfo = webglGl.getExtension('WEBGL_debug_renderer_info');
-      const isWebGL2 = 'WEBGL2' in gl || canvas.getContext('webgl2') !== null;
+      const isWebGL2 = canvas.getContext('webgl2') !== null;
 
       const metrics: WebGLMetrics = {
         renderer: debugInfo 
@@ -134,7 +134,11 @@ export function useWebGLMonitoring() {
   }, []);
 
   // Мониторинг FPS
+  const isMonitoringRef = useRef(false);
+
   const monitorFPS = useCallback(() => {
+    if (!isMonitoringRef.current) return;
+
     const now = performance.now();
     frameCountRef.current++;
 
@@ -187,7 +191,7 @@ export function useWebGLMonitoring() {
 
   // Инициализация мониторинга
   useEffect(() => {
-    // Запускаем мониторинг FPS
+    isMonitoringRef.current = true;
     const fpsMonitorId = requestAnimationFrame(monitorFPS);
 
     // Проверяем поддержку WebGL при загрузке
@@ -201,6 +205,7 @@ export function useWebGLMonitoring() {
     }
 
     return () => {
+      isMonitoringRef.current = false;
       cancelAnimationFrame(fpsMonitorId);
     };
   }, [monitorFPS, checkWebGLSupport, trackEvent]);

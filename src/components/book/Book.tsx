@@ -107,8 +107,6 @@ export function Book({
   const touchState = useRef({ startX: 0, startY: 0, isDragging: false });
   const touchRotation = useRef({ x: 0, y: 0 });
   const targetRotation = useRef(0);
-  const lastHoveredRef = useRef(hovered);
-  lastHoveredRef.current = hovered;
 
   const [coverTexture, setCoverTexture] = useState<THREE.Texture | null>(null);
   const [spineTexture, setSpineTexture] = useState<THREE.Texture | null>(null);

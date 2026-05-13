@@ -242,15 +242,16 @@ class TextureManager {
     const cached = PLACEHOLDER_CACHE.get(cacheKey);
     if (cached) return cached;
 
-    const placeholder = this.useSVGPlaceholders
-      ? this.createSVGPlaceholder(type)
-      : (type === 'spine' ? this.createSpinePlaceholder() : this.createCoverPlaceholder());
+    // SVG placeholders are async, so we always use synchronous canvas placeholders here
+    const placeholder = type === 'spine'
+      ? this.createSpinePlaceholder()
+      : this.createCoverPlaceholder();
     PLACEHOLDER_CACHE.set(cacheKey, placeholder);
     return placeholder;
   }
 
   // SVG заглушка с градиентом и рамкой
-  private createSVGPlaceholder(type: 'cover' | 'spine' | 'back'): THREE.CanvasTexture {
+  private createSVGPlaceholder(type: 'cover' | 'spine' | 'back'): Promise<THREE.CanvasTexture> {
     const svgNS = 'http://www.w3.org/2000/svg';
     const width = type === 'spine' ? 32 : 128;
     const height = type === 'spine' ? 176 : 176;
@@ -328,7 +329,7 @@ class TextureManager {
         resolve(texture);
       };
       img.src = url;
-    }) as unknown as THREE.CanvasTexture;
+    });
   }
 
   private createCoverPlaceholder(): THREE.CanvasTexture {
