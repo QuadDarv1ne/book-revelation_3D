@@ -465,7 +465,7 @@ function getThemeOfDay(): ThemeOfDay {
  * Хук для управления геймификацией
  */
 export function useGamification() {
-  const { settings, updateStatistics, unlockAchievement, updateAchievement } = useUserSettings();
+  const { settings, updateStatistics, unlockAchievement, updateAchievement, addFavorite, removeFavorite } = useUserSettings();
   const [achievements, setAchievements] = useState<Achievement[]>(() => {
     // Read persisted settings synchronously from localStorage
     let persistedAchievements: PersistedAchievement[] = [];
@@ -675,10 +675,8 @@ export function useGamification() {
     }
   }, [checkAchievement]);
 
-  // Лайк цитаты с проверкой достижения
+  // Лайк цитаты с добавлением/удалением из избранного
   const toggleQuoteLike = useCallback(() => {
-    const favoritesCount = settingsRef.current.favorites.length;
-    const newCount = favoritesCount + 1;
     setQuoteOfDay(prev => {
       const newLiked = !prev.liked;
       // Сохраняем в localStorage
@@ -690,14 +688,38 @@ export function useGamification() {
       } catch {
         // Игнорируем ошибки localStorage
       }
+
+      // Добавляем или удаляем из реального списка избранного
+      const quote: { text: string; author: string } = { text: prev.quote, author: prev.author };
+      if (newLiked) {
+        addFavorite(quote);
+      } else {
+        removeFavorite(quote.text);
+      }
+
       return { ...prev, liked: newLiked };
     });
-    
-    if (newCount >= 10) {
-      checkAchievement("favorites_curator", newCount);
+  }, [addFavorite, removeFavorite]);
+
+  // Автоматическая проверка достижений при изменении избранного
+  useEffect(() => {
+    const favoritesCount = settings.favorites.length;
+    if (favoritesCount >= 10) {
+      checkAchievement("favorites_curator", favoritesCount);
     }
-    if (newCount >= 50) {
-      checkAchievement("favorites_master", newCount);
+    if (favoritesCount >= 50) {
+      checkAchievement("favorites_master", favoritesCount);
+    }
+  }, [settings.favorites.length, checkAchievement]);
+
+  // Проверка достижений за избранное (вызывается извне после обновления favorites)
+  const checkFavoritesAchievements = useCallback(() => {
+    const favoritesCount = settingsRef.current.favorites.length;
+    if (favoritesCount >= 10) {
+      checkAchievement("favorites_curator", favoritesCount);
+    }
+    if (favoritesCount >= 50) {
+      checkAchievement("favorites_master", favoritesCount);
     }
   }, [checkAchievement]);
 

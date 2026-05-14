@@ -43,13 +43,11 @@ function Copy({ className }: IconProps) {
 export function DailyChallenge() {
   const { quoteOfDay, toggleQuoteLike, themeOfDay, completeThemeChallenge } = useGamification();
   const { showToast } = useToast();
-  const [isLiked, setIsLiked] = useState(quoteOfDay.liked);
 
   const handleLike = useCallback(() => {
-    setIsLiked(prev => !prev);
     toggleQuoteLike();
-    showToast(isLiked ? "Удалено из избранного" : "Добавлено в избранное", isLiked ? "info" : "success");
-  }, [isLiked, toggleQuoteLike, showToast]);
+    showToast(!quoteOfDay.liked ? "Добавлено в избранное" : "Удалено из избранного", !quoteOfDay.liked ? "success" : "info");
+  }, [quoteOfDay.liked, toggleQuoteLike, showToast]);
 
   const handleShare = useCallback(async () => {
     const shareData = {
@@ -141,15 +139,15 @@ export function DailyChallenge() {
         <button
           onClick={handleLike}
           className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-amber-400 ${
-            isLiked
+            quoteOfDay.liked
               ? "bg-amber-500/20 text-amber-300"
               : "bg-white/5 text-gray-400 hover:text-amber-300 hover:bg-white/10"
           }`}
-          aria-label={isLiked ? "Удалить из избранного" : "Добавить в избранное"}
+          aria-label={quoteOfDay.liked ? "Удалить из избранного" : "Добавить в избранное"}
           type="button"
         >
-          <Heart className="w-4 h-4" filled={isLiked} />
-          <span className="text-xs">{isLiked ? "В избранном" : "В избранное"}</span>
+          <Heart className="w-4 h-4" filled={quoteOfDay.liked} />
+          <span className="text-xs">{quoteOfDay.liked ? "В избранном" : "В избранное"}</span>
         </button>
 
         <button
