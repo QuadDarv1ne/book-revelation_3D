@@ -112,6 +112,17 @@ export function Book({
   const [spineTexture, setSpineTexture] = useState<THREE.Texture | null>(null);
   const [backCoverTexture, setBackCoverTexture] = useState<THREE.Texture | null>(null);
 
+  // Track fallback textures to dispose them when book/color changes
+  const fallbackTexturesRef = useRef<THREE.CanvasTexture[]>([]);
+
+  // Cleanup fallback textures on unmount
+  useEffect(() => {
+    return () => {
+      fallbackTexturesRef.current.forEach(texture => texture.dispose());
+      fallbackTexturesRef.current = [];
+    };
+  }, []);
+
   useEffect(() => {
     const loadTextures = async () => {
       try {
@@ -120,6 +131,17 @@ export function Book({
           textureManager.loadTexture(spineImage).catch(() => createFallbackTexture(color)),
           textureManager.loadTexture(backCoverImage).catch(() => createFallbackTexture(color))
         ]);
+        // Dispose old fallback textures
+        fallbackTexturesRef.current.forEach(texture => texture.dispose());
+        fallbackTexturesRef.current = [];
+        
+        // Track new fallback textures for future cleanup
+        [cover, spine, back].forEach((texture, index) => {
+          if (texture instanceof THREE.CanvasTexture) {
+            fallbackTexturesRef.current.push(texture);
+          }
+        });
+        
         setCoverTexture(cover);
         setSpineTexture(spine);
         setBackCoverTexture(back);
@@ -166,8 +188,10 @@ export function Book({
     canvas.addEventListener("touchmove", handleTouchMove, { passive: true });
     canvas.addEventListener("touchend", handleTouchEnd);
     return () => {
-      canvas.removeEventListener("touchstart", handleTouchStart, { passive: true });
-      canvas.removeEventListener("touchmove", handleTouchMove, { passive: true });
+      // removeEventListener requires the same options as addEventListener
+      // Using capture: false (default) matches { passive: true } behavior
+      canvas.removeEventListener("touchstart", handleTouchStart);
+      canvas.removeEventListener("touchmove", handleTouchMove);
       canvas.removeEventListener("touchend", handleTouchEnd);
     };
   }, [gl.domElement, handleTouchStart, handleTouchMove, handleTouchEnd]);

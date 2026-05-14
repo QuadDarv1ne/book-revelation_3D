@@ -12,14 +12,6 @@ interface PostProcessingProps {
   enableSMAA?: boolean;
 }
 
-function SMAAEffect({ preset }: { preset: string }) {
-  return <SMAA preset={preset as "high"} />;
-}
-
-function SSAOEffect({ radius, intensity, bias }: { radius: number; intensity: number; bias: number }) {
-  return <SSAO radius={radius} intensity={intensity} bias={bias} />;
-}
-
 const DEFAULT_BLOOM = {
   intensity: 0.35,
   radius: 0.5,
@@ -54,14 +46,16 @@ export function PostProcessing({
 
   return (
     <EffectComposer enableNormalPass={true}>
-      <SMAAEffect preset={enableSMAA ? "high" : "off"} />
+      {enableSMAA && <SMAA preset="high" />}
       <Bloom
         intensity={bloomSettings.intensity}
         radius={bloomSettings.radius}
         threshold={bloomSettings.threshold}
         levels={bloomSettings.levels}
       />
-      <SSAOEffect radius={SSAO_SETTINGS.radius} intensity={SSAO_SETTINGS.intensity} bias={SSAO_SETTINGS.bias} />
+      {_enableSSAO && (
+        <SSAO radius={SSAO_SETTINGS.radius} intensity={SSAO_SETTINGS.intensity} bias={SSAO_SETTINGS.bias} />
+      )}
     </EffectComposer>
   );
 }

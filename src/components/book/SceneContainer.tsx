@@ -57,6 +57,7 @@ export function SceneContainer({ book, rotationSpeed, onError }: SceneContainerP
       const stats = textureManager.getCacheStats();
       if (stats.loaded >= 3) {
         setShowLoading(false);
+        clearInterval(interval);
       }
     };
     const interval = setInterval(checkTextures, 100);

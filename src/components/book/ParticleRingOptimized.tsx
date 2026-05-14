@@ -59,16 +59,26 @@ export const ParticleRingOptimized = memo(function ParticleRingOptimized({
     [particleCount, graphicsQuality]
   );
   const meshRef = useRef<THREE.InstancedMesh>(null);
+  const geometryRef = useRef<THREE.SphereGeometry | null>(null);
+  const materialRef = useRef<THREE.MeshBasicMaterial | null>(null);
   const particleData = useMemo(() => createParticleInstancedMesh(effectiveParticleCount), [effectiveParticleCount]);
   const colorRef = useRef(new THREE.Color());
   const matrixRef = useRef(new THREE.Matrix4());
 
   // Освобождаем память при размонтировании
   useEffect(() => {
-    const currentMesh = meshRef.current;
     return () => {
-      if (currentMesh) {
-        currentMesh.dispose();
+      const mesh = meshRef.current;
+      if (mesh) {
+        mesh.dispose();
+      }
+      if (geometryRef.current) {
+        geometryRef.current.dispose();
+        geometryRef.current = null;
+      }
+      if (materialRef.current) {
+        materialRef.current.dispose();
+        materialRef.current = null;
       }
     };
   }, []);
@@ -124,14 +134,8 @@ export const ParticleRingOptimized = memo(function ParticleRingOptimized({
       args={[undefined, undefined, effectiveParticleCount]}
       frustumCulled={false}
     >
-      <sphereGeometry args={[0.03, 8, 8]} />
-      <meshBasicMaterial
-        vertexColors
-        transparent
-        opacity={0.7}
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
+      <sphereGeometry ref={geometryRef} args={[0.03, 8, 8]} />
+      <meshBasicMaterial ref={materialRef} vertexColors transparent opacity={0.7} depthWrite={false} blending={THREE.AdditiveBlending} />
     </instancedMesh>
   );
 });

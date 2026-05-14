@@ -7,6 +7,12 @@ export function useDebounce<T extends (...args: Parameters<T>) => ReturnType<T>>
   delay: number
 ): (...args: Parameters<T>) => void {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const callbackRef = useRef(callback);
+
+  // Keep callback ref updated
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
 
   useEffect(() => {
     return () => {
@@ -21,7 +27,7 @@ export function useDebounce<T extends (...args: Parameters<T>) => ReturnType<T>>
       clearTimeout(timeoutRef.current);
     }
     timeoutRef.current = setTimeout(() => {
-      callback(...args);
+      callbackRef.current(...args);
     }, delay);
-  }, [callback, delay]);
+  }, [delay]);
 }
