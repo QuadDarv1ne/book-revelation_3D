@@ -166,8 +166,8 @@ export function Book({
     canvas.addEventListener("touchmove", handleTouchMove, { passive: true });
     canvas.addEventListener("touchend", handleTouchEnd);
     return () => {
-      canvas.removeEventListener("touchstart", handleTouchStart);
-      canvas.removeEventListener("touchmove", handleTouchMove);
+      canvas.removeEventListener("touchstart", handleTouchStart, { passive: true });
+      canvas.removeEventListener("touchmove", handleTouchMove, { passive: true });
       canvas.removeEventListener("touchend", handleTouchEnd);
     };
   }, [gl.domElement, handleTouchStart, handleTouchMove, handleTouchEnd]);

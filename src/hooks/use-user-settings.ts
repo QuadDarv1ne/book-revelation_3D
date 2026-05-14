@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Locale } from './use-i18n';
 
 export type Theme = 'dark' | 'light' | 'blue' | 'purple' | 'ambient' | 'relax' | 'auto' | 'auto-time';
@@ -111,6 +111,11 @@ function isValidGraphicsQuality(value: unknown): value is GraphicsQuality {
 export function useUserSettings() {
   const [settings, setSettings] = useState<UserSettings>(defaultSettings);
   const [isLoaded, setIsLoaded] = useState(false);
+  const settingsRef = useRef(settings);
+
+  useEffect(() => {
+    settingsRef.current = settings;
+  }, [settings]);
 
   useEffect(() => {
     try {
@@ -276,13 +281,14 @@ export function useUserSettings() {
       }
 
       if (data.statistics && typeof data.statistics === 'object') {
+        const currentStats = settingsRef.current.statistics;
         validatedData.statistics = {
-          ...settings.statistics,
-          timeSpent: typeof data.statistics.timeSpent === 'number' ? data.statistics.timeSpent : settings.statistics.timeSpent,
-          quotesRead: typeof data.statistics.quotesRead === 'number' ? data.statistics.quotesRead : settings.statistics.quotesRead,
-          rotations: typeof data.statistics.rotations === 'number' ? data.statistics.rotations : settings.statistics.rotations,
-          booksViewed: Array.isArray(data.statistics.booksViewed) ? data.statistics.booksViewed.slice(0, 50) : settings.statistics.booksViewed,
-          themesExplored: Array.isArray(data.statistics.themesExplored) ? data.statistics.themesExplored.slice(0, 50) : settings.statistics.themesExplored,
+          ...currentStats,
+          timeSpent: typeof data.statistics.timeSpent === 'number' ? data.statistics.timeSpent : currentStats.timeSpent,
+          quotesRead: typeof data.statistics.quotesRead === 'number' ? data.statistics.quotesRead : currentStats.quotesRead,
+          rotations: typeof data.statistics.rotations === 'number' ? data.statistics.rotations : currentStats.rotations,
+          booksViewed: Array.isArray(data.statistics.booksViewed) ? data.statistics.booksViewed.slice(0, 50) : currentStats.booksViewed,
+          themesExplored: Array.isArray(data.statistics.themesExplored) ? data.statistics.themesExplored.slice(0, 50) : currentStats.themesExplored,
         };
       }
 
@@ -291,7 +297,7 @@ export function useUserSettings() {
     } catch {
       return { success: false, error: 'Ошибка parsing JSON' };
     }
-  }, [settings.statistics]);
+  }, []);
 
   const resetSettings = useCallback(() => {
     setSettings(defaultSettings);

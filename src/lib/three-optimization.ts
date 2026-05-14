@@ -244,7 +244,7 @@ export function checkWebGLSupport(): {
     return { webgl2: false, draco: false, anisotropy: 1 };
   }
 
-  const isWebGL2 = 'webgl2' in canvas;
+  const isWebGL2 = gl instanceof WebGL2RenderingContext;
   
   // Проверка поддержки Draco
   const dracoSupported = typeof WebAssembly !== 'undefined';

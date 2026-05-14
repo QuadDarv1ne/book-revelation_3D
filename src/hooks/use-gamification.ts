@@ -540,6 +540,12 @@ export function useGamification() {
   const [themeOfDay, setThemeOfDay] = useState<ThemeOfDay>(getThemeOfDay);
   const [showAchievement, setShowAchievement] = useState<Achievement | null>(null);
 
+  // Use a ref to avoid stale closures in callbacks
+  const settingsRef = useRef(settings);
+  useEffect(() => {
+    settingsRef.current = settings;
+  }, [settings]);
+
   // Проверка достижения
   const checkAchievement = useCallback((achievementId: string, progressValue: number) => {
     setAchievements(prev => prev.map(ach => {
@@ -579,7 +585,8 @@ export function useGamification() {
 
   // Обновление прогресса вращения
   const incrementRotations = useCallback(() => {
-    const newCount = settings.statistics.rotations + 1;
+    const rotations = settingsRef.current.statistics.rotations;
+    const newCount = rotations + 1;
     updateStatistics({ rotations: newCount });
 
     if (newCount >= 10) {
@@ -591,32 +598,35 @@ export function useGamification() {
     if (newCount >= 100) {
       checkAchievement("rotation_legend", newCount);
     }
-  }, [checkAchievement, settings.statistics.rotations, updateStatistics]);
+  }, [checkAchievement, updateStatistics]);
 
   // Обновление исследованных тем
   const addThemeExplored = useCallback((theme: string) => {
-    if (!settings.statistics.themesExplored.includes(theme)) {
-      const newThemes = [...settings.statistics.themesExplored, theme];
+    const themes = settingsRef.current.statistics.themesExplored;
+    if (!themes.includes(theme)) {
+      const newThemes = [...themes, theme];
       updateStatistics({ themesExplored: newThemes });
 
       checkAchievement("theme_explorer", newThemes.length);
       checkAchievement("theme_master", newThemes.length);
     }
-  }, [checkAchievement, settings.statistics.themesExplored, updateStatistics]);
+  }, [checkAchievement, updateStatistics]);
 
   // Добавление просмотренной книги
   const addBookViewed = useCallback((bookId: string) => {
-    if (!settings.statistics.booksViewed.includes(bookId)) {
-      const newBooks = [...settings.statistics.booksViewed, bookId];
+    const books = settingsRef.current.statistics.booksViewed;
+    if (!books.includes(bookId)) {
+      const newBooks = [...books, bookId];
       updateStatistics({ booksViewed: newBooks });
       checkAchievement("book_collector", newBooks.length);
       checkAchievement("book_library", newBooks.length);
     }
-  }, [checkAchievement, settings.statistics.booksViewed, updateStatistics]);
+  }, [checkAchievement, updateStatistics]);
 
   // Инкремент прочитанных цитат
   const incrementQuotesRead = useCallback(() => {
-    const newCount = settings.statistics.quotesRead + 1;
+    const quotesRead = settingsRef.current.statistics.quotesRead;
+    const newCount = quotesRead + 1;
     updateStatistics({ quotesRead: newCount });
 
     if (newCount >= 5) {
@@ -628,7 +638,7 @@ export function useGamification() {
     if (newCount >= 100) {
       checkAchievement("stoic_sage", newCount);
     }
-  }, [checkAchievement, settings.statistics.quotesRead, updateStatistics]);
+  }, [checkAchievement, updateStatistics]);
 
   // Инкремент прочитанных цитат по категориям
   const incrementCategoryRead = useCallback((category: string) => {
@@ -667,7 +677,8 @@ export function useGamification() {
 
   // Лайк цитаты с проверкой достижения
   const toggleQuoteLike = useCallback(() => {
-    const newCount = settings.favorites.length + 1;
+    const favoritesCount = settingsRef.current.favorites.length;
+    const newCount = favoritesCount + 1;
     setQuoteOfDay(prev => {
       const newLiked = !prev.liked;
       // Сохраняем в localStorage
@@ -688,7 +699,7 @@ export function useGamification() {
     if (newCount >= 50) {
       checkAchievement("favorites_master", newCount);
     }
-  }, [checkAchievement, settings.favorites.length]);
+  }, [checkAchievement]);
 
   // Шаринг цитаты с проверкой достижения
   const incrementQuoteShares = useCallback((shareCount: number) => {
@@ -747,13 +758,13 @@ export function useGamification() {
 
   // Отслеживание времени в приложении с проверкой достижения zen_master
   const trackTime = useCallback((seconds: number) => {
-    const totalTime = settings.statistics.timeSpent + seconds;
+    const totalTime = settingsRef.current.statistics.timeSpent + seconds;
     
     // Проверка достижения zen_master (30 минут = 1800 секунд)
     if (totalTime >= 1800 && !achievements.find(a => a.id === 'zen_master')?.unlocked) {
       checkAchievement('zen_master', totalTime);
     }
-  }, [settings.statistics.timeSpent, achievements, checkAchievement]);
+  }, [achievements, checkAchievement]);
 
   /**
    * Экспорт прогресса пользователя в JSON
