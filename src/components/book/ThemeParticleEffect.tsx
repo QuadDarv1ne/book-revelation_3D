@@ -71,6 +71,7 @@ export function ThemeParticleEffect({ activeTheme, graphicsQuality = 'high' }: T
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const targetColorRef = useRef<THREE.Color | null>(null);
   const colorVelocityRef = useRef<{ r: number; g: number; b: number }>({ r: 0, g: 0, b: 0 });
+  const baseColorRef = useRef(new THREE.Color());
 
   // Инициализация частиц при монтировании
   useEffect(() => {
@@ -151,13 +152,11 @@ export function ThemeParticleEffect({ activeTheme, graphicsQuality = 'high' }: T
       const alpha = Math.max(0, Math.min(1, positionsArray[i * 3 + 1] / 3));
 
       // Применяем альфа-затухание к текущему цвету (без накопительного эффекта)
-      const baseColor = targetColorRef.current 
-        ? new THREE.Color(THEME_COLORS[activeTheme as keyof typeof THEME_COLORS])
-        : new THREE.Color(THEME_COLORS[activeTheme as keyof typeof THEME_COLORS]);
+      baseColorRef.current.set(THEME_COLORS[activeTheme as keyof typeof THEME_COLORS]);
       const fadeFactor = 0.95 + alpha * 0.05;
-      colorsArray[i * 3] = baseColor.r * fadeFactor;
-      colorsArray[i * 3 + 1] = baseColor.g * fadeFactor;
-      colorsArray[i * 3 + 2] = baseColor.b * fadeFactor;
+      colorsArray[i * 3] = baseColorRef.current.r * fadeFactor;
+      colorsArray[i * 3 + 1] = baseColorRef.current.g * fadeFactor;
+      colorsArray[i * 3 + 2] = baseColorRef.current.b * fadeFactor;
 
       if (positionsArray[i * 3 + 1] > 3) {
         const radius = 0.5 + Math.random() * 1.5;

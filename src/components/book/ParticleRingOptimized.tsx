@@ -64,6 +64,7 @@ export const ParticleRingOptimized = memo(function ParticleRingOptimized({
   const particleData = useMemo(() => createParticleInstancedMesh(effectiveParticleCount), [effectiveParticleCount]);
   const colorRef = useRef(new THREE.Color());
   const matrixRef = useRef(new THREE.Matrix4());
+  const scaleVecRef = useRef(new THREE.Vector3());
 
   // Освобождаем память при размонтировании
   useEffect(() => {
@@ -102,17 +103,16 @@ export const ParticleRingOptimized = memo(function ParticleRingOptimized({
       // Пульсация размера
       const scale = scales[i] * (1 + Math.sin(time * 2 + phases[i]) * 0.1);
 
-      // Позиция
-      matrixRef.current.setPosition(
-        positions[i * 3],
-        y,
-        positions[i * 3 + 2]
+      // Сбрасываем матрицу и строим заново для каждой частицы
+      const matrix = matrixRef.current;
+      matrix.identity();
+      scaleVecRef.current.set(scale, scale, scale);
+      matrix.compose(
+        new THREE.Vector3(positions[i * 3], y, positions[i * 3 + 2]),
+        THREE.Quaternion.IDENTITY,
+        scaleVecRef.current
       );
-
-      // Масштаб
-      matrixRef.current.scale(new THREE.Vector3(scale, scale, scale));
-
-      mesh.setMatrixAt(i, matrixRef.current);
+      mesh.setMatrixAt(i, matrix);
 
       // Мерцание цвета
       const flicker = 0.95 + Math.sin(time * 3 + phases[i]) * 0.05;
