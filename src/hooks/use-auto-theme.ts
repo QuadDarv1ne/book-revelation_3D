@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 type TimeBasedTheme = "morning" | "day" | "evening" | "night";
 
@@ -48,7 +48,7 @@ export function useAutoTheme() {
     return () => clearInterval(interval);
   }, []);
 
-  const getThemeConfig = (): TimeThemeConfig => {
+  const themeConfig = useMemo((): TimeThemeConfig => {
     switch (timeTheme) {
       case "morning":
         return {
@@ -76,11 +76,11 @@ export function useAutoTheme() {
           colorClass: "night-theme"
         };
     }
-  };
+  }, [timeTheme]);
 
   return {
     timeTheme,
-    themeConfig: getThemeConfig(),
+    themeConfig,
     isAutoTime: true
   };
 }
