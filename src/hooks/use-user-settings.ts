@@ -43,6 +43,7 @@ interface UserSettings {
     totalVisits: number;
     lastVisitDate: string;
     firstVisitDate: string;
+    visitHistory: string[]; // Array of ISO date strings for accurate streak calculation
   };
   activeBookId: string;
   cameraState: CameraState;
@@ -66,6 +67,7 @@ const defaultSettings: UserSettings = {
     totalVisits: 0,
     lastVisitDate: '',
     firstVisitDate: '',
+    visitHistory: [],
   },
   activeBookId: 'marcus-aurelius-meditations',
   cameraState: {
@@ -298,6 +300,9 @@ export function useUserSettings() {
           totalVisits: typeof data.statistics.totalVisits === 'number' ? data.statistics.totalVisits : currentStats.totalVisits,
           lastVisitDate: typeof data.statistics.lastVisitDate === 'string' ? data.statistics.lastVisitDate : currentStats.lastVisitDate,
           firstVisitDate: typeof data.statistics.firstVisitDate === 'string' ? data.statistics.firstVisitDate : currentStats.firstVisitDate,
+          visitHistory: Array.isArray(data.statistics.visitHistory)
+            ? data.statistics.visitHistory.filter((d: unknown): d is string => typeof d === 'string').slice(-365)
+            : currentStats.visitHistory,
         };
       }
 

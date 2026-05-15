@@ -380,44 +380,44 @@ function getDayOfYear(): number {
   return Math.floor(diff / oneDay) + 1;
 }
 
-function calculateStreakDays(lastVisitDate: string, firstVisitDate: string): number {
-  if (!lastVisitDate) return 0;
+function calculateStreakDays(visitHistory: string[]): number {
+  if (visitHistory.length === 0) return 0;
+
+  // Get unique dates sorted descending (newest first)
+  const uniqueDates = [...new Set(visitHistory)].sort((a, b) => b.localeCompare(a));
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const todayStr = today.toISOString().split('T')[0];
 
-  const lastVisit = new Date(lastVisitDate);
-  lastVisit.setHours(0, 0, 0, 0);
-  const lastVisitStr = lastVisit.toISOString().split('T')[0];
-
-  // If last visit was before today and not today or yesterday, streak is broken
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
   const yesterdayStr = yesterday.toISOString().split('T')[0];
 
-  if (lastVisitStr !== todayStr && lastVisitStr !== yesterdayStr) {
+  // Streak only counts if user visited today or yesterday
+  const mostRecentDate = uniqueDates[0];
+  if (mostRecentDate !== todayStr && mostRecentDate !== yesterdayStr) {
     return 0; // Streak broken
   }
 
-  // Count consecutive days from first visit
-  const first = new Date(firstVisitDate);
-  first.setHours(0, 0, 0, 0);
+  // Count consecutive days backwards from the most recent visit
+  let streak = 1;
+  let currentDate = new Date(mostRecentDate + 'T00:00:00');
 
-  // Walk backwards from today checking if each day has a visit
-  // For simplicity, we track based on the gap between first and last visit
-  const daysBetween = Math.floor((today.getTime() - first.getTime()) / (1000 * 60 * 60 * 24));
+  for (let i = 1; i < uniqueDates.length; i++) {
+    const prevDate = new Date(uniqueDates[i] + 'T00:00:00');
+    const expectedPrev = new Date(currentDate);
+    expectedPrev.setDate(expectedPrev.getDate() - 1);
 
-  // If last visit was today, count from first visit
-  if (lastVisitStr === todayStr) {
-    // Simple approach: count days since first visit if no gaps > 1 day
-    // For a proper implementation we'd store all visit dates, but this is a good approximation
-    return Math.min(daysBetween + 1, 365); // Cap at 365
-  } else if (lastVisitStr === yesterdayStr) {
-    return Math.min(daysBetween, 365);
+    if (prevDate.getTime() === expectedPrev.getTime()) {
+      streak++;
+      currentDate = prevDate;
+    } else {
+      break; // Gap found, streak ends
+    }
   }
 
-  return 0;
+  return Math.min(streak, 365); // Cap at 365
 }
 
 function getQuoteForToday(): QuoteOfDay {
@@ -623,13 +623,16 @@ export function useGamification() {
     hasInitializedVisitRef.current = true;
 
     const today = new Date().toISOString().split('T')[0];
-    const { totalVisits, firstVisitDate } = settingsRef.current.statistics;
+    const { totalVisits, firstVisitDate, visitHistory } = settingsRef.current.statistics;
 
-    // Increment total visits
+    // Add today to visit history if not already recorded
+    const updatedHistory = visitHistory.includes(today) ? visitHistory : [...visitHistory, today];
+
     updateStatistics({
       totalVisits: totalVisits + 1,
       lastVisitDate: today,
       firstVisitDate: firstVisitDate || today,
+      visitHistory: updatedHistory,
     });
 
     // Check time-based achievements (night owl, early bird)
@@ -806,7 +809,7 @@ export function useGamification() {
     quotesLiked: settings.favorites.length,
     booksViewed: settings.statistics.booksViewed.length,
     themesExplored: settings.statistics.themesExplored.length,
-    streakDays: calculateStreakDays(settings.statistics.lastVisitDate, settings.statistics.firstVisitDate),
+    streakDays: calculateStreakDays(settings.statistics.visitHistory),
     totalTimeSeconds: settings.statistics.timeSpent,
     firstVisitDate: settings.statistics.firstVisitDate,
     lastVisitDate: settings.statistics.lastVisitDate,
@@ -836,6 +839,7 @@ export function useGamification() {
         rotations: settings.statistics.rotations,
         booksViewed: settings.statistics.booksViewed,
         themesExplored: settings.statistics.themesExplored,
+        visitHistory: settings.statistics.visitHistory,
       },
       achievements: achievements
         .filter(a => a.unlocked)
