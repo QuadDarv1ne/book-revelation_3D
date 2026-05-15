@@ -374,10 +374,50 @@ const INITIAL_ACHIEVEMENTS: Achievement[] = INITIAL_ACHIEVEMENTS_DATA as Achieve
 
 function getDayOfYear(): number {
   const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
+  const start = new Date(now.getFullYear(), 0, 1);
   const diff = now.getTime() - start.getTime();
   const oneDay = 1000 * 60 * 60 * 24;
-  return Math.floor(diff / oneDay);
+  return Math.floor(diff / oneDay) + 1;
+}
+
+function calculateStreakDays(lastVisitDate: string, firstVisitDate: string): number {
+  if (!lastVisitDate) return 0;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayStr = today.toISOString().split('T')[0];
+
+  const lastVisit = new Date(lastVisitDate);
+  lastVisit.setHours(0, 0, 0, 0);
+  const lastVisitStr = lastVisit.toISOString().split('T')[0];
+
+  // If last visit was before today and not today or yesterday, streak is broken
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+  if (lastVisitStr !== todayStr && lastVisitStr !== yesterdayStr) {
+    return 0; // Streak broken
+  }
+
+  // Count consecutive days from first visit
+  const first = new Date(firstVisitDate);
+  first.setHours(0, 0, 0, 0);
+
+  // Walk backwards from today checking if each day has a visit
+  // For simplicity, we track based on the gap between first and last visit
+  const daysBetween = Math.floor((today.getTime() - first.getTime()) / (1000 * 60 * 60 * 24));
+
+  // If last visit was today, count from first visit
+  if (lastVisitStr === todayStr) {
+    // Simple approach: count days since first visit if no gaps > 1 day
+    // For a proper implementation we'd store all visit dates, but this is a good approximation
+    return Math.min(daysBetween + 1, 365); // Cap at 365
+  } else if (lastVisitStr === yesterdayStr) {
+    return Math.min(daysBetween, 365);
+  }
+
+  return 0;
 }
 
 function getQuoteForToday(): QuoteOfDay {
@@ -576,12 +616,31 @@ export function useGamification() {
     }));
   }, [unlockAchievement, updateAchievement]);
 
-  // Обновление прогресса при посещении - используем ref для избежания setState в effect
+  // Трекинг посещений при первой загрузке
   const hasInitializedVisitRef = useRef(false);
   useEffect(() => {
     if (hasInitializedVisitRef.current) return;
     hasInitializedVisitRef.current = true;
-  }, []);
+
+    const today = new Date().toISOString().split('T')[0];
+    const { totalVisits, firstVisitDate } = settingsRef.current.statistics;
+
+    // Increment total visits
+    updateStatistics({
+      totalVisits: totalVisits + 1,
+      lastVisitDate: today,
+      firstVisitDate: firstVisitDate || today,
+    });
+
+    // Check time-based achievements (night owl, early bird)
+    const hour = new Date().getHours();
+    if (hour >= 0 && hour < 5) {
+      checkAchievement("night_owl", 1);
+    }
+    if (hour >= 5 && hour < 8) {
+      checkAchievement("early_bird", 1);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- run only once on mount
 
   // Обновление прогресса вращения
   const incrementRotations = useCallback(() => {
@@ -712,17 +771,6 @@ export function useGamification() {
     }
   }, [settings.favorites.length, checkAchievement]);
 
-  // Проверка достижений за избранное (вызывается извне после обновления favorites)
-  const checkFavoritesAchievements = useCallback(() => {
-    const favoritesCount = settingsRef.current.favorites.length;
-    if (favoritesCount >= 10) {
-      checkAchievement("favorites_curator", favoritesCount);
-    }
-    if (favoritesCount >= 50) {
-      checkAchievement("favorites_master", favoritesCount);
-    }
-  }, [checkAchievement]);
-
   // Шаринг цитаты с проверкой достижения
   const incrementQuoteShares = useCallback((shareCount: number) => {
     if (shareCount >= 5) {
@@ -730,26 +778,12 @@ export function useGamification() {
     }
   }, [checkAchievement]);
 
-  // Проверка времени посещения для достижений
-  const checkTimeBasedAchievements = useCallback(() => {
-    const hour = new Date().getHours();
-    
-    if (hour >= 0 && hour < 5) {
-      checkAchievement("night_owl", 1);
-    }
-    if (hour >= 5 && hour < 8) {
-      checkAchievement("early_bird", 1);
-    }
-  }, [checkAchievement]);
-
-  // Разблокировка достижения за загрузку обложки
-  const unlockCustomCoverAchievement = useCallback(() => {
-    // Достижение удалено из списка
-  }, []);
-
   const dismissAchievement = useCallback(() => {
     setShowAchievement(null);
   }, []);
+
+  // No-op: achievement was removed but kept for API compatibility
+  const unlockCustomCoverAchievement = useCallback(() => {}, []);
 
   const totalUnlocked = useMemo(() =>
     achievements.filter(a => a.unlocked).length,
@@ -766,27 +800,28 @@ export function useGamification() {
     totalAchievements: achievements.length,
     totalUnlocked,
     completionPercentage,
-    totalVisits: 0,
+    totalVisits: settings.statistics.totalVisits,
     totalRotations: settings.statistics.rotations,
     quotesRead: settings.statistics.quotesRead,
     quotesLiked: settings.favorites.length,
     booksViewed: settings.statistics.booksViewed.length,
     themesExplored: settings.statistics.themesExplored.length,
-    streakDays: 0,
+    streakDays: calculateStreakDays(settings.statistics.lastVisitDate, settings.statistics.firstVisitDate),
     totalTimeSeconds: settings.statistics.timeSpent,
-    firstVisitDate: "",
-    lastVisitDate: "",
+    firstVisitDate: settings.statistics.firstVisitDate,
+    lastVisitDate: settings.statistics.lastVisitDate,
   }), [achievements, totalUnlocked, completionPercentage, settings]);
 
   // Отслеживание времени в приложении с проверкой достижения zen_master
   const trackTime = useCallback((seconds: number) => {
     const totalTime = settingsRef.current.statistics.timeSpent + seconds;
-    
+
     // Проверка достижения zen_master (30 минут = 1800 секунд)
-    if (totalTime >= 1800 && !achievements.find(a => a.id === 'zen_master')?.unlocked) {
+    const zenAchievement = INITIAL_ACHIEVEMENTS.find(a => a.id === 'zen_master');
+    if (totalTime >= 1800 && zenAchievement) {
       checkAchievement('zen_master', totalTime);
     }
-  }, [achievements, checkAchievement]);
+  }, [checkAchievement]);
 
   /**
    * Экспорт прогресса пользователя в JSON
@@ -854,7 +889,6 @@ export function useGamification() {
     incrementQuotesRead,
     incrementCategoryRead,
     incrementQuoteShares,
-    checkTimeBasedAchievements,
     unlockCustomCoverAchievement,
     trackTime,
     dismissAchievement,

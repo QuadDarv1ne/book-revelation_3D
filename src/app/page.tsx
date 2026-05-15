@@ -7,7 +7,7 @@ import { SceneContainer } from "@/components/book/SceneContainer";
 import { generateBookJsonLd } from "@/lib/seo/book-metadata";
 import { usePrefersColorScheme } from "@/hooks/use-prefers-color-scheme";
 import { useOfflineQuotes } from "@/hooks/use-offline-quotes";
-import { useAnalytics, trackBookChange, trackThemeChange } from "@/hooks/use-analytics";
+import { useAnalytics, trackBookChange } from "@/hooks/use-analytics";
 import { useAutoTheme } from "@/hooks/use-auto-theme";
 import { useGamification } from "@/hooks/use-gamification";
 import { useZenMode } from "@/hooks/use-zen-mode";
@@ -20,14 +20,17 @@ import { getBookById, getDefaultBook, books } from "@/data/books";
 import { textureManager } from "@/lib/textures/texture-manager";
 import { useToast } from "@/components/ui/Toast";
 import { useDailyReminder } from "@/hooks/use-daily-reminder";
+import { useThemeApplication } from "@/hooks/use-theme-application";
 import type { Quote } from "@/types/quote";
 
 const QUOTE_ROTATION_INTERVAL = 5000;
+const THEMES_CYCLE: Theme[] = ['dark', 'light', 'blue', 'purple', 'ambient', 'relax'];
 
 export default function Home() {
   const hasWebGL = useWebGLSupport();
   const { trackEvent } = useAnalytics();
   const { themeConfig: autoThemeConfig } = useAutoTheme();
+  const systemColorScheme = usePrefersColorScheme();
   const { addThemeExplored, addBookViewed, trackTime, incrementCategoryRead, themeOfDay, completeThemeChallenge, incrementRotations } = useGamification();
   const { isZenMode, toggleZenMode } = useZenMode({ autoSave: true });
   const {
@@ -50,7 +53,10 @@ export default function Home() {
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
   const [menuIsRotating, setMenuIsRotating] = useState(false);
 
-  const systemColorScheme = usePrefersColorScheme();
+  // UI panel states (replaces document.querySelector approach)
+  const [showSettingsPanel, setShowSettingsPanel] = useState(false);
+  const [showAchievementsPanel, setShowAchievementsPanel] = useState(false);
+  const [showProgressPanel, setShowProgressPanel] = useState(false);
 
   const effectiveTheme = useMemo(() => {
     if (settings.theme === "auto") {
@@ -64,21 +70,37 @@ export default function Home() {
 
   const activeBook = useMemo(() => getBookById(settings.activeBookId) || getDefaultBook(), [settings.activeBookId]);
 
+  // Theme application effect
+  useThemeApplication({
+    theme: settings.theme,
+    isLoaded: settingsLoaded,
+    autoThemeConfig,
+    effectiveTheme,
+    addThemeExplored,
+  });
+
+  // Postmessage listener for iframe zen mode toggle
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'TOGGLE_ROTATION') {
         toggleZenMode();
       }
     };
-
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, [toggleZenMode]);
 
+  // Keyboard shortcuts - callback-based (no querySelector)
+  const activeBookRef = useRef(activeBook);
+  useEffect(() => {
+    activeBookRef.current = activeBook;
+  }, [activeBook]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Игнорируем комбинации с модификаторами
       if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      const currentBook = activeBookRef.current;
 
       switch (e.key.toLowerCase()) {
         case 'z':
@@ -87,42 +109,35 @@ export default function Home() {
         case 'escape':
           if (isZenMode) toggleZenMode();
           if (showShortcutsHelp) setShowShortcutsHelp(false);
+          if (showSettingsPanel) setShowSettingsPanel(false);
+          if (showAchievementsPanel) setShowAchievementsPanel(false);
+          if (showProgressPanel) setShowProgressPanel(false);
           break;
         case 'h':
           setShowShortcutsHelp(prev => !prev);
           break;
-        case 'p':
-          // Открыть прогресс книг (эмуляция клика)
-          const progressButton = document.querySelector('[data-testid="book-progress"]') as HTMLButtonElement;
-          progressButton?.click();
-          break;
         case 'q':
-          // Следующая цитата
-          setActiveQuote(prev => (prev + 1) % activeBook.quotes.length);
+          setActiveQuote(prev => (prev + 1) % currentBook.quotes.length);
           break;
         case 'a':
-          // Предыдущая цитата
-          setActiveQuote(prev => (prev - 1 + activeBook.quotes.length) % activeBook.quotes.length);
+          setActiveQuote(prev => (prev - 1 + currentBook.quotes.length) % currentBook.quotes.length);
           break;
-        case 't':
-          // Циклическая смена темы
-          const themes: Theme[] = ['dark', 'light', 'blue', 'purple', 'ambient', 'relax'];
-          const currentIndex = themes.indexOf(settings.theme as Theme);
-          const nextTheme = themes[(currentIndex + 1) % themes.length];
+        case 't': {
+          const currentIndex = THEMES_CYCLE.indexOf(settings.theme as Theme);
+          const nextTheme = THEMES_CYCLE[(currentIndex + 1) % THEMES_CYCLE.length];
           updateSettings('theme', nextTheme);
           break;
+        }
         case 's':
-          // Открыть настройки
-          const settingsButton = document.querySelector('[data-testid="settings-toggle"]') as HTMLButtonElement;
-          settingsButton?.click();
+          setShowSettingsPanel(prev => !prev);
           break;
         case 'g':
-          // Открыть достижения
-          const achievementButton = document.querySelector('[data-testid="achievements-toggle"]') as HTMLButtonElement;
-          achievementButton?.click();
+          setShowAchievementsPanel(prev => !prev);
+          break;
+        case 'p':
+          setShowProgressPanel(prev => !prev);
           break;
         case 'd':
-          // Показать цитату дня
           showReminderNow();
           break;
         case '1':
@@ -130,8 +145,7 @@ export default function Home() {
         case '3':
         case '4':
         case '5':
-        case '6':
-          // Быстрая смена книги (1-6)
+        case '6': {
           const bookIndex = parseInt(e.key) - 1;
           if (bookIndex < books.length) {
             const newBook = books[bookIndex];
@@ -140,69 +154,15 @@ export default function Home() {
             showToast(`Выбрана книга: ${newBook.title}`, 'info');
           }
           break;
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isZenMode, toggleZenMode, showShortcutsHelp, settings.theme, activeBook.quotes.length, updateSettings, addBookViewed, showToast, showReminderNow]);
+  }, [isZenMode, toggleZenMode, showShortcutsHelp, settings.theme, updateSettings, addBookViewed, showToast, showReminderNow, showSettingsPanel, showAchievementsPanel, showProgressPanel]);
 
-  useEffect(() => {
-    if (!settingsLoaded) return;
-
-    document.body.classList.add('theme-transitioning');
-
-    // Определяем эффективную тему для class на body
-    let themeClass: string;
-    let shouldAddDarkClass = false;
-
-    if (settings.theme === "auto-time") {
-      // Автоматическая тема по времени суток
-      themeClass = autoThemeConfig.colorClass;
-      // Для evening и night добавляем класс dark для shadcn компонентов
-      shouldAddDarkClass = autoThemeConfig.theme === "evening" || autoThemeConfig.theme === "night";
-    } else if (settings.theme === "auto") {
-      // Автоматическая тема по системной схеме
-      themeClass = `${effectiveTheme}-theme`;
-      shouldAddDarkClass = effectiveTheme === "dark";
-    } else if (settings.theme === "dark") {
-      // Явная тёмная тема
-      themeClass = "dark-theme";
-      shouldAddDarkClass = true;
-    } else if (settings.theme === "light") {
-      // Явная светлая тема
-      themeClass = "light-theme";
-      shouldAddDarkClass = false;
-    } else {
-      // Кастомные темы (blue, purple, ambient, relax)
-      themeClass = `${settings.theme}-theme`;
-      shouldAddDarkClass = false;
-    }
-
-    // Применяем класс темы, сохраняя остальные классы (например, переменные шрифтов)
-    const themeClasses = ['dark-theme', 'light-theme', 'blue-theme', 'purple-theme', 'ambient-theme', 'relax-theme', 'morning-theme', 'day-theme', 'evening-theme', 'night-theme'];
-    document.body.classList.remove(...themeClasses);
-    document.body.classList.add(themeClass);
-
-    // Добавляем/удаляем класс dark для совместимости с shadcn/ui
-    if (shouldAddDarkClass) {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark');
-    }
-
-    trackThemeChange(settings.theme);
-    trackEvent("settings", "theme_change", settings.theme);
-    addThemeExplored(settings.theme);
-
-    const timer = setTimeout(() => {
-      document.body.classList.remove('theme-transitioning');
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [effectiveTheme, settings.theme, settingsLoaded, trackEvent, autoThemeConfig, addThemeExplored]);
-
-  // Трекинг времени с обновлением statistics
+  // Time tracking
   useEffect(() => {
     const interval = setInterval(() => {
       trackTime(10);
@@ -211,6 +171,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [trackTime, incrementTimeSpent]);
 
+  // Quote auto-rotation
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveQuote((prev) => {
@@ -219,7 +180,6 @@ export default function Home() {
         if (quote?.category) {
           incrementCategoryRead(quote.category);
         }
-        // Трекинг прочитанной цитаты по книге
         incrementBookQuoteRead(activeBook.id);
         return next;
       });
@@ -227,7 +187,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [activeBook.quotes.length, activeBook.quotes, activeBook.id, incrementCategoryRead, incrementBookQuoteRead]);
 
-  // Автоматическое завершение theme challenge при смене темы
+  // Auto-complete theme challenge
   useEffect(() => {
     if (!themeOfDay.completed && settings.theme === themeOfDay.theme) {
       completeThemeChallenge();
@@ -276,12 +236,10 @@ export default function Home() {
 
   const handleExportFavorites = useCallback(() => {
     const exportData = exportSettings();
-
     if (!exportData) {
       showToast("Нет избранных цитат для экспорта", "info");
       return;
     }
-
     try {
       exportFavoritesToFile(exportData, showToast, captureMessage);
     } catch (error) {
@@ -305,27 +263,20 @@ export default function Home() {
       const content = readEvent.target?.result as string;
       importFavoritesFromFile(content, showToast, captureMessage, captureException);
     };
-
     reader.onerror = () => {
       showToast("Ошибка чтения файла", "error");
     };
-
     reader.readAsText(file);
-
-    // Сброс input для повторного выбора того же файла
     e.target.value = '';
   }, [showToast, captureMessage, captureException, importFavoritesFromFile]);
 
-  // Вычисляем useMemo до условного return
   const backgroundGradient = useMemo(() => {
-    // Определяем, является ли тема светлой
     const isLightTheme = settings.theme === "light" || settings.theme === "relax";
     const isAutoLight = settings.theme === "auto" && effectiveTheme === "light";
-    const isAutoTimeLight = settings.theme === "auto-time" && 
+    const isAutoTimeLight = settings.theme === "auto-time" &&
       (autoThemeConfig.theme === "morning" || autoThemeConfig.theme === "day");
-    
     const isLight = isLightTheme || isAutoLight || isAutoTimeLight;
-    
+
     return isLight
       ? 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(180,160,80,0.12)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(160,140,70,0.08)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(255,255,255,0.9)_0%,transparent_50%)'
       : 'radial-gradient(ellipse_75%_45%_at_28%_38%,rgba(212,175,55,0.08)_0%,transparent_50%),radial-gradient(ellipse_55%_35%_at_72%_68%,rgba(212,175,55,0.06)_0%,transparent_45%),radial-gradient(ellipse_100%_75%_at_50%_100%,rgba(30,30,50,0.7)_0%,transparent_50%)';
@@ -344,15 +295,8 @@ export default function Home() {
       "applicationCategory": "EducationalApplication",
       "operatingSystem": "Any",
       "browserRequirements": "Requires JavaScript",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "author": {
-        "@type": "Person",
-        "name": "Book Revelation 3D Team"
-      },
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "Book Revelation 3D Team" },
       "keywords": "стоицизм, 3D книга, Марк Аврелий, Эпиктет, Стивен Хокинг, философия, цитаты",
       "inLanguage": ["ru", "en", "zh", "he", "es", "fr", "de"]
     };
@@ -389,7 +333,6 @@ export default function Home() {
           Управление
         </a>
         <div className="absolute inset-0 pointer-events-none" style={{ background: backgroundGradient }} />
-
         <div className="absolute inset-0 pointer-events-none opacity-[0.012]" style={{ background: gridPattern, backgroundSize: '45px 45px' }} />
 
         <div className="relative z-10 h-full flex flex-col lg:flex-row">
@@ -447,11 +390,9 @@ export default function Home() {
               <div className="w-6 h-px bg-gradient-to-r from-amber-500/20 to-transparent" />
               <div className="w-1 h-1 rounded-full bg-amber-500/12" />
             </div>
-
             <div className="absolute bottom-3 left-3 pointer-events-none">
               <p className="text-amber-600/15 text-[9px] tracking-[0.2em] uppercase font-light">Stoic Philosophy</p>
             </div>
-
             <div className="absolute bottom-3 left-0 right-0 flex justify-center z-40">
               <MainMenu
                 theme={settings.theme}
@@ -485,7 +426,18 @@ export default function Home() {
           </div>
         )}
 
-        {!isZenMode && <SettingsBar theme={settings.theme} onThemeChange={(t) => updateSettings('theme', t as typeof settings.theme)} />}
+        {!isZenMode && (
+          <SettingsBar
+            theme={settings.theme}
+            onThemeChange={(t) => updateSettings('theme', t as typeof settings.theme)}
+            showSettings={showSettingsPanel}
+            onShowSettingsChange={setShowSettingsPanel}
+            showAchievements={showAchievementsPanel}
+            onShowAchievementsChange={setShowAchievementsPanel}
+            showProgress={showProgressPanel}
+            onShowProgressChange={setShowProgressPanel}
+          />
+        )}
 
         {!isZenMode && <PWAInstall />}
 

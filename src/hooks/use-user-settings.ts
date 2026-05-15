@@ -40,6 +40,9 @@ interface UserSettings {
     themesExplored: string[];
     rotations: number;
     bookQuotesRead: Record<string, number>; // Прогресс по книгам: { bookId: count }
+    totalVisits: number;
+    lastVisitDate: string;
+    firstVisitDate: string;
   };
   activeBookId: string;
   cameraState: CameraState;
@@ -60,6 +63,9 @@ const defaultSettings: UserSettings = {
     themesExplored: [],
     rotations: 0,
     bookQuotesRead: {}, // Прогресс по книгам
+    totalVisits: 0,
+    lastVisitDate: '',
+    firstVisitDate: '',
   },
   activeBookId: 'marcus-aurelius-meditations',
   cameraState: {
@@ -289,6 +295,9 @@ export function useUserSettings() {
           rotations: typeof data.statistics.rotations === 'number' ? data.statistics.rotations : currentStats.rotations,
           booksViewed: Array.isArray(data.statistics.booksViewed) ? data.statistics.booksViewed.slice(0, 50) : currentStats.booksViewed,
           themesExplored: Array.isArray(data.statistics.themesExplored) ? data.statistics.themesExplored.slice(0, 50) : currentStats.themesExplored,
+          totalVisits: typeof data.statistics.totalVisits === 'number' ? data.statistics.totalVisits : currentStats.totalVisits,
+          lastVisitDate: typeof data.statistics.lastVisitDate === 'string' ? data.statistics.lastVisitDate : currentStats.lastVisitDate,
+          firstVisitDate: typeof data.statistics.firstVisitDate === 'string' ? data.statistics.firstVisitDate : currentStats.firstVisitDate,
         };
       }
 

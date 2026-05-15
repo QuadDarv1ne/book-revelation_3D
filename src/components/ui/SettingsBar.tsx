@@ -115,14 +115,29 @@ const THEME_ICONS: Record<ThemeOption["value"], ComponentType<IconProps>> = {
 interface SettingsBarProps {
   theme: string;
   onThemeChange: (theme: ThemeOption["value"]) => void;
+  showSettings?: boolean;
+  onShowSettingsChange?: (v: boolean) => void;
+  showAchievements?: boolean;
+  onShowAchievementsChange?: (v: boolean) => void;
+  showProgress?: boolean;
+  onShowProgressChange?: (v: boolean) => void;
 }
 
-export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
+export function SettingsBar({
+  theme,
+  onThemeChange,
+  showSettings = false,
+  onShowSettingsChange,
+  showAchievements = false,
+  onShowAchievementsChange,
+  showProgress: showProgressProp = false,
+  onShowProgressChange,
+}: SettingsBarProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showThemeDropdown, setShowThemeDropdown] = useState(false);
   const [rotationSpeed, setRotationSpeed] = useState(0.5);
   const [showSpeedPresets, setShowSpeedPresets] = useState(false);
-  const [showProgress, setShowProgress] = useState(false);
+  const [showProgress, setShowProgress] = useState(showProgressProp);
   const [showQualityDropdown, setShowQualityDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const speedRef = useRef<HTMLDivElement>(null);
@@ -182,6 +197,10 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
   useEffect(() => {
     setRotationSpeed(settings.rotationSpeed);
   }, [settings.rotationSpeed]);
+
+  useEffect(() => {
+    setShowProgress(showProgressProp);
+  }, [showProgressProp]);
 
   const handleSpeedChange = useCallback((newSpeed: number) => {
     setRotationSpeed(newSpeed);
@@ -468,14 +487,17 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
 
       {/* Модальное окно прогресса чтения */}
       {showProgress && (
-        <div 
+        <div
           className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-          onClick={() => setShowProgress(false)}
+          onClick={() => {
+            setShowProgress(false);
+            onShowProgressChange?.(false);
+          }}
           role="dialog"
           aria-modal="true"
           aria-label="Прогресс чтения книг"
         >
-          <div 
+          <div
             className="relative w-full max-w-2xl max-h-[80vh] overflow-y-auto rounded-2xl bg-[rgba(15,15,25,0.98)] border border-[rgba(212,175,55,0.2)] shadow-2xl animate-in fade-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
@@ -483,7 +505,10 @@ export function SettingsBar({ theme, onThemeChange }: SettingsBarProps) {
             <div className="sticky top-0 flex items-center justify-between px-4 py-3 border-b border-[rgba(212,175,55,0.1)] bg-[rgba(15,15,25,0.98)]">
               <h3 className="text-lg font-semibold text-amber-100">Прогресс чтения книг</h3>
               <button
-                onClick={() => setShowProgress(false)}
+                onClick={() => {
+                  setShowProgress(false);
+                  onShowProgressChange?.(false);
+                }}
                 className="p-2 text-amber-100/60 hover:text-amber-100 transition-colors rounded-lg hover:bg-[rgba(212,175,55,0.1)]"
                 aria-label="Закрыть"
               >
