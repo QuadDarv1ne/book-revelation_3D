@@ -410,6 +410,13 @@ class TextureManager {
     return { size: this.cache.size, loaded, pending };
   }
 
+  areTexturesLoaded(urls: string[]): boolean {
+    return urls.every(url => {
+      const entry = this.cache.get(url);
+      return entry?.loadComplete === true;
+    });
+  }
+
   getErrorLog(): TextureLoadReport[] {
     return [...ERROR_LOG];
   }

@@ -51,18 +51,29 @@ export function SceneContainer({ book, rotationSpeed, onError }: SceneContainerP
     });
   }, [book.coverImage, book.spineImage, book.backCoverImage]);
 
-  // Отслеживание прогресса загрузки текстур
+  // Отслеживание прогресса загрузки текстур с таймаутом
   useEffect(() => {
+    const startTime = Date.now();
+    const TIMEOUT_MS = 10000; // 10 секунд максимум
+    const textureUrls = [book.coverImage, book.spineImage, book.backCoverImage];
+
     const checkTextures = () => {
-      const stats = textureManager.getCacheStats();
-      if (stats.loaded >= 3) {
+      const elapsed = Date.now() - startTime;
+      if (elapsed >= TIMEOUT_MS) {
+        // Таймаут — скрываем загрузку чтобы не блокировать UI
+        setShowLoading(false);
+        clearInterval(interval);
+        return;
+      }
+
+      if (textureManager.areTexturesLoaded(textureUrls)) {
         setShowLoading(false);
         clearInterval(interval);
       }
     };
     const interval = setInterval(checkTextures, 100);
     return () => clearInterval(interval);
-  }, []);
+  }, [book.coverImage, book.spineImage, book.backCoverImage]);
 
   if (sceneError) {
     return null;
