@@ -72,10 +72,12 @@ export function ThemeParticleEffect({ activeTheme, graphicsQuality = 'high' }: T
   const targetColorRef = useRef<THREE.Color | null>(null);
   const colorVelocityRef = useRef<{ r: number; g: number; b: number }>({ r: 0, g: 0, b: 0 });
   const baseColorRef = useRef(new THREE.Color());
+  const particleCountRef = useRef<number>(0);
 
   // Инициализация частиц при монтировании
   useEffect(() => {
     particleDataRef.current = createParticleData(activeTheme as keyof typeof THEME_COLORS, graphicsQuality);
+    particleCountRef.current = QUALITY_PARTICLE_COUNT[graphicsQuality];
   }, [activeTheme, graphicsQuality]);
 
   // Эффект при смене темы с плавным переходом цвета
@@ -129,7 +131,7 @@ export function ThemeParticleEffect({ activeTheme, graphicsQuality = 'high' }: T
     const positionsArray = geometry.attributes.position.array as Float32Array;
     const colorsArray = geometry.attributes.color.array as Float32Array;
     const velocities = particleDataRef.current.velocities;
-    const particleCount = QUALITY_PARTICLE_COUNT[graphicsQuality];
+    const particleCount = particleCountRef.current;
 
     // Плавное изменение цвета к целевому
     if (targetColorRef.current) {

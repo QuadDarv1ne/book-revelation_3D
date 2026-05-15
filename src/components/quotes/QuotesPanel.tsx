@@ -16,7 +16,7 @@ interface QuotesPanelProps {
 }
 
 export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: QuotesPanelProps) {
-  const [visibleQuotes, setVisibleQuotes] = useState<number[]>([]);
+  const [visibleCount, setVisibleCount] = useState(0);
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,11 +67,13 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
 
   useEffect(() => {
     const timers: NodeJS.Timeout[] = [];
-    
+    let cancelled = false;
+
     const showQuote = (index: number) => {
+      if (cancelled) return;
       if (index < quotes.length) {
         const timer = setTimeout(() => {
-          setVisibleQuotes(prev => [...prev, index]);
+          setVisibleCount(index + 1);
           showQuote(index + 1);
         }, 50);
         timers.push(timer);
@@ -80,8 +82,9 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
 
     const initialTimer = setTimeout(() => showQuote(0), 300);
     timers.push(initialTimer);
-    
+
     return () => {
+      cancelled = true;
       timers.forEach(timer => clearTimeout(timer));
     };
   }, [quotes.length]);
@@ -250,7 +253,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
         key={originalIndex}
         quote={quote}
         index={originalIndex}
-        isVisible={visibleQuotes.includes(originalIndex)}
+        isVisible={originalIndex < visibleCount}
         isActive={activeQuote === originalIndex}
         isFavorite={isFavorite(quote)}
         onClick={() => setActiveQuote(originalIndex)}
@@ -259,7 +262,7 @@ export function QuotesPanel({ quotes, activeQuote, setActiveQuote, bookTitle }: 
         onShare={handleShareQuote}
       />
     ));
-  }, [isLoaded, filteredQuotesWithIndex, visibleQuotes, activeQuote, isFavorite, handleToggleFavorite, handleCopyQuote, handleShareQuote, setActiveQuote, filter, bookTitle, t]);
+  }, [isLoaded, filteredQuotesWithIndex, visibleCount, activeQuote, isFavorite, handleToggleFavorite, handleCopyQuote, handleShareQuote, setActiveQuote, filter, bookTitle, t]);
 
   return (
     <div
