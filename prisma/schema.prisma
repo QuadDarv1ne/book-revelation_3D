@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "postgresql"
+  relationMode = "prisma"
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  passwordHash  String
+  role          Role      @default(STUDENT)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+
+  // Preferences
+  theme           String  @default("relax")
+  locale          String  @default("ru")
+  rotationSpeed   Float   @default(0.5)
+  zenMode         Boolean @default(false)
+  activeBookId    String  @default("marcus-aurelius-meditations")
+  cameraPositionX Float   @default(0)
+  cameraPositionY Float   @default(1.25)
+  cameraPositionZ Float   @default(4.0)
+  cameraZoom      Float   @default(1)
+  graphicsQuality String  @default("high")
+
+  statistics   UserStatistics?
+  achievements UserAchievement[]
+  favorites    Favorite[]
+  sessions     Session[]
+  analyticsEvents AnalyticsEvent[]
+
+  @@map("users")
+}
+
+model UserStatistics {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  timeSpent      Int      @default(0)
+  quotesRead     Int      @default(0)
+  rotations      Int      @default(0)
+  totalVisits    Int      @default(0)
+  lastVisitDate  String   @default("")
+  firstVisitDate String   @default("")
+  visitHistory   String[] @default([])
+  booksViewed    String[] @default([])
+  themesExplored String[] @default([])
+
+  bookQuotesRead String   @default("{}")
+  categoryReads  String   @default("{}")
+
+  updatedAt DateTime @updatedAt
+
+  @@map("user_statistics")
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  achievementId String
+  progress      Int      @default(0)
+  unlocked      Boolean  @default(false)
+  unlockedAt    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model Favorite {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  quoteText     String
+  quoteAuthor   String
+  quoteEra      String?
+  quoteCategory String?
+  quoteBookId   String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, quoteText])
+  @@map("favorites")
+}
+
+model Session {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sessionId     String   @unique
+  startTime     DateTime @default(now())
+  endTime       DateTime?
+  durationSeconds Int    @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@map("sessions")
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  sessionId String?
+  event     String
+  category  String
+  label     String?
+  value     Int?
+  timestamp DateTime @default(now())
+
+  createdAt DateTime @default(now())
+
+  @@map("analytics_events")
+  @@index([userId, timestamp])
+  @@index([category, timestamp])
+}

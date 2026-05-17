@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
-  output: process.env.DOCKER === "true" ? "standalone" : "export",
+  output: process.env.DOCKER === "true" ? "standalone" : undefined,
   reactStrictMode: true,
   images: {
     unoptimized: process.env.DOCKER !== "true",

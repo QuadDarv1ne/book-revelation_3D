@@ -21,6 +21,8 @@ import { textureManager } from "@/lib/textures/texture-manager";
 import { useToast } from "@/components/ui/Toast";
 import { useDailyReminder } from "@/hooks/use-daily-reminder";
 import { useThemeApplication } from "@/hooks/use-theme-application";
+import { MigrationBanner } from "@/components/auth/MigrationBanner";
+import { AuthButtons } from "@/components/auth/AuthButtons";
 import type { Quote } from "@/types/quote";
 
 const QUOTE_ROTATION_INTERVAL = 5000;
@@ -390,6 +392,9 @@ export default function Home() {
               <div className="w-6 h-px bg-gradient-to-r from-amber-500/20 to-transparent" />
               <div className="w-1 h-1 rounded-full bg-amber-500/12" />
             </div>
+            <div className="absolute top-3 right-3 z-50 pointer-events-auto">
+              <AuthButtons />
+            </div>
             <div className="absolute bottom-3 left-3 pointer-events-none">
               <p className="text-amber-600/15 text-[9px] tracking-[0.2em] uppercase font-light">Stoic Philosophy</p>
             </div>
@@ -456,6 +461,8 @@ export default function Home() {
         />
 
         <KeyboardShortcutsHelp isOpen={showShortcutsHelp} onClose={() => setShowShortcutsHelp(false)} />
+
+        <MigrationBanner />
 
         <style jsx global>{`
           .custom-scrollbar::-webkit-scrollbar { width: 2.5px; }
